@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Link } from "react-router-dom";
 
 function OwnerLogin() {
@@ -51,20 +49,13 @@ function OwnerLogin() {
 
         </form>
 
-        <div className="flex justify-between mt-6">
+        <div className="mt-6 text-center">
 
           <Link
             to="/"
             className="text-blue-600 hover:underline"
           >
-            ← Back
-          </Link>
-
-          <Link
-            to="/forgot-password"
-            className="text-red-500 hover:underline"
-          >
-            Forgot Password?
+            ← Back to Home
           </Link>
 
         </div>
