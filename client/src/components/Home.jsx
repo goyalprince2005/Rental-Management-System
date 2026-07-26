@@ -1,4 +1,6 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
+
 function Home() {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center gap-4">
@@ -14,13 +16,17 @@ function Home() {
 
         <div className="flex gap-4 mt-6">
 
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
-            Owner Login
-          </button>
+          <Link to="/owner-login">
+            <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+              Owner Login
+            </button>
+          </Link>
 
-          <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
-            Tenant Login
-          </button>
+          <Link to="/tenant-login">
+            <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-600 hover:text-white transition duration-300">
+              Tenant Login
+            </button>
+          </Link>
 
         </div>
 
