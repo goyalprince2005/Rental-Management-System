@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-
+import ForgotPassword from "./components/ForgotPassword";
 import Home from "./components/Home";
 import OwnerLogin from "./components/OwnerLogin";
 import TenantLogin from "./components/TenantLogin";
@@ -17,6 +17,10 @@ function App() {
       <Route
         path="/tenant-login"
         element={<TenantLogin />}
+      />
+      <Route
+        path="/forgot-password"
+        element={<ForgotPassword />}
       />
     </Routes>
   );

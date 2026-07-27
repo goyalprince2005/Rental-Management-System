@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 
-function TenantLogin() {
+function ForgotPassword() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
       <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
 
         <h1 className="text-3xl font-bold text-center">
-          Tenant Login
+          Forgot Password
         </h1>
 
         <p className="text-center text-gray-500 mt-2 mb-6">
-          Login to view your room details and payments.
+          Enter your registered mobile number to receive an OTP.
         </p>
 
         <form className="space-y-5">
@@ -23,19 +23,7 @@ function TenantLogin() {
 
             <input
               type="tel"
-              placeholder="Enter your mobile number"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-2 font-medium">
-              Password
-            </label>
-
-            <input
-              type="password"
-              placeholder="Enter your password"
+              placeholder="Enter registered mobile number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -44,25 +32,18 @@ function TenantLogin() {
             type="button"
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
-            Login
+            Send OTP
           </button>
 
         </form>
 
-        <div className="flex justify-between mt-6">
+        <div className="mt-6 text-center">
 
           <Link
             to="/tenant-login"
             className="text-blue-600 hover:underline"
           >
-            ← Back
-          </Link>
-
-          <Link
-            to="/forgot-password"
-            className="text-red-500 hover:underline"
-          >
-            Forgot Password?
+            ← Back to Tenant Login
           </Link>
 
         </div>
@@ -73,4 +54,4 @@ function TenantLogin() {
   );
 }
 
-export default TenantLogin;
+export default ForgotPassword;
