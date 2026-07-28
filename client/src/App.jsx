@@ -3,6 +3,8 @@ import ForgotPassword from "./components/ForgotPassword";
 import Home from "./components/Home";
 import OwnerLogin from "./components/OwnerLogin";
 import TenantLogin from "./components/TenantLogin";
+import OTPVerification from "./components/OTPVerification";
+import ResetPassword from "./components/ResetPassword";
 
 function App() {
   return (
@@ -21,6 +23,14 @@ function App() {
       <Route
         path="/forgot-password"
         element={<ForgotPassword />}
+      />
+      <Route
+        path="/otp-verification"
+        element={<OTPVerification />}
+      />
+      <Route
+        path="/reset-password"
+        element={<ResetPassword />}
       />
     </Routes>
   );
