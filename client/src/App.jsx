@@ -5,7 +5,7 @@ import OwnerLogin from "./components/OwnerLogin";
 import TenantLogin from "./components/TenantLogin";
 import OTPVerification from "./components/OTPVerification";
 import ResetPassword from "./components/ResetPassword";
-
+import Dashboard from "./components/Dashboard";
 function App() {
   return (
     <Routes>
@@ -15,7 +15,6 @@ function App() {
         path="/owner-login"
         element={<OwnerLogin />}
       />
-
       <Route
         path="/tenant-login"
         element={<TenantLogin />}
@@ -31,6 +30,10 @@ function App() {
       <Route
         path="/reset-password"
         element={<ResetPassword />}
+      />
+      <Route
+        path="/owner-dashboard"
+        element={<Dashboard />}
       />
     </Routes>
   );

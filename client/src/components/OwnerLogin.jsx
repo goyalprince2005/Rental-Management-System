@@ -1,6 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function OwnerLogin() {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/owner-dashboard");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
@@ -42,6 +48,7 @@ function OwnerLogin() {
 
           <button
             type="button"
+            onClick={handleLogin}
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
           >
             Login
