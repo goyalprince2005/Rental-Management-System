@@ -1,603 +1,301 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Menu,
   Home,
   Building2,
   DoorOpen,
   Users,
-  FileText,
+  Receipt,
   CreditCard,
+  FileText,
   BarChart3,
-  UserCircle,
-  Bell,
+  Settings,
   LogOut,
+  Bell,
   Printer,
-  ChevronDown,
-  Circle,
-  Plus,
+  ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
-  const navigate = useNavigate();
-
   const [menuOpen, setMenuOpen] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState(null);
-  const [hoveredMenu, setHoveredMenu] = useState(null);
 
-  const menuRef = useRef(null);
-
-  /*
-   * ==========================================
-   * MENU DATA
-   * ==========================================
-   */
-
-  const menuItems = {
-    properties: {
-      label: "Properties",
-      icon: Building2,
-      items: [
-        "All Properties",
-        "Add Property",
-        "Property Details",
-        "Property Documents",
-      ],
-    },
-
-    rooms: {
-      label: "Rooms",
-      icon: DoorOpen,
-      items: [
-        "All Rooms",
-        "Add Room",
-        "Available Rooms",
-        "Occupied Rooms",
-      ],
-    },
-
-    tenants: {
-      label: "Tenants",
-      icon: Users,
-      items: [
-        "All Tenants",
-        "Add Tenant",
-        "Active Tenants",
-        "Vacated Tenants",
-        "Tenant Documents",
-      ],
-    },
-
-    bills: {
-      label: "Bills",
-      icon: FileText,
-      items: [
-        "All Bills",
-        "Generate Bill",
-        "Pending Bills",
-        "Paid Bills",
-      ],
-    },
-
-    payments: {
-      label: "Payments",
-      icon: CreditCard,
-      items: [
-        "All Payments",
-        "Record Payment",
-        "Pending Payments",
-        "Payment History",
-      ],
-    },
-
-    reports: {
-      label: "Reports",
-      icon: BarChart3,
-      items: [
-        "Rent Report",
-        "Payment Report",
-        "Tenant Report",
-        "Room Report",
-      ],
-    },
-
-    profile: {
-      label: "Profile",
-      icon: UserCircle,
-      items: [
-        "My Profile",
-        "Account Settings",
-        "Change Password",
-      ],
-    },
-  };
-
-  /*
-   * ==========================================
-   * OUTSIDE CLICK
-   * ==========================================
-   */
-
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        menuOpen &&
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
-        setMenuOpen(false);
-        setOpenSubmenu(null);
-        setHoveredMenu(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [menuOpen]);
-
-  /*
-   * ==========================================
-   * FUNCTIONS
-   * ==========================================
-   */
-
-  const toggleSubmenu = (name) => {
-    setOpenSubmenu(
-      openSubmenu === name ? null : name
-    );
-  };
-
-  const handleHome = () => {
-    setMenuOpen(false);
-    setOpenSubmenu(null);
-    navigate("/");
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleLogout = () => {
-    setMenuOpen(false);
-    setOpenSubmenu(null);
-    navigate("/");
-  };
-
-  /*
-   * ==========================================
-   * COLLAPSED SIDEBAR ITEM
-   * ==========================================
-   */
-
-  const handleSidebarHover = (name) => {
-    setHoveredMenu(name);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ==================================================
-          TOP NAVBAR
-      ================================================== */}
+      {/* ================= TOP NAVBAR ================= */}
 
-      <header className="no-print fixed top-0 left-0 right-0 z-50 h-16 bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md">
+      <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
 
-        <div className="h-full flex items-center justify-between px-4">
+        <div className="flex items-center gap-4">
 
-          {/* LEFT */}
+          {/* Three Line Menu */}
 
-          <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            title="Rental Menu"
+          >
+            <Menu size={24} />
+          </button>
 
-            <button
-              onClick={() => {
-                setMenuOpen(!menuOpen);
-                setHoveredMenu(null);
+          <div>
+            <h1 className="text-xl font-bold text-blue-600">
+              Rental Management
+            </h1>
 
-                if (menuOpen) {
-                  setOpenSubmenu(null);
-                }
-              }}
-              className="p-2 rounded-lg hover:bg-white/10 transition"
-              aria-label="Rental Menu"
-            >
-              <Menu size={26} />
-            </button>
-
-            <div className="flex items-center gap-2">
-
-              <Building2 size={24} />
-
-              <div>
-
-                <h1 className="text-lg font-semibold leading-none">
-                  Rental Management
-                </h1>
-
-                <p className="text-xs text-blue-100">
-                  Owner Panel
-                </p>
-
-              </div>
-
-            </div>
-
+            <p className="text-xs text-gray-500 hidden sm:block">
+              Owner Dashboard
+            </p>
           </div>
 
+        </div>
 
-          {/* RIGHT */}
 
-          <div className="flex items-center gap-1">
+        {/* ================= RIGHT SIDE ================= */}
 
-            <button
-              onClick={handleHome}
-              className="p-2 rounded-lg hover:bg-white/10 transition"
-              title="Home"
-            >
-              <Home size={21} />
-            </button>
+        <div className="flex items-center gap-2">
 
-            <button
-              onClick={handlePrint}
-              className="p-2 rounded-lg hover:bg-white/10 transition"
-              title="Print"
-            >
-              <Printer size={21} />
-            </button>
+          {/* Notifications */}
 
-            <button
-              className="relative p-2 rounded-lg hover:bg-white/10 transition"
-              title="Notifications"
-            >
-              <Bell size={21} />
+          <button
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            title="Notifications"
+          >
+            <Bell size={21} />
+          </button>
 
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
-            </button>
 
-            <button
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/10 transition"
-              title="Owner Profile"
-            >
-              <UserCircle size={24} />
+          {/* Print */}
 
-              <span className="hidden md:block text-sm">
-                Owner
-              </span>
-            </button>
+          <button
+            onClick={() => window.print()}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            title="Print"
+          >
+            <Printer size={21} />
+          </button>
 
-          </div>
+
+          {/* Owner */}
+
+          <button className="hidden sm:block px-4 py-2 border rounded-lg hover:bg-gray-100">
+            Owner
+          </button>
 
         </div>
 
       </header>
 
 
-      {/* ==================================================
-          COLLAPSED SIDEBAR
-      ================================================== */}
-
-      {!menuOpen && (
-
-        <aside className="no-print fixed left-0 top-16 bottom-0 w-16 bg-white border-r shadow-sm z-30">
-
-          <nav className="py-4 flex flex-col items-center gap-2">
-
-
-            {/* DASHBOARD */}
-
-            <button
-              onClick={() =>
-                navigate("/owner-dashboard")
-              }
-              onMouseEnter={() =>
-                setHoveredMenu(null)
-              }
-              className="w-11 h-11 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
-            >
-              <Home size={21} />
-            </button>
-
-
-            {/* ==========================================
-                ALL MENU ITEMS
-            ========================================== */}
-
-            {Object.entries(menuItems).map(
-              ([key, menu]) => {
-
-                const Icon = menu.icon;
-
-                return (
-
-                  <div
-                    key={key}
-                    className="relative"
-                    onMouseEnter={() =>
-                      handleSidebarHover(key)
-                    }
-                    onMouseLeave={() =>
-                      setHoveredMenu(null)
-                    }
-                  >
-
-                    {/* ICON */}
-
-                    <button
-                      className={`w-11 h-11 flex items-center justify-center rounded-lg transition ${
-                        hoveredMenu === key
-                          ? "bg-blue-50 text-blue-700"
-                          : "hover:bg-gray-100"
-                      }`}
-                    >
-                      <Icon size={21} />
-                    </button>
-
-
-                    {/* ==================================
-                        HOVER FLYOUT
-                    ================================== */}
-
-                    {hoveredMenu === key && (
-
-                      <div
-                        className="absolute left-14 top-0 w-64 bg-white rounded-lg shadow-xl border z-50 overflow-hidden"
-                        onMouseEnter={() =>
-                          setHoveredMenu(key)
-                        }
-                        onMouseLeave={() =>
-                          setHoveredMenu(null)
-                        }
-                      >
-
-                        {/* TITLE */}
-
-                        <div className="bg-gray-50 border-b px-4 py-3">
-
-                          <div className="flex items-center gap-2">
-
-                            <Icon size={19} />
-
-                            <span className="font-semibold">
-                              {menu.label}
-                            </span>
-
-                          </div>
-
-                        </div>
-
-
-                        {/* SUBMENU */}
-
-                        <div className="py-2">
-
-                          {menu.items.map(
-                            (item) => (
-
-                              <button
-                                key={item}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm hover:bg-blue-50 hover:text-blue-700 transition"
-                                onClick={() => {
-                                  setHoveredMenu(null);
-                                }}
-                              >
-
-                                <Circle
-                                  size={9}
-                                />
-
-                                <span>
-                                  {item}
-                                </span>
-
-                              </button>
-
-                            )
-                          )}
-
-                        </div>
-
-                      </div>
-
-                    )}
-
-                  </div>
-
-                );
-              }
-            )}
-
-
-            {/* DIVIDER */}
-
-            <div className="w-10 border-t my-2" />
-
-
-            {/* LOGOUT */}
-
-            <button
-              onClick={handleLogout}
-              onMouseEnter={() =>
-                setHoveredMenu(null)
-              }
-              className="w-11 h-11 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition"
-              title="Logout"
-            >
-              <LogOut size={21} />
-            </button>
-
-          </nav>
-
-        </aside>
-
-      )}
-
-
-      {/* ==================================================
-          FULL RENTAL MENU
-      ================================================== */}
+      {/* ================= RENTAL MENU ================= */}
 
       {menuOpen && (
 
-        <>
+        <div className="fixed inset-0 z-50">
 
-          {/* BACKDROP */}
+          {/* Background */}
 
-          <div className="no-print fixed inset-0 top-16 bg-black/20 z-30" />
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={() => setMenuOpen(false)}
+          ></div>
 
 
-          {/* MENU */}
+          {/* Menu */}
 
-          <aside
-            ref={menuRef}
-            className="no-print fixed left-0 top-16 bottom-0 w-80 bg-white shadow-2xl z-40 overflow-y-auto"
-          >
+          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
 
-            {/* MENU HEADER */}
+            {/* Menu Header */}
 
-            <div className="sticky top-0 bg-gradient-to-r from-blue-700 to-blue-500 text-white px-5 py-4 flex items-center justify-between">
+            <div className="p-5 border-b">
 
-              <div>
+              <h2 className="text-xl font-bold text-blue-600">
+                Rental Menu
+              </h2>
 
-                <h2 className="text-xl font-semibold">
-                  Rental Menu
-                </h2>
-
-                <p className="text-xs text-blue-100 mt-1">
-                  Rental Management System
-                </p>
-
-              </div>
-
-              {/* Always hamburger — NO X */}
-
-              <Menu size={24} />
+              <p className="text-sm text-gray-500 mt-1">
+                Owner Panel
+              </p>
 
             </div>
 
 
-            {/* MENU */}
+            {/* Navigation */}
 
-            <nav className="p-3">
+            <nav className="p-4 space-y-1">
 
 
-              {/* DASHBOARD */}
+              {/* ================= DASHBOARD ================= */}
 
               <button
                 onClick={() => {
-                  navigate("/owner-dashboard");
                   setMenuOpen(false);
-                  setOpenSubmenu(null);
+                  navigate("/owner-dashboard");
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 transition mb-1"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
               >
 
                 <Home size={20} />
 
-                <span className="font-medium">
-                  Dashboard
-                </span>
+                Dashboard
 
               </button>
 
 
-              {/* ==========================================
-                  FULL MENU SUBMENUS
-              ========================================== */}
+              {/* ================= PROPERTIES ================= */}
 
-              {Object.entries(menuItems).map(
-                ([key, menu]) => {
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate("/properties");
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
 
-                  const Icon = menu.icon;
+                <span className="flex items-center gap-3">
 
-                  return (
+                  <Building2 size={20} />
 
-                    <div key={key}>
+                  Properties
 
-                      <button
-                        onClick={() =>
-                          toggleSubmenu(key)
-                        }
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition ${
-                          openSubmenu === key
-                            ? "bg-blue-50 text-blue-700"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
+                </span>
 
-                        <div className="flex items-center gap-3">
+                <ChevronRight size={18} />
 
-                          <Icon size={20} />
-
-                          <span className="font-medium">
-                            {menu.label}
-                          </span>
-
-                        </div>
-
-                        <ChevronDown
-                          size={18}
-                          className={`transition-transform ${
-                            openSubmenu === key
-                              ? "rotate-180"
-                              : ""
-                          }`}
-                        />
-
-                      </button>
+              </button>
 
 
-                      {/* SUBMENU */}
+              {/* ================= ROOMS ================= */}
 
-                      {openSubmenu === key && (
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate("/rooms");
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
 
-                        <div className="ml-7 mt-1 mb-2 border-l-2 border-blue-100">
+                <span className="flex items-center gap-3">
 
-                          {menu.items.map(
-                            (item) => (
+                  <DoorOpen size={20} />
 
-                              <button
-                                key={item}
-                                className="w-full flex items-center gap-3 text-left px-4 py-2.5 text-sm hover:bg-gray-50"
-                              >
+                  Rooms
 
-                                <Circle
-                                  size={9}
-                                />
+                </span>
 
-                                {item}
+                <ChevronRight size={18} />
 
-                              </button>
-
-                            )
-                          )}
-
-                        </div>
-
-                      )}
-
-                    </div>
-
-                  );
-                }
-              )}
+              </button>
 
 
-              {/* LOGOUT */}
+              {/* ================= TENANTS ================= */}
 
-              <div className="border-t mt-3 pt-3">
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  navigate("/tenants");
+                }}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <span className="flex items-center gap-3">
+
+                  <Users size={20} />
+
+                  Tenants
+
+                </span>
+
+                <ChevronRight size={18} />
+
+              </button>
+
+
+              {/* ================= RENT & BILLS ================= */}
+
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <Receipt size={20} />
+
+                Rent & Bills
+
+              </button>
+
+
+              {/* ================= PAYMENTS ================= */}
+
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <CreditCard size={20} />
+
+                Payments
+
+              </button>
+
+
+              {/* ================= DOCUMENTS ================= */}
+
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <FileText size={20} />
+
+                Documents
+
+              </button>
+
+
+              {/* ================= REPORTS ================= */}
+
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <BarChart3 size={20} />
+
+                Reports
+
+              </button>
+
+
+              {/* ================= SETTINGS ================= */}
+
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+              >
+
+                <Settings size={20} />
+
+                Settings
+
+              </button>
+
+
+              {/* ================= LOGOUT ================= */}
+
+              <div className="border-t pt-3 mt-3">
 
                 <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/");
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
                 >
 
                   <LogOut size={20} />
 
-                  <span className="font-medium">
-                    Logout
-                  </span>
+                  Logout
 
                 </button>
 
@@ -607,357 +305,741 @@ function Dashboard() {
 
           </aside>
 
-        </>
+        </div>
 
       )}
 
 
-      {/* ==================================================
-          MAIN DASHBOARD
-      ================================================== */}
+      {/* ================= MAIN CONTENT ================= */}
 
-      <main className="pt-16 min-h-screen ml-16">
-
-        <section className="p-6">
+      <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
 
-          {/* HEADER */}
+        {/* ================= WELCOME ================= */}
 
-          <div className="mb-6">
+        <div className="mb-6">
 
-            <h2 className="text-3xl font-bold text-gray-800">
-              Dashboard
-            </h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Welcome back, Owner 👋
+          </h2>
 
-            <p className="text-gray-500 mt-1">
-              Welcome back, Owner. Here's your rental overview.
+          <p className="text-gray-500 mt-1">
+            Here's what's happening with your rental properties.
+          </p>
+
+        </div>
+
+
+        {/* ================= SUMMARY CARDS ================= */}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+
+          {/* Total Properties */}
+
+          <div className="bg-white rounded-xl shadow-sm p-5 border">
+
+            <Building2
+              className="text-blue-600"
+              size={28}
+            />
+
+            <p className="text-gray-500 mt-4">
+              Total Properties
             </p>
 
-          </div>
-
-
-          {/* SUMMARY CARDS */}
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-
-
-            {/* PROPERTIES */}
-
-            <div className="bg-white rounded-xl shadow-sm p-6 border">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-gray-500 text-sm">
-                    Total Properties
-                  </p>
-
-                  <h3 className="text-3xl font-bold mt-2">
-                    2
-                  </h3>
-
-                </div>
-
-                <Building2
-                  size={32}
-                  className="text-blue-600"
-                />
-
-              </div>
-
-            </div>
-
-
-            {/* ROOMS */}
-
-            <div className="bg-white rounded-xl shadow-sm p-6 border">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-gray-500 text-sm">
-                    Total Rooms
-                  </p>
-
-                  <h3 className="text-3xl font-bold mt-2">
-                    25
-                  </h3>
-
-                </div>
-
-                <DoorOpen
-                  size={32}
-                  className="text-green-600"
-                />
-
-              </div>
-
-            </div>
-
-
-            {/* TENANTS */}
-
-            <div className="bg-white rounded-xl shadow-sm p-6 border">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-gray-500 text-sm">
-                    Total Tenants
-                  </p>
-
-                  <h3 className="text-3xl font-bold mt-2">
-                    22
-                  </h3>
-
-                </div>
-
-                <Users
-                  size={32}
-                  className="text-purple-600"
-                />
-
-              </div>
-
-            </div>
-
-
-            {/* RENT */}
-
-            <div className="bg-white rounded-xl shadow-sm p-6 border">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-gray-500 text-sm">
-                    Pending Rent
-                  </p>
-
-                  <h3 className="text-3xl font-bold mt-2">
-                    ₹25,000
-                  </h3>
-
-                </div>
-
-                <CreditCard
-                  size={32}
-                  className="text-orange-500"
-                />
-
-              </div>
-
-            </div>
+            <h3 className="text-3xl font-bold mt-1">
+              2
+            </h3>
 
           </div>
 
 
-          {/* QUICK ACTIONS */}
+          {/* Total Rooms */}
 
-          <div className="mt-8">
+          <div className="bg-white rounded-xl shadow-sm p-5 border">
 
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Quick Actions
-            </h2>
+            <DoorOpen
+              className="text-green-600"
+              size={28}
+            />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <p className="text-gray-500 mt-4">
+              Total Rooms
+            </p>
 
-              <button className="flex items-center justify-center gap-2 bg-blue-600 text-white p-4 rounded-xl hover:bg-blue-700 transition">
+            <h3 className="text-3xl font-bold mt-1">
+              25
+            </h3>
 
-                <Plus size={20} />
+          </div>
 
-                Add Property
 
+          {/* Active Tenants */}
+
+          <div className="bg-white rounded-xl shadow-sm p-5 border">
+
+            <Users
+              className="text-purple-600"
+              size={28}
+            />
+
+            <p className="text-gray-500 mt-4">
+              Active Tenants
+            </p>
+
+            <h3 className="text-3xl font-bold mt-1">
+              22
+            </h3>
+
+          </div>
+
+
+          {/* Pending Rent */}
+
+          <div className="bg-white rounded-xl shadow-sm p-5 border">
+
+            <CreditCard
+              className="text-orange-500"
+              size={28}
+            />
+
+            <p className="text-gray-500 mt-4">
+              Pending Rent
+            </p>
+
+            <h3 className="text-3xl font-bold mt-1">
+              ₹25,000
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        {/* ================= PROPERTY + ATTENTION ================= */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+
+
+          {/* ================= MY PROPERTIES ================= */}
+
+          <div className="bg-white rounded-xl shadow-sm border">
+
+            <div className="p-5 border-b flex justify-between items-center">
+
+              <div>
+
+                <h2 className="text-xl font-bold">
+                  My Properties
+                </h2>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Property and room overview
+                </p>
+
+              </div>
+
+              <button
+                onClick={() => navigate("/properties")}
+                className="text-blue-600 text-sm font-medium hover:underline"
+              >
+                View All →
               </button>
 
-
-              <button className="flex items-center justify-center gap-2 bg-green-600 text-white p-4 rounded-xl hover:bg-green-700 transition">
-
-                <Plus size={20} />
-
-                Add Room
-
-              </button>
+            </div>
 
 
-              <button className="flex items-center justify-center gap-2 bg-purple-600 text-white p-4 rounded-xl hover:bg-purple-700 transition">
-
-                <Plus size={20} />
-
-                Add Tenant
-
-              </button>
+            <div className="p-5 space-y-4">
 
 
-              <button className="flex items-center justify-center gap-2 bg-orange-500 text-white p-4 rounded-xl hover:bg-orange-600 transition">
+              {/* Property A */}
 
-                <Plus size={20} />
+              <div className="border rounded-xl p-4 hover:shadow-sm transition">
 
-                Add Bill
+                <div className="flex justify-between">
 
-              </button>
+                  <div>
+
+                    <h3 className="font-bold text-lg">
+                      Green View Apartments
+                    </h3>
+
+                    <p className="text-sm text-gray-500">
+                      📍 Bhopal
+                    </p>
+
+                  </div>
+
+                  <Building2
+                    size={24}
+                    className="text-blue-600"
+                  />
+
+                </div>
+
+
+                <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+
+
+                  <div className="bg-gray-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Floors
+                    </p>
+
+                    <p className="font-bold">
+                      5
+                    </p>
+
+                  </div>
+
+
+                  <div className="bg-gray-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Rooms
+                    </p>
+
+                    <p className="font-bold">
+                      13
+                    </p>
+
+                  </div>
+
+
+                  <div className="bg-green-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Available
+                    </p>
+
+                    <p className="font-bold text-green-600">
+                      3
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              {/* Property B */}
+
+              <div className="border rounded-xl p-4 hover:shadow-sm transition">
+
+                <div className="flex justify-between">
+
+                  <div>
+
+                    <h3 className="font-bold text-lg">
+                      Shyam Residency
+                    </h3>
+
+                    <p className="text-sm text-gray-500">
+                      📍 Bhopal
+                    </p>
+
+                  </div>
+
+                  <Building2
+                    size={24}
+                    className="text-blue-600"
+                  />
+
+                </div>
+
+
+                <div className="grid grid-cols-3 gap-2 mt-4 text-center">
+
+
+                  <div className="bg-gray-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Floors
+                    </p>
+
+                    <p className="font-bold">
+                      2
+                    </p>
+
+                  </div>
+
+
+                  <div className="bg-gray-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Rooms
+                    </p>
+
+                    <p className="font-bold">
+                      6
+                    </p>
+
+                  </div>
+
+
+                  <div className="bg-green-50 rounded-lg p-2">
+
+                    <p className="text-xs text-gray-500">
+                      Available
+                    </p>
+
+                    <p className="font-bold text-green-600">
+                      1
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
 
           </div>
 
 
-          {/* RECENT TENANTS */}
+          {/* ================= ATTENTION REQUIRED ================= */}
 
-          <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border">
 
-            <div className="p-6 border-b">
+            <div className="p-5 border-b flex justify-between items-center">
 
-              <h2 className="text-xl font-bold text-gray-800">
+              <div>
+
+                <h2 className="text-xl font-bold">
+                  Attention Required
+                </h2>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Things that need your attention
+                </p>
+
+              </div>
+
+              <AlertTriangle
+                size={25}
+                className="text-orange-500"
+              />
+
+            </div>
+
+
+            <div className="p-5 space-y-4">
+
+
+              {/* Pending Rent */}
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-red-50">
+
+                <div>
+
+                  <p className="font-semibold text-red-700">
+                    Rent Pending
+                  </p>
+
+                  <p className="text-sm text-red-600">
+                    5 tenants have pending rent
+                  </p>
+
+                </div>
+
+                <span className="font-bold text-red-700">
+                  5
+                </span>
+
+              </div>
+
+
+              {/* Vacant Rooms */}
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-yellow-50">
+
+                <div>
+
+                  <p className="font-semibold text-yellow-700">
+                    Vacant Rooms
+                  </p>
+
+                  <p className="text-sm text-yellow-700">
+                    3 rooms are currently available
+                  </p>
+
+                </div>
+
+                <span className="font-bold text-yellow-700">
+                  3
+                </span>
+
+              </div>
+
+
+              {/* Documents */}
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-orange-50">
+
+                <div>
+
+                  <p className="font-semibold text-orange-700">
+                    Documents Expiring
+                  </p>
+
+                  <p className="text-sm text-orange-700">
+                    4 tenant documents need attention
+                  </p>
+
+                </div>
+
+                <span className="font-bold text-orange-700">
+                  4
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* ================= RECENT TENANTS ================= */}
+
+        <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
+
+          <div className="p-5 border-b flex justify-between items-center">
+
+            <div>
+
+              <h2 className="text-xl font-bold">
                 Recent Tenants
               </h2>
 
-            </div>
-
-            <div className="overflow-x-auto">
-
-              <table className="w-full text-left">
-
-                <thead className="bg-gray-50">
-
-                  <tr>
-
-                    <th className="px-6 py-4">
-                      Tenant
-                    </th>
-
-                    <th className="px-6 py-4">
-                      Room
-                    </th>
-
-                    <th className="px-6 py-4">
-                      Monthly Rent
-                    </th>
-
-                    <th className="px-6 py-4">
-                      Status
-                    </th>
-
-                  </tr>
-
-                </thead>
-
-                <tbody>
-
-                  <tr className="border-t">
-
-                    <td className="px-6 py-4">
-                      Rahul Sharma
-                    </td>
-
-                    <td className="px-6 py-4">
-                      101
-                    </td>
-
-                    <td className="px-6 py-4">
-                      ₹5,000
-                    </td>
-
-                    <td className="px-6 py-4">
-
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                        Active
-                      </span>
-
-                    </td>
-
-                  </tr>
-
-
-                  <tr className="border-t">
-
-                    <td className="px-6 py-4">
-                      Aman Kumar
-                    </td>
-
-                    <td className="px-6 py-4">
-                      102
-                    </td>
-
-                    <td className="px-6 py-4">
-                      ₹6,000
-                    </td>
-
-                    <td className="px-6 py-4">
-
-                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                        Active
-                      </span>
-
-                    </td>
-
-                  </tr>
-
-
-                  <tr className="border-t">
-
-                    <td className="px-6 py-4">
-                      Neha Sharma
-                    </td>
-
-                    <td className="px-6 py-4">
-                      103
-                    </td>
-
-                    <td className="px-6 py-4">
-                      ₹5,500
-                    </td>
-
-                    <td className="px-6 py-4">
-
-                      <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                        Pending
-                      </span>
-
-                    </td>
-
-                  </tr>
-
-                </tbody>
-
-              </table>
+              <p className="text-sm text-gray-500 mt-1">
+                Recently added or active tenants
+              </p>
 
             </div>
+
+            <button
+              onClick={() => navigate("/tenants")}
+              className="text-blue-600 text-sm font-medium hover:underline"
+            >
+              View All →
+            </button>
 
           </div>
 
-        </section>
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full text-left">
+
+              <thead className="bg-gray-50">
+
+                <tr>
+
+                  <th className="px-5 py-4">
+                    Tenant
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Property
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Room
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Rent
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Status
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4 font-medium">
+                    Rahul Sharma
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Green View Apartments
+                  </td>
+
+                  <td className="px-5 py-4">
+                    101
+                  </td>
+
+                  <td className="px-5 py-4">
+                    ₹5,000
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      Active
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4 font-medium">
+                    Aman Kumar
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Green View Apartments
+                  </td>
+
+                  <td className="px-5 py-4">
+                    102
+                  </td>
+
+                  <td className="px-5 py-4">
+                    ₹6,000
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      Active
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4 font-medium">
+                    Neha Sharma
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Shyam Residency
+                  </td>
+
+                  <td className="px-5 py-4">
+                    203
+                  </td>
+
+                  <td className="px-5 py-4">
+                    ₹5,500
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                      Due
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+
+        {/* ================= RECENT PAYMENTS ================= */}
+
+        <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
+
+          <div className="p-5 border-b flex justify-between items-center">
+
+            <div>
+
+              <h2 className="text-xl font-bold">
+                Recent Payments
+              </h2>
+
+              <p className="text-sm text-gray-500 mt-1">
+                Latest rent payment activity
+              </p>
+
+            </div>
+
+            <button
+              className="text-blue-600 text-sm font-medium hover:underline"
+            >
+              View All →
+            </button>
+
+          </div>
+
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full text-left">
+
+              <thead className="bg-gray-50">
+
+                <tr>
+
+                  <th className="px-5 py-4">
+                    Tenant
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Property
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Room
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Amount
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Date
+                  </th>
+
+                  <th className="px-5 py-4">
+                    Status
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4">
+                    Rahul Sharma
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Green View Apartments
+                  </td>
+
+                  <td className="px-5 py-4">
+                    101
+                  </td>
+
+                  <td className="px-5 py-4 font-medium">
+                    ₹5,000
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Aug 01, 2026
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      Paid
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4">
+                    Aman Kumar
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Green View Apartments
+                  </td>
+
+                  <td className="px-5 py-4">
+                    102
+                  </td>
+
+                  <td className="px-5 py-4 font-medium">
+                    ₹6,000
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Aug 02, 2026
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                      Paid
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+                <tr className="border-t">
+
+                  <td className="px-5 py-4">
+                    Neha Sharma
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Shyam Residency
+                  </td>
+
+                  <td className="px-5 py-4">
+                    203
+                  </td>
+
+                  <td className="px-5 py-4 font-medium">
+                    ₹5,500
+                  </td>
+
+                  <td className="px-5 py-4">
+                    Aug 05, 2026
+                  </td>
+
+                  <td className="px-5 py-4">
+
+                    <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                      Due
+                    </span>
+
+                  </td>
+
+                </tr>
+
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
 
       </main>
-
-
-      {/* ==================================================
-          PRINT
-      ================================================== */}
-
-      <style>
-        {`
-          @media print {
-
-            .no-print {
-              display: none !important;
-            }
-
-            main {
-              margin-left: 0 !important;
-              padding-top: 0 !important;
-            }
-
-            body {
-              background: white !important;
-            }
-
-          }
-        `}
-      </style>
 
     </div>
   );
