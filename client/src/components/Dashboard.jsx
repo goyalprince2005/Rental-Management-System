@@ -110,6 +110,7 @@ function Dashboard() {
 
           <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
 
+
             {/* Menu Header */}
 
             <div className="p-5 border-b">
@@ -139,11 +140,9 @@ function Dashboard() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
               >
-
                 <Home size={20} />
 
                 Dashboard
-
               </button>
 
 
@@ -300,6 +299,7 @@ function Dashboard() {
                 </button>
 
               </div>
+
 
             </nav>
 
@@ -481,7 +481,6 @@ function Dashboard() {
 
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
-
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -553,7 +552,6 @@ function Dashboard() {
 
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
-
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -595,6 +593,7 @@ function Dashboard() {
                 </div>
 
               </div>
+
 
             </div>
 
@@ -768,7 +767,6 @@ function Dashboard() {
 
               <tbody>
 
-
                 <tr className="border-t">
 
                   <td className="px-5 py-4 font-medium">
@@ -855,7 +853,6 @@ function Dashboard() {
 
                 </tr>
 
-
               </tbody>
 
             </table>
@@ -930,7 +927,6 @@ function Dashboard() {
 
 
               <tbody>
-
 
                 <tr className="border-t">
 
@@ -1029,7 +1025,6 @@ function Dashboard() {
                   </td>
 
                 </tr>
-
 
               </tbody>
 

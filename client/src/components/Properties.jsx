@@ -2,43 +2,69 @@ import React from "react";
 import {
   Building2,
   MapPin,
-  DoorOpen,
-  Users,
   Plus,
   Eye,
+  Pencil,
+  ArrowLeft,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function Properties() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-100">
 
       {/* ================= TOP NAVBAR ================= */}
+
       <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
 
-        <div>
-          <h1 className="text-xl font-bold text-blue-600">
-            Rental Management
-          </h1>
+        <div className="flex items-center gap-3">
 
-          <p className="text-xs text-gray-500">
-            Properties
-          </p>
+          <button
+            onClick={() => navigate("/owner-dashboard")}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            title="Back to Dashboard"
+          >
+            <ArrowLeft size={22} />
+          </button>
+
+          <div>
+
+            <h1 className="text-xl font-bold text-blue-600">
+              Properties
+            </h1>
+
+            <p className="text-xs text-gray-500 hidden sm:block">
+              Manage your rental properties
+            </p>
+
+          </div>
+
         </div>
+
+
+        {/* Add Property Button */}
 
         <button
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
         >
-          <Plus size={18} />
-          Add Property
+          <Plus size={20} />
+
+          <span className="hidden sm:block">
+            Add Property
+          </span>
         </button>
 
       </header>
 
 
       {/* ================= MAIN CONTENT ================= */}
+
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
         {/* Page Heading */}
+
         <div className="mb-6">
 
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -46,29 +72,34 @@ function Properties() {
           </h2>
 
           <p className="text-gray-500 mt-1">
-            Manage your properties, floors and rooms.
+            View and manage all your rental properties.
           </p>
 
         </div>
 
 
         {/* ================= PROPERTY CARDS ================= */}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
 
           {/* ================= PROPERTY 1 ================= */}
+
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
             {/* Property Header */}
+
             <div className="p-5 border-b flex justify-between items-start">
 
               <div className="flex items-start gap-3">
 
                 <div className="p-3 bg-blue-50 rounded-lg">
+
                   <Building2
-                    size={28}
+                    size={26}
                     className="text-blue-600"
                   />
+
                 </div>
 
                 <div>
@@ -78,13 +109,19 @@ function Properties() {
                   </h3>
 
                   <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
+
                     <MapPin size={15} />
+
                     Bhopal
+
                   </div>
 
                 </div>
 
               </div>
+
+
+              {/* Status */}
 
               <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
                 Active
@@ -93,20 +130,22 @@ function Properties() {
             </div>
 
 
-            {/* Property Statistics */}
+            {/* Property Information */}
+
             <div className="p-5">
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
 
 
                 {/* Floors */}
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-gray-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Floors
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 mt-1">
+                  <p className="text-xl font-bold mt-1">
                     5
                   </p>
 
@@ -114,13 +153,14 @@ function Properties() {
 
 
                 {/* Rooms */}
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-gray-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Rooms
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 mt-1">
+                  <p className="text-xl font-bold mt-1">
                     13
                   </p>
 
@@ -128,75 +168,87 @@ function Properties() {
 
 
                 {/* Available */}
-                <div className="bg-green-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-green-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Available
                   </p>
 
-                  <p className="text-2xl font-bold text-green-600 mt-1">
+                  <p className="text-xl font-bold text-green-600 mt-1">
                     3
                   </p>
 
                 </div>
 
-              </div>
 
+                {/* Occupied */}
 
-              {/* Occupancy */}
-              <div className="mt-5">
+                <div className="bg-blue-50 rounded-lg p-3">
 
-                <div className="flex justify-between text-sm mb-2">
+                  <p className="text-xs text-gray-500">
+                    Occupied
+                  </p>
 
-                  <span className="text-gray-500">
-                    Occupancy
-                  </span>
-
-                  <span className="font-semibold">
-                    77%
-                  </span>
-
-                </div>
-
-                <div className="w-full bg-gray-200 rounded-full h-2">
-
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: "77%" }}
-                  ></div>
+                  <p className="text-xl font-bold text-blue-600 mt-1">
+                    10
+                  </p>
 
                 </div>
 
               </div>
 
 
-              {/* View Details */}
-              <button
-                className="w-full mt-5 flex items-center justify-center gap-2 border border-blue-600 text-blue-600 py-2.5 rounded-lg hover:bg-blue-50 transition"
-              >
-                <Eye size={18} />
-                View Property Details
-              </button>
+              {/* Buttons */}
+
+              <div className="flex gap-3 mt-5">
+
+                <button
+                onClick={() => navigate("/property-details")}
+                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                >
+          
+               <Eye size={18} />
+                View Details
+                </button>
+
+
+                <button
+                  className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                >
+
+                  <Pencil size={18} />
+
+                  <span className="hidden sm:block">
+                    Edit
+                  </span>
+
+                </button>
+
+              </div>
 
             </div>
 
           </div>
 
 
-
           {/* ================= PROPERTY 2 ================= */}
+
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
             {/* Property Header */}
+
             <div className="p-5 border-b flex justify-between items-start">
 
               <div className="flex items-start gap-3">
 
-                <div className="p-3 bg-purple-50 rounded-lg">
+                <div className="p-3 bg-blue-50 rounded-lg">
+
                   <Building2
-                    size={28}
-                    className="text-purple-600"
+                    size={26}
+                    className="text-blue-600"
                   />
+
                 </div>
 
                 <div>
@@ -206,13 +258,19 @@ function Properties() {
                   </h3>
 
                   <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
+
                     <MapPin size={15} />
+
                     Bhopal
+
                   </div>
 
                 </div>
 
               </div>
+
+
+              {/* Status */}
 
               <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
                 Active
@@ -221,20 +279,22 @@ function Properties() {
             </div>
 
 
-            {/* Property Statistics */}
+            {/* Property Information */}
+
             <div className="p-5">
 
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
 
 
                 {/* Floors */}
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-gray-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Floors
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 mt-1">
+                  <p className="text-xl font-bold mt-1">
                     2
                   </p>
 
@@ -242,13 +302,14 @@ function Properties() {
 
 
                 {/* Rooms */}
-                <div className="bg-gray-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-gray-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Rooms
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 mt-1">
+                  <p className="text-xl font-bold mt-1">
                     6
                   </p>
 
@@ -256,55 +317,63 @@ function Properties() {
 
 
                 {/* Available */}
-                <div className="bg-green-50 rounded-lg p-3 text-center">
 
-                  <p className="text-sm text-gray-500">
+                <div className="bg-green-50 rounded-lg p-3">
+
+                  <p className="text-xs text-gray-500">
                     Available
                   </p>
 
-                  <p className="text-2xl font-bold text-green-600 mt-1">
+                  <p className="text-xl font-bold text-green-600 mt-1">
                     1
                   </p>
 
                 </div>
 
-              </div>
 
+                {/* Occupied */}
 
-              {/* Occupancy */}
-              <div className="mt-5">
+                <div className="bg-blue-50 rounded-lg p-3">
 
-                <div className="flex justify-between text-sm mb-2">
+                  <p className="text-xs text-gray-500">
+                    Occupied
+                  </p>
 
-                  <span className="text-gray-500">
-                    Occupancy
-                  </span>
-
-                  <span className="font-semibold">
-                    83%
-                  </span>
-
-                </div>
-
-                <div className="w-full bg-gray-200 rounded-full h-2">
-
-                  <div
-                    className="bg-purple-600 h-2 rounded-full"
-                    style={{ width: "83%" }}
-                  ></div>
+                  <p className="text-xl font-bold text-blue-600 mt-1">
+                    5
+                  </p>
 
                 </div>
 
               </div>
 
 
-              {/* View Details */}
-              <button
-                className="w-full mt-5 flex items-center justify-center gap-2 border border-purple-600 text-purple-600 py-2.5 rounded-lg hover:bg-purple-50 transition"
-              >
+              {/* Buttons */}
+
+              <div className="flex gap-3 mt-5">
+
+                <button
+                onClick={() => navigate("/property-details")}
+                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                >
                 <Eye size={18} />
-                View Property Details
-              </button>
+                View Details
+                </button>
+
+
+                <button
+                  className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                >
+
+                  <Pencil size={18} />
+
+                  <span className="hidden sm:block">
+                    Edit
+                  </span>
+
+                </button>
+
+              </div>
 
             </div>
 

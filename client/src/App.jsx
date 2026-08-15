@@ -7,6 +7,7 @@ import OTPVerification from "./components/OTPVerification";
 import ResetPassword from "./components/ResetPassword";
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";
+import PropertyDetails from "./components/PropertyDetails";
 function App() {
   return (
     <Routes>
@@ -39,6 +40,10 @@ function App() {
       <Route
         path="/properties"
         element={<Properties />}
+      />
+      <Route
+        path="/property-details"
+        element={<PropertyDetails />}
       />
     </Routes>
   );
