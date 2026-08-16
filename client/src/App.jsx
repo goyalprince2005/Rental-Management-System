@@ -8,6 +8,8 @@ import ResetPassword from "./components/ResetPassword";
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";
 import PropertyDetails from "./components/PropertyDetails";
+import Rooms from "./components/Rooms";
+import RoomDetails from "./components/RoomDetails";
 function App() {
   return (
     <Routes>
@@ -45,6 +47,15 @@ function App() {
         path="/property-details"
         element={<PropertyDetails />}
       />
+      <Route
+        path="/rooms"
+        element={<Rooms />}
+      />
+      <Route
+        path="/room-details/:id"
+        element={<RoomDetails />}
+      />
+      
     </Routes>
   );
 }
