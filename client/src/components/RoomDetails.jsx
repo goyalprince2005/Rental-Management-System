@@ -107,7 +107,6 @@ function RoomDetails() {
 
       </header>
 
-
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="p-4 md:p-6 max-w-5xl mx-auto">
@@ -126,7 +125,6 @@ function RoomDetails() {
 
         </div>
 
-
         {/* ================= ROOM CARD ================= */}
 
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -138,10 +136,12 @@ function RoomDetails() {
             <div className="flex items-center gap-4">
 
               <div className="p-4 bg-blue-50 rounded-xl">
+
                 <DoorOpen
                   size={32}
                   className="text-blue-600"
                 />
+
               </div>
 
               <div>
@@ -151,19 +151,24 @@ function RoomDetails() {
                 </h3>
 
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
+
                   <Building2 size={16} />
+
                   {room.property}
+
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
+
                   <MapPin size={16} />
+
                   {room.location}
+
                 </div>
 
               </div>
 
             </div>
-
 
             {/* Status */}
 
@@ -181,7 +186,6 @@ function RoomDetails() {
 
           </div>
 
-
           {/* ================= ROOM INFORMATION ================= */}
 
           <div className="p-6">
@@ -197,10 +201,13 @@ function RoomDetails() {
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <DoorOpen size={18} />
+
                   <p className="text-sm">
                     Floor
                   </p>
+
                 </div>
 
                 <p className="text-2xl font-bold mt-2">
@@ -209,16 +216,18 @@ function RoomDetails() {
 
               </div>
 
-
               {/* Rent */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <IndianRupee size={18} />
+
                   <p className="text-sm">
                     Monthly Rent
                   </p>
+
                 </div>
 
                 <p className="text-2xl font-bold mt-2">
@@ -227,16 +236,18 @@ function RoomDetails() {
 
               </div>
 
-
               {/* Tenant */}
 
               <div className="bg-blue-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-blue-600">
+
                   <User size={18} />
+
                   <p className="text-sm">
                     Tenant
                   </p>
+
                 </div>
 
                 <p className="text-xl font-bold text-blue-600 mt-2">
@@ -244,7 +255,6 @@ function RoomDetails() {
                 </p>
 
               </div>
-
 
               {/* Status */}
 
@@ -262,7 +272,6 @@ function RoomDetails() {
 
             </div>
 
-
             {/* ================= PROPERTY INFORMATION ================= */}
 
             <div className="mt-8">
@@ -276,10 +285,12 @@ function RoomDetails() {
                 <div className="flex items-center gap-3">
 
                   <div className="p-3 bg-blue-50 rounded-lg">
+
                     <Building2
                       size={24}
                       className="text-blue-600"
                     />
+
                   </div>
 
                   <div>
@@ -300,20 +311,26 @@ function RoomDetails() {
 
             </div>
 
-
             {/* ================= ACTION BUTTONS ================= */}
 
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
+
+              {/* Back Button */}
 
               <button
                 onClick={() => navigate("/rooms")}
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
                 <ArrowLeft size={18} />
+
                 Back to Rooms
+
               </button>
 
+              {/* Edit Room Button */}
+
               <button
+                onClick={() => navigate(`/edit-room/${id}`)}
                 className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
               >
                 Edit Room

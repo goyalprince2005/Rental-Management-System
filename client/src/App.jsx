@@ -10,6 +10,7 @@ import Properties from "./components/Properties";
 import PropertyDetails from "./components/PropertyDetails";
 import Rooms from "./components/Rooms";
 import RoomDetails from "./components/RoomDetails";
+import EditRoom from "./components/EditRoom";
 function App() {
   return (
     <Routes>
@@ -54,6 +55,10 @@ function App() {
       <Route
         path="/room-details/:id"
         element={<RoomDetails />}
+      />
+      <Route
+        path="/edit-room/:id"
+        element={<EditRoom />}
       />
       
     </Routes>
