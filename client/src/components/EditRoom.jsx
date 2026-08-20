@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 
 function EditRoom() {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const [roomData, setRoomData] = useState({
+    roomNumber: id,
+    floor: "",
+    rent: "",
+    tenant: "",
+    status: "Occupied",
+  });
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -69,7 +77,13 @@ function EditRoom() {
 
               <input
                 type="text"
-                defaultValue={id}
+                value={roomData.roomNumber}
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    roomNumber: e.target.value,
+                  })
+                }
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
 
@@ -86,6 +100,13 @@ function EditRoom() {
 
               <input
                 type="number"
+                value={roomData.floor}
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    floor: e.target.value,
+                  })
+                }
                 placeholder="Enter floor number"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />

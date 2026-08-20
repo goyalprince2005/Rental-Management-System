@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -20,9 +20,19 @@ import {
 } from "lucide-react";
 
 function Dashboard() {
-  const [menuOpen, setMenuOpen] = useState(false);
+ const [menuOpen, setMenuOpen] = useState(false);
+const [hoveredItem, setHoveredItem] = useState(null);
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
+
+// Prevent the main dashboard from scrolling when menu is open
+useEffect(() => {
+  document.body.style.overflow = menuOpen ? "hidden" : "";
+
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [menuOpen]);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -94,220 +104,216 @@ function Dashboard() {
 
       {/* ================= RENTAL MENU ================= */}
 
-      {menuOpen && (
+{menuOpen && (
+  <div className="fixed inset-0 z-50">
 
-        <div className="fixed inset-0 z-50">
+    {/* Background */}
+    <div
+      className="absolute inset-0 bg-black/30"
+      onClick={() => {
+        setMenuOpen(false);
+        setHoveredItem(null);
+      }}
+    ></div>
 
-          {/* Background */}
+    {/* Menu */}
+    <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl overflow-y-auto">
 
-          <div
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setMenuOpen(false)}
-          ></div>
+      {/* Menu Header */}
+      <div className="p-5 border-b">
+        <h2 className="text-xl font-bold text-blue-600">
+          Rental Menu
+        </h2>
+
+        <p className="text-sm text-gray-500 mt-1">
+          Owner Panel
+        </p>
+      </div>
+
+      {/* Navigation */}
+      <nav className="p-4 space-y-1">
+
+        {/* ================= DASHBOARD ================= */}
+
+        <button
+          onClick={() => {
+            setMenuOpen(false);
+            setHoveredItem(null);
+            navigate("/owner-dashboard");
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
+        >
+          <Home size={20} />
+          Dashboard
+        </button>
 
 
-          {/* Menu */}
+        {/* ================= PROPERTIES ================= */}
 
-          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
+        <div
+          className="relative"
+          onMouseEnter={() => setHoveredItem("properties")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              setHoveredItem(null);
+              navigate("/properties");
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+          >
+            <span className="flex items-center gap-3">
+              <Building2 size={20} />
+              Properties
+            </span>
 
+            <ChevronRight size={18} />
+          </button>
 
-            {/* Menu Header */}
-
-            <div className="p-5 border-b">
-
-              <h2 className="text-xl font-bold text-blue-600">
-                Rental Menu
-              </h2>
-
-              <p className="text-sm text-gray-500 mt-1">
-                Owner Panel
-              </p>
-
+          {hoveredItem === "properties" && (
+            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
+              View and manage all your rental properties.
             </div>
-
-
-            {/* Navigation */}
-
-            <nav className="p-4 space-y-1">
-
-
-              {/* ================= DASHBOARD ================= */}
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/owner-dashboard");
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
-              >
-                <Home size={20} />
-
-                Dashboard
-              </button>
-
-
-              {/* ================= PROPERTIES ================= */}
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/properties");
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <span className="flex items-center gap-3">
-
-                  <Building2 size={20} />
-
-                  Properties
-
-                </span>
-
-                <ChevronRight size={18} />
-
-              </button>
-
-
-              {/* ================= ROOMS ================= */}
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/rooms");
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <span className="flex items-center gap-3">
-
-                  <DoorOpen size={20} />
-
-                  Rooms
-
-                </span>
-
-                <ChevronRight size={18} />
-
-              </button>
-
-
-              {/* ================= TENANTS ================= */}
-
-              <button
-                onClick={() => {
-                  setMenuOpen(false);
-                  navigate("/tenants");
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <span className="flex items-center gap-3">
-
-                  <Users size={20} />
-
-                  Tenants
-
-                </span>
-
-                <ChevronRight size={18} />
-
-              </button>
-
-
-              {/* ================= RENT & BILLS ================= */}
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <Receipt size={20} />
-
-                Rent & Bills
-
-              </button>
-
-
-              {/* ================= PAYMENTS ================= */}
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <CreditCard size={20} />
-
-                Payments
-
-              </button>
-
-
-              {/* ================= DOCUMENTS ================= */}
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <FileText size={20} />
-
-                Documents
-
-              </button>
-
-
-              {/* ================= REPORTS ================= */}
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <BarChart3 size={20} />
-
-                Reports
-
-              </button>
-
-
-              {/* ================= SETTINGS ================= */}
-
-              <button
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-
-                <Settings size={20} />
-
-                Settings
-
-              </button>
-
-
-              {/* ================= LOGOUT ================= */}
-
-              <div className="border-t pt-3 mt-3">
-
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/");
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
-                >
-
-                  <LogOut size={20} />
-
-                  Logout
-
-                </button>
-
-              </div>
-
-
-            </nav>
-
-          </aside>
+          )}
+        </div>
+
+
+        {/* ================= ROOMS ================= */}
+
+        <div
+          className="relative"
+          onMouseEnter={() => setHoveredItem("rooms")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              setHoveredItem(null);
+              navigate("/rooms");
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+          >
+            <span className="flex items-center gap-3">
+              <DoorOpen size={20} />
+              Rooms
+            </span>
+
+            <ChevronRight size={18} />
+          </button>
+
+          {hoveredItem === "rooms" && (
+            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
+              View and manage rooms across your properties.
+            </div>
+          )}
+        </div>
+
+
+        {/* ================= TENANTS ================= */}
+
+        <div
+          className="relative"
+          onMouseEnter={() => setHoveredItem("tenants")}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              setHoveredItem(null);
+              navigate("/tenants");
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
+          >
+            <span className="flex items-center gap-3">
+              <Users size={20} />
+              Tenants
+            </span>
+
+            <ChevronRight size={18} />
+          </button>
+
+          {hoveredItem === "tenants" && (
+            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
+              Manage tenant information and occupancy.
+            </div>
+          )}
+        </div>
+
+
+        {/* ================= RENT & BILLS ================= */}
+
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+        >
+          <Receipt size={20} />
+          Rent & Bills
+        </button>
+
+
+        {/* ================= PAYMENTS ================= */}
+
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+        >
+          <CreditCard size={20} />
+          Payments
+        </button>
+
+
+        {/* ================= DOCUMENTS ================= */}
+
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+        >
+          <FileText size={20} />
+          Documents
+        </button>
+
+
+        {/* ================= REPORTS ================= */}
+
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+        >
+          <BarChart3 size={20} />
+          Reports
+        </button>
+
+
+        {/* ================= SETTINGS ================= */}
+
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
+        >
+          <Settings size={20} />
+          Settings
+        </button>
+
+
+        {/* ================= LOGOUT ================= */}
+
+        <div className="border-t pt-3 mt-3">
+
+          <button
+            onClick={() => {
+              setMenuOpen(false);
+              setHoveredItem(null);
+              navigate("/");
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
+          >
+            <LogOut size={20} />
+            Logout
+          </button>
 
         </div>
 
-      )}
+      </nav>
+
+    </aside>
+  </div>
+)}
 
 
       {/* ================= MAIN CONTENT ================= */}
