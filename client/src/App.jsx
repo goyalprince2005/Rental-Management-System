@@ -11,6 +11,8 @@ import PropertyDetails from "./components/PropertyDetails";
 import Rooms from "./components/Rooms";
 import RoomDetails from "./components/RoomDetails";
 import EditRoom from "./components/EditRoom";
+import Tenants from "./components/Tenants";
+import TenantDetails from "./components/TenantDetails";
 function App() {
   return (
     <Routes>
@@ -59,6 +61,14 @@ function App() {
       <Route
         path="/edit-room/:id"
         element={<EditRoom />}
+      />
+      <Route
+        path="/tenants"
+        element={<Tenants />}
+      />
+      <Route
+        path="/tenant-details/:id"
+        element={<TenantDetails />}
       />
       
     </Routes>

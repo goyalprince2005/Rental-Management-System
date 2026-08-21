@@ -17,41 +17,189 @@ import {
   Printer,
   ChevronRight,
   AlertTriangle,
+  Info,
 } from "lucide-react";
 
 function Dashboard() {
- const [menuOpen, setMenuOpen] = useState(false);
-const [hoveredItem, setHoveredItem] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [hoverPosition, setHoverPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-// Prevent the main dashboard from scrolling when menu is open
-useEffect(() => {
-  document.body.style.overflow = menuOpen ? "hidden" : "";
+  /*
+   * ============================================================
+   * MENU INFORMATION
+   * ============================================================
+   */
 
-  return () => {
-    document.body.style.overflow = "";
+  const menuItems = [
+    {
+      id: "properties",
+      label: "Properties",
+      icon: Building2,
+      description:
+        "View and manage all your rental properties.",
+      path: "/properties",
+    },
+    {
+      id: "rooms",
+      label: "Rooms",
+      icon: DoorOpen,
+      description:
+        "View and manage rooms across your properties.",
+      path: "/rooms",
+    },
+    {
+      id: "tenants",
+      label: "Tenants",
+      icon: Users,
+      description:
+        "Manage tenant information and occupancy.",
+      path: "/tenants",
+    },
+    {
+      id: "rent",
+      label: "Rent & Bills",
+      icon: Receipt,
+      description:
+        "Track rent collection, pending bills and monthly dues.",
+    },
+    {
+      id: "payments",
+      label: "Payments",
+      icon: CreditCard,
+      description:
+        "View and manage rental payment transactions.",
+    },
+    {
+      id: "documents",
+      label: "Documents",
+      icon: FileText,
+      description:
+        "Manage tenant agreements and important rental documents.",
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: BarChart3,
+      description:
+        "View rental income, occupancy and property reports.",
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      description:
+        "Manage your rental system preferences and settings.",
+    },
+  ];
+
+  /*
+   * ============================================================
+   * LOCK MAIN PAGE SCROLL
+   * ============================================================
+   *
+   * When menu is open:
+   * - Body cannot scroll.
+   * - Only the menu's internal area can scroll.
+   */
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  /*
+   * ============================================================
+   * CLOSE MENU
+   * ============================================================
+   */
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setHoveredItem(null);
   };
-}, [menuOpen]);
+
+  /*
+   * ============================================================
+   * HOVER MENU ITEM
+   * ============================================================
+   *
+   * The information card position is calculated from the
+   * hovered button.
+   *
+   * This makes the card appear on the RIGHT side instead of
+   * creating extra space underneath the menu option.
+   */
+
+  const handleMenuHover = (itemId, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+
+    setHoveredItem(itemId);
+
+    setHoverPosition({
+      top: rect.top,
+      left: rect.right + 12,
+    });
+  };
+
+  /*
+   * ============================================================
+   * NAVIGATION
+   * ============================================================
+   */
+
+  const handleNavigation = (path) => {
+    if (!path) return;
+
+    closeMenu();
+    navigate(path);
+  };
+
+  /*
+   * ============================================================
+   * CURRENT HOVERED ITEM
+   * ============================================================
+   */
+
+  const activeItem = menuItems.find(
+    (item) => item.id === hoveredItem
+  );
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ======================================================
+          TOP NAVBAR
+      ====================================================== */}
 
       <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
 
+        {/* LEFT SIDE */}
+
         <div className="flex items-center gap-4">
 
-          {/* Three Line Menu */}
+          {/* HAMBURGER */}
 
           <button
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => {
+              setMenuOpen(!menuOpen);
+              setHoveredItem(null);
+            }}
             className="p-2 rounded-lg hover:bg-gray-100 transition"
             title="Rental Menu"
           >
             <Menu size={24} />
           </button>
+
+          {/* TITLE */}
 
           <div>
             <h1 className="text-xl font-bold text-blue-600">
@@ -65,12 +213,11 @@ useEffect(() => {
 
         </div>
 
-
-        {/* ================= RIGHT SIDE ================= */}
+        {/* RIGHT SIDE */}
 
         <div className="flex items-center gap-2">
 
-          {/* Notifications */}
+          {/* NOTIFICATIONS */}
 
           <button
             className="p-2 rounded-lg hover:bg-gray-100 transition"
@@ -79,8 +226,7 @@ useEffect(() => {
             <Bell size={21} />
           </button>
 
-
-          {/* Print */}
+          {/* PRINT */}
 
           <button
             onClick={() => window.print()}
@@ -90,8 +236,7 @@ useEffect(() => {
             <Printer size={21} />
           </button>
 
-
-          {/* Owner */}
+          {/* OWNER */}
 
           <button className="hidden sm:block px-4 py-2 border rounded-lg hover:bg-gray-100">
             Owner
@@ -101,227 +246,190 @@ useEffect(() => {
 
       </header>
 
+      {/* ======================================================
+          RENTAL MENU
+      ====================================================== */}
 
-      {/* ================= RENTAL MENU ================= */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-50">
 
-{menuOpen && (
-  <div className="fixed inset-0 z-50">
+          {/* BACKGROUND OVERLAY */}
 
-    {/* Background */}
-    <div
-      className="absolute inset-0 bg-black/30"
-      onClick={() => {
-        setMenuOpen(false);
-        setHoveredItem(null);
-      }}
-    ></div>
+          <div
+            className="absolute inset-0 bg-black/30"
+            onClick={closeMenu}
+          />
 
-    {/* Menu */}
-    <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl overflow-y-auto">
+          {/* ==================================================
+              MENU PANEL
+          ================================================== */}
 
-      {/* Menu Header */}
-      <div className="p-5 border-b">
-        <h2 className="text-xl font-bold text-blue-600">
-          Rental Menu
-        </h2>
+          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
 
-        <p className="text-sm text-gray-500 mt-1">
-          Owner Panel
-        </p>
-      </div>
+            {/* MENU HEADER */}
 
-      {/* Navigation */}
-      <nav className="p-4 space-y-1">
+            <div className="p-5 border-b">
 
-        {/* ================= DASHBOARD ================= */}
+              <h2 className="text-xl font-bold text-blue-600">
+                Rental Menu
+              </h2>
 
-        <button
-          onClick={() => {
-            setMenuOpen(false);
-            setHoveredItem(null);
-            navigate("/owner-dashboard");
-          }}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
-        >
-          <Home size={20} />
-          Dashboard
-        </button>
+              <p className="text-sm text-gray-500 mt-1">
+                Owner Panel
+              </p>
 
+            </div>
 
-        {/* ================= PROPERTIES ================= */}
+            {/* =================================================
+                ONLY THIS AREA SCROLLS
+            ================================================= */}
 
-        <div
-          className="relative"
-          onMouseEnter={() => setHoveredItem("properties")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              setHoveredItem(null);
-              navigate("/properties");
-            }}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            <span className="flex items-center gap-3">
-              <Building2 size={20} />
-              Properties
-            </span>
+            <div className="h-[calc(100%-89px)] overflow-y-auto">
 
-            <ChevronRight size={18} />
-          </button>
+              <nav className="p-4 space-y-1">
 
-          {hoveredItem === "properties" && (
-            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
-              View and manage all your rental properties.
+                {/* =================================================
+                    DASHBOARD
+                ================================================= */}
+
+                <button
+                  onClick={() =>
+                    handleNavigation("/owner-dashboard")
+                  }
+                  onMouseEnter={(event) => {
+                    setHoveredItem(null);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
+                >
+                  <Home size={20} />
+                  Dashboard
+                </button>
+
+                {/* =================================================
+                    OTHER MENU ITEMS
+                ================================================= */}
+
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() =>
+                        handleNavigation(item.path)
+                      }
+                      onMouseEnter={(event) =>
+                        handleMenuHover(item.id, event)
+                      }
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100 transition"
+                    >
+
+                      <span className="flex items-center gap-3">
+
+                        <Icon size={20} />
+
+                        {item.label}
+
+                      </span>
+
+                      <ChevronRight size={18} />
+
+                    </button>
+                  );
+                })}
+
+                {/* =================================================
+                    LOGOUT
+                ================================================= */}
+
+                <div className="border-t pt-3 mt-3">
+
+                  <button
+                    onClick={() => {
+                      closeMenu();
+                      navigate("/");
+                    }}
+                    onMouseEnter={() => setHoveredItem(null)}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition"
+                  >
+                    <LogOut size={20} />
+                    Logout
+                  </button>
+
+                </div>
+
+              </nav>
+
+            </div>
+
+          </aside>
+
+          {/* ==================================================
+              HOVER INFORMATION CARD
+              ==================================================
+              
+              IMPORTANT:
+              This is FIXED outside the scrolling menu.
+              
+              Therefore:
+              - It doesn't create space.
+              - It doesn't push other options down.
+              - It opens on the RIGHT side.
+          ================================================== */}
+
+          {activeItem && (
+            <div
+              className="fixed w-72 bg-white border border-gray-200 shadow-xl rounded-xl p-4 z-[60]"
+              style={{
+                top: hoverPosition.top,
+                left: hoverPosition.left,
+              }}
+            >
+
+              <div className="flex items-start gap-3">
+
+                {/* CIRCLE ICON */}
+
+                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+
+                  <Info
+                    size={18}
+                    className="text-blue-600"
+                  />
+
+                </div>
+
+                {/* INFORMATION */}
+
+                <div>
+
+                  <h3 className="font-semibold text-gray-800">
+                    {activeItem.label}
+                  </h3>
+
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                    {activeItem.description}
+                  </p>
+
+                </div>
+
+              </div>
+
             </div>
           )}
-        </div>
-
-
-        {/* ================= ROOMS ================= */}
-
-        <div
-          className="relative"
-          onMouseEnter={() => setHoveredItem("rooms")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              setHoveredItem(null);
-              navigate("/rooms");
-            }}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            <span className="flex items-center gap-3">
-              <DoorOpen size={20} />
-              Rooms
-            </span>
-
-            <ChevronRight size={18} />
-          </button>
-
-          {hoveredItem === "rooms" && (
-            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
-              View and manage rooms across your properties.
-            </div>
-          )}
-        </div>
-
-
-        {/* ================= TENANTS ================= */}
-
-        <div
-          className="relative"
-          onMouseEnter={() => setHoveredItem("tenants")}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              setHoveredItem(null);
-              navigate("/tenants");
-            }}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100"
-          >
-            <span className="flex items-center gap-3">
-              <Users size={20} />
-              Tenants
-            </span>
-
-            <ChevronRight size={18} />
-          </button>
-
-          {hoveredItem === "tenants" && (
-            <div className="ml-4 mt-1 mb-1 px-4 py-2 rounded-lg bg-blue-50 text-sm text-gray-600">
-              Manage tenant information and occupancy.
-            </div>
-          )}
-        </div>
-
-
-        {/* ================= RENT & BILLS ================= */}
-
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-        >
-          <Receipt size={20} />
-          Rent & Bills
-        </button>
-
-
-        {/* ================= PAYMENTS ================= */}
-
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-        >
-          <CreditCard size={20} />
-          Payments
-        </button>
-
-
-        {/* ================= DOCUMENTS ================= */}
-
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-        >
-          <FileText size={20} />
-          Documents
-        </button>
-
-
-        {/* ================= REPORTS ================= */}
-
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-        >
-          <BarChart3 size={20} />
-          Reports
-        </button>
-
-
-        {/* ================= SETTINGS ================= */}
-
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100"
-        >
-          <Settings size={20} />
-          Settings
-        </button>
-
-
-        {/* ================= LOGOUT ================= */}
-
-        <div className="border-t pt-3 mt-3">
-
-          <button
-            onClick={() => {
-              setMenuOpen(false);
-              setHoveredItem(null);
-              navigate("/");
-            }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50"
-          >
-            <LogOut size={20} />
-            Logout
-          </button>
 
         </div>
+      )}
 
-      </nav>
-
-    </aside>
-  </div>
-)}
-
-
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ======================================================
+          MAIN DASHBOARD
+      ====================================================== */}
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
-
-        {/* ================= WELCOME ================= */}
+        {/* ====================================================
+            WELCOME
+        ==================================================== */}
 
         <div className="mb-6">
 
@@ -335,13 +443,13 @@ useEffect(() => {
 
         </div>
 
-
-        {/* ================= SUMMARY CARDS ================= */}
+        {/* ====================================================
+            SUMMARY CARDS
+        ==================================================== */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-
-          {/* Total Properties */}
+          {/* TOTAL PROPERTIES */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
 
@@ -360,8 +468,7 @@ useEffect(() => {
 
           </div>
 
-
-          {/* Total Rooms */}
+          {/* TOTAL ROOMS */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
 
@@ -380,8 +487,7 @@ useEffect(() => {
 
           </div>
 
-
-          {/* Active Tenants */}
+          {/* ACTIVE TENANTS */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
 
@@ -400,8 +506,7 @@ useEffect(() => {
 
           </div>
 
-
-          {/* Pending Rent */}
+          {/* PENDING RENT */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
 
@@ -421,16 +526,19 @@ useEffect(() => {
           </div>
 
         </div>
-
-
-        {/* ================= PROPERTY + ATTENTION ================= */}
+        {/* ====================================================
+            PROPERTY + ATTENTION
+        ==================================================== */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
 
-
-          {/* ================= MY PROPERTIES ================= */}
+          {/* ==================================================
+              MY PROPERTIES
+          ================================================== */}
 
           <div className="bg-white rounded-xl shadow-sm border">
+
+            {/* HEADER */}
 
             <div className="p-5 border-b flex justify-between items-center">
 
@@ -455,11 +563,11 @@ useEffect(() => {
 
             </div>
 
+            {/* PROPERTY LIST */}
 
             <div className="p-5 space-y-4">
 
-
-              {/* Property A */}
+              {/* PROPERTY A */}
 
               <div className="border rounded-xl p-4 hover:shadow-sm transition">
 
@@ -484,7 +592,6 @@ useEffect(() => {
 
                 </div>
 
-
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
                   <div className="bg-gray-50 rounded-lg p-2">
@@ -499,7 +606,6 @@ useEffect(() => {
 
                   </div>
 
-
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -511,7 +617,6 @@ useEffect(() => {
                     </p>
 
                   </div>
-
 
                   <div className="bg-green-50 rounded-lg p-2">
 
@@ -529,8 +634,7 @@ useEffect(() => {
 
               </div>
 
-
-              {/* Property B */}
+              {/* PROPERTY B */}
 
               <div className="border rounded-xl p-4 hover:shadow-sm transition">
 
@@ -555,7 +659,6 @@ useEffect(() => {
 
                 </div>
 
-
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
                   <div className="bg-gray-50 rounded-lg p-2">
@@ -570,7 +673,6 @@ useEffect(() => {
 
                   </div>
 
-
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -582,7 +684,6 @@ useEffect(() => {
                     </p>
 
                   </div>
-
 
                   <div className="bg-green-50 rounded-lg p-2">
 
@@ -600,15 +701,17 @@ useEffect(() => {
 
               </div>
 
-
             </div>
 
           </div>
 
-
-          {/* ================= ATTENTION REQUIRED ================= */}
+          {/* ==================================================
+              ATTENTION REQUIRED
+          ================================================== */}
 
           <div className="bg-white rounded-xl shadow-sm border">
+
+            {/* HEADER */}
 
             <div className="p-5 border-b flex justify-between items-center">
 
@@ -631,11 +734,11 @@ useEffect(() => {
 
             </div>
 
+            {/* ALERT LIST */}
 
             <div className="p-5 space-y-4">
 
-
-              {/* Pending Rent */}
+              {/* RENT PENDING */}
 
               <div className="flex items-center justify-between p-4 rounded-xl bg-red-50">
 
@@ -657,8 +760,7 @@ useEffect(() => {
 
               </div>
 
-
-              {/* Vacant Rooms */}
+              {/* VACANT ROOMS */}
 
               <div className="flex items-center justify-between p-4 rounded-xl bg-yellow-50">
 
@@ -680,8 +782,7 @@ useEffect(() => {
 
               </div>
 
-
-              {/* Documents */}
+              {/* DOCUMENTS */}
 
               <div className="flex items-center justify-between p-4 rounded-xl bg-orange-50">
 
@@ -709,10 +810,13 @@ useEffect(() => {
 
         </div>
 
-
-        {/* ================= RECENT TENANTS ================= */}
+        {/* ====================================================
+            RECENT TENANTS
+        ==================================================== */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
+
+          {/* HEADER */}
 
           <div className="p-5 border-b flex justify-between items-center">
 
@@ -737,6 +841,7 @@ useEffect(() => {
 
           </div>
 
+          {/* TABLE */}
 
           <div className="overflow-x-auto">
 
@@ -770,8 +875,9 @@ useEffect(() => {
 
               </thead>
 
-
               <tbody>
+
+                {/* TENANT 1 */}
 
                 <tr className="border-t">
 
@@ -801,6 +907,7 @@ useEffect(() => {
 
                 </tr>
 
+                {/* TENANT 2 */}
 
                 <tr className="border-t">
 
@@ -830,6 +937,7 @@ useEffect(() => {
 
                 </tr>
 
+                {/* TENANT 3 */}
 
                 <tr className="border-t">
 
@@ -866,11 +974,13 @@ useEffect(() => {
           </div>
 
         </div>
-
-
-        {/* ================= RECENT PAYMENTS ================= */}
+        {/* ====================================================
+            RECENT PAYMENTS
+        ==================================================== */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
+
+          {/* HEADER */}
 
           <div className="p-5 border-b flex justify-between items-center">
 
@@ -894,6 +1004,7 @@ useEffect(() => {
 
           </div>
 
+          {/* TABLE */}
 
           <div className="overflow-x-auto">
 
@@ -931,8 +1042,9 @@ useEffect(() => {
 
               </thead>
 
-
               <tbody>
+
+                {/* PAYMENT 1 */}
 
                 <tr className="border-t">
 
@@ -966,6 +1078,7 @@ useEffect(() => {
 
                 </tr>
 
+                {/* PAYMENT 2 */}
 
                 <tr className="border-t">
 
@@ -999,6 +1112,7 @@ useEffect(() => {
 
                 </tr>
 
+                {/* PAYMENT 3 */}
 
                 <tr className="border-t">
 
