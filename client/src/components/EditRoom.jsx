@@ -30,7 +30,6 @@ function EditRoom() {
         </button>
 
         <div className="ml-3">
-
           <h1 className="text-xl font-bold text-blue-600">
             Edit Room
           </h1>
@@ -38,7 +37,6 @@ function EditRoom() {
           <p className="text-xs text-gray-500 hidden sm:block">
             Update room information
           </p>
-
         </div>
 
       </header>
@@ -124,6 +122,13 @@ function EditRoom() {
 
               <input
                 type="number"
+                value={roomData.rent}
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    rent: e.target.value,
+                  })
+                }
                 placeholder="Enter monthly rent"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -141,6 +146,13 @@ function EditRoom() {
 
               <input
                 type="text"
+                value={roomData.tenant}
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    tenant: e.target.value,
+                  })
+                }
                 placeholder="Enter tenant name"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -157,7 +169,13 @@ function EditRoom() {
               </label>
 
               <select
-                defaultValue="Occupied"
+                value={roomData.status}
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    status: e.target.value,
+                  })
+                }
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               >
 
@@ -182,28 +200,27 @@ function EditRoom() {
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
 
+              {/* Cancel */}
+
               <button
                 type="button"
                 onClick={() => navigate(`/room-details/${id}`)}
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
                 <ArrowLeft size={18} />
-
                 Cancel
-
               </button>
 
+
+              {/* Save */}
 
               <button
                 type="button"
                 onClick={() => navigate(`/room-details/${id}`)}
                 className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition"
               >
-
                 <Save size={18} />
-
                 Save Changes
-
               </button>
 
             </div>
