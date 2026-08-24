@@ -92,13 +92,20 @@ function Dashboard() {
     },
   ];
 
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+useEffect(() => {
+  if (menuOpen) {
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
 
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
+  return () => {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  };
+}, [menuOpen]);
 
   const closeMenu = () => {
     setMenuOpen(false);
