@@ -13,6 +13,7 @@ import RoomDetails from "./components/RoomDetails";
 import EditRoom from "./components/EditRoom";
 import Tenants from "./components/Tenants";
 import TenantDetails from "./components/TenantDetails";
+import EditTenant from "./components/EditTenant";
 function App() {
   return (
     <Routes>
@@ -69,6 +70,10 @@ function App() {
       <Route
         path="/tenant-details/:id"
         element={<TenantDetails />}
+      />
+      <Route
+        path="/edit-tenant/:id"
+        element={<EditTenant />}
       />
       
     </Routes>
