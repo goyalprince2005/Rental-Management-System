@@ -30,12 +30,6 @@ function Dashboard() {
 
   const navigate = useNavigate();
 
-  /*
-   * ============================================================
-   * MENU INFORMATION
-   * ============================================================
-   */
-
   const menuItems = [
     {
       id: "properties",
@@ -98,16 +92,6 @@ function Dashboard() {
     },
   ];
 
-  /*
-   * ============================================================
-   * LOCK MAIN PAGE SCROLL
-   * ============================================================
-   *
-   * When menu is open:
-   * - Body cannot scroll.
-   * - Only the menu's internal area can scroll.
-   */
-
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
 
@@ -116,28 +100,10 @@ function Dashboard() {
     };
   }, [menuOpen]);
 
-  /*
-   * ============================================================
-   * CLOSE MENU
-   * ============================================================
-   */
-
   const closeMenu = () => {
     setMenuOpen(false);
     setHoveredItem(null);
   };
-
-  /*
-   * ============================================================
-   * HOVER MENU ITEM
-   * ============================================================
-   *
-   * The information card position is calculated from the
-   * hovered button.
-   *
-   * This makes the card appear on the RIGHT side instead of
-   * creating extra space underneath the menu option.
-   */
 
   const handleMenuHover = (itemId, event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -150,24 +116,12 @@ function Dashboard() {
     });
   };
 
-  /*
-   * ============================================================
-   * NAVIGATION
-   * ============================================================
-   */
-
   const handleNavigation = (path) => {
     if (!path) return;
 
     closeMenu();
     navigate(path);
   };
-
-  /*
-   * ============================================================
-   * CURRENT HOVERED ITEM
-   * ============================================================
-   */
 
   const activeItem = menuItems.find(
     (item) => item.id === hoveredItem
@@ -176,13 +130,9 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ======================================================
-          TOP NAVBAR
-      ====================================================== */}
+      {/* ================= TOP NAVBAR ================= */}
 
       <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
-
-        {/* LEFT SIDE */}
 
         <div className="flex items-center gap-4">
 
@@ -217,16 +167,12 @@ function Dashboard() {
 
         <div className="flex items-center gap-2">
 
-          {/* NOTIFICATIONS */}
-
           <button
             className="p-2 rounded-lg hover:bg-gray-100 transition"
             title="Notifications"
           >
             <Bell size={21} />
           </button>
-
-          {/* PRINT */}
 
           <button
             onClick={() => window.print()}
@@ -236,8 +182,6 @@ function Dashboard() {
             <Printer size={21} />
           </button>
 
-          {/* OWNER */}
-
           <button className="hidden sm:block px-4 py-2 border rounded-lg hover:bg-gray-100">
             Owner
           </button>
@@ -246,25 +190,24 @@ function Dashboard() {
 
       </header>
 
-      {/* ======================================================
-          RENTAL MENU
-      ====================================================== */}
+      {/* ================= RENTAL MENU ================= */}
 
       {menuOpen && (
         <div className="fixed inset-0 z-50">
 
-          {/* BACKGROUND OVERLAY */}
+          {/* OVERLAY */}
 
           <div
             className="absolute inset-0 bg-black/30"
             onClick={closeMenu}
           />
 
-          {/* ==================================================
-              MENU PANEL
-          ================================================== */}
+          {/* MENU PANEL */}
 
-          <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl">
+          <aside
+            className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl"
+            onMouseLeave={() => setHoveredItem(null)}
+          >
 
             {/* MENU HEADER */}
 
@@ -280,34 +223,26 @@ function Dashboard() {
 
             </div>
 
-            {/* =================================================
-                ONLY THIS AREA SCROLLS
-            ================================================= */}
+            {/* SCROLLABLE MENU AREA */}
 
             <div className="h-[calc(100%-89px)] overflow-y-auto">
 
               <nav className="p-4 space-y-1">
 
-                {/* =================================================
-                    DASHBOARD
-                ================================================= */}
+                {/* DASHBOARD */}
 
                 <button
                   onClick={() =>
                     handleNavigation("/owner-dashboard")
                   }
-                  onMouseEnter={(event) => {
-                    setHoveredItem(null);
-                  }}
+                  onMouseEnter={() => setHoveredItem(null)}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
                 >
                   <Home size={20} />
                   Dashboard
                 </button>
 
-                {/* =================================================
-                    OTHER MENU ITEMS
-                ================================================= */}
+                {/* OTHER OPTIONS */}
 
                 {menuItems.map((item) => {
                   const Icon = item.icon;
@@ -338,9 +273,7 @@ function Dashboard() {
                   );
                 })}
 
-                {/* =================================================
-                    LOGOUT
-                ================================================= */}
+                {/* LOGOUT */}
 
                 <div className="border-t pt-3 mt-3">
 
@@ -364,18 +297,7 @@ function Dashboard() {
 
           </aside>
 
-          {/* ==================================================
-              HOVER INFORMATION CARD
-              ==================================================
-              
-              IMPORTANT:
-              This is FIXED outside the scrolling menu.
-              
-              Therefore:
-              - It doesn't create space.
-              - It doesn't push other options down.
-              - It opens on the RIGHT side.
-          ================================================== */}
+          {/* HOVER INFORMATION CARD */}
 
           {activeItem && (
             <div
@@ -388,8 +310,6 @@ function Dashboard() {
 
               <div className="flex items-start gap-3">
 
-                {/* CIRCLE ICON */}
-
                 <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
 
                   <Info
@@ -398,8 +318,6 @@ function Dashboard() {
                   />
 
                 </div>
-
-                {/* INFORMATION */}
 
                 <div>
 
@@ -421,15 +339,11 @@ function Dashboard() {
         </div>
       )}
 
-      {/* ======================================================
-          MAIN DASHBOARD
-      ====================================================== */}
+      {/* ================= MAIN DASHBOARD ================= */}
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
-        {/* ====================================================
-            WELCOME
-        ==================================================== */}
+        {/* WELCOME */}
 
         <div className="mb-6">
 
@@ -443,9 +357,7 @@ function Dashboard() {
 
         </div>
 
-        {/* ====================================================
-            SUMMARY CARDS
-        ==================================================== */}
+        {/* SUMMARY CARDS */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
@@ -526,19 +438,14 @@ function Dashboard() {
           </div>
 
         </div>
-        {/* ====================================================
-            PROPERTY + ATTENTION
-        ==================================================== */}
+
+        {/* PROPERTY + ATTENTION */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
 
-          {/* ==================================================
-              MY PROPERTIES
-          ================================================== */}
+          {/* MY PROPERTIES */}
 
           <div className="bg-white rounded-xl shadow-sm border">
-
-            {/* HEADER */}
 
             <div className="p-5 border-b flex justify-between items-center">
 
@@ -562,8 +469,6 @@ function Dashboard() {
               </button>
 
             </div>
-
-            {/* PROPERTY LIST */}
 
             <div className="p-5 space-y-4">
 
@@ -704,14 +609,9 @@ function Dashboard() {
             </div>
 
           </div>
-
-          {/* ==================================================
-              ATTENTION REQUIRED
-          ================================================== */}
+          {/* ATTENTION REQUIRED */}
 
           <div className="bg-white rounded-xl shadow-sm border">
-
-            {/* HEADER */}
 
             <div className="p-5 border-b flex justify-between items-center">
 
@@ -733,8 +633,6 @@ function Dashboard() {
               />
 
             </div>
-
-            {/* ALERT LIST */}
 
             <div className="p-5 space-y-4">
 
@@ -810,13 +708,9 @@ function Dashboard() {
 
         </div>
 
-        {/* ====================================================
-            RECENT TENANTS
-        ==================================================== */}
+        {/* ================= RECENT TENANTS ================= */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
-
-          {/* HEADER */}
 
           <div className="p-5 border-b flex justify-between items-center">
 
@@ -840,8 +734,6 @@ function Dashboard() {
             </button>
 
           </div>
-
-          {/* TABLE */}
 
           <div className="overflow-x-auto">
 
@@ -974,13 +866,10 @@ function Dashboard() {
           </div>
 
         </div>
-        {/* ====================================================
-            RECENT PAYMENTS
-        ==================================================== */}
+
+        {/* ================= RECENT PAYMENTS ================= */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
-
-          {/* HEADER */}
 
           <div className="p-5 border-b flex justify-between items-center">
 
@@ -1003,8 +892,6 @@ function Dashboard() {
             </button>
 
           </div>
-
-          {/* TABLE */}
 
           <div className="overflow-x-auto">
 
@@ -1153,8 +1040,7 @@ function Dashboard() {
           </div>
 
         </div>
-
-      </main>
+        </main>
 
     </div>
   );
