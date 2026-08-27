@@ -54,7 +54,7 @@ function Sidebar() {
     {
       name: "Payments",
       icon: CreditCard,
-      path: null,
+      path: "/payments",
       description: "View and manage rental payment transactions.",
     },
     {

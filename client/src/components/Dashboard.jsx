@@ -61,7 +61,7 @@ function Dashboard() {
       icon: Receipt,
       description:
         "Track rent collection, pending bills and monthly dues.",
-      path:"/rent-bills"
+      path:"/rent-bills",
     },
     {
       id: "payments",
@@ -69,6 +69,7 @@ function Dashboard() {
       icon: CreditCard,
       description:
         "View and manage rental payment transactions.",
+      path:"/payments",
     },
     {
       id: "documents",
