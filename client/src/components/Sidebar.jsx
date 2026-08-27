@@ -48,7 +48,7 @@ function Sidebar() {
     {
       name: "Rent & Bills",
       icon: Receipt,
-      path: null,
+      path: "/rent-bills",
       description: "Manage rental bills and monthly rent information.",
     },
     {

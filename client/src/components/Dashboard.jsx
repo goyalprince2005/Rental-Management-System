@@ -61,6 +61,7 @@ function Dashboard() {
       icon: Receipt,
       description:
         "Track rent collection, pending bills and monthly dues.",
+      path:"/rent-bills"
     },
     {
       id: "payments",

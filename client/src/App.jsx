@@ -14,6 +14,7 @@ import EditRoom from "./components/EditRoom";
 import Tenants from "./components/Tenants";
 import TenantDetails from "./components/TenantDetails";
 import EditTenant from "./components/EditTenant";
+import RentBills from "./components/RentBills";
 function App() {
   return (
     <Routes>
@@ -74,6 +75,10 @@ function App() {
       <Route
         path="/edit-tenant/:id"
         element={<EditTenant />}
+      />
+      <Route
+        path="/rent-bills"
+        element={<RentBills />}
       />
       
     </Routes>
