@@ -77,6 +77,7 @@ function Dashboard() {
       icon: FileText,
       description:
         "Manage tenant agreements and important rental documents.",
+      path:"/documents",
     },
     {
       id: "reports",

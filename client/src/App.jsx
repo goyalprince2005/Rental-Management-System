@@ -16,6 +16,7 @@ import TenantDetails from "./components/TenantDetails";
 import EditTenant from "./components/EditTenant";
 import RentBills from "./components/RentBills";
 import Payments from "./components/Payments";
+import Documents from "./components/Documents";
 function App() {
   return (
     <Routes>
@@ -85,7 +86,11 @@ function App() {
         path="payments"
         element={<Payments/>}
       />
-      
+      <Route
+        path="/documents"
+        element={<Documents />}
+      />
+              
     </Routes>
   );
 }

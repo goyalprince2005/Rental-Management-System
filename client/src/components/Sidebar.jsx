@@ -60,7 +60,7 @@ function Sidebar() {
     {
       name: "Documents",
       icon: FileText,
-      path: null,
+      path: "/documents",
       description: "Manage rental-related documents.",
     },
     {
