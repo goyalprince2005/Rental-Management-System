@@ -313,7 +313,7 @@ useEffect(() => {
 
           {activeItem && (
             <div
-              className="fixed w-72 bg-white border border-gray-200 shadow-xl rounded-xl p-4 z-[60]"
+              className="fixed w-72 bg-white border border-gray-200 shadow-xl rounded-xl p-4 z-50"
               style={{
                 top: hoverPosition.top,
                 left: hoverPosition.left,
@@ -322,7 +322,7 @@ useEffect(() => {
 
               <div className="flex items-start gap-3">
 
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
 
                   <Info
                     size={18}
