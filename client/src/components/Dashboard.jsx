@@ -85,6 +85,7 @@ function Dashboard() {
       icon: BarChart3,
       description:
         "View rental income, occupancy and property reports.",
+      path:"/reports",
     },
     {
       id: "settings",

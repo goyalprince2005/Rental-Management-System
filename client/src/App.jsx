@@ -17,6 +17,7 @@ import EditTenant from "./components/EditTenant";
 import RentBills from "./components/RentBills";
 import Payments from "./components/Payments";
 import Documents from "./components/Documents";
+import Reports from "./components/Reports";
 function App() {
   return (
     <Routes>
@@ -89,6 +90,10 @@ function App() {
       <Route
         path="/documents"
         element={<Documents />}
+      />
+      <Route
+        path="/reports"
+        element={<Reports/>}
       />
               
     </Routes>

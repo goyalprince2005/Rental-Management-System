@@ -66,7 +66,7 @@ function Sidebar() {
     {
       name: "Reports",
       icon: BarChart3,
-      path: null,
+      path: "/reports",
       description: "View rental reports and statistics.",
     },
     {
