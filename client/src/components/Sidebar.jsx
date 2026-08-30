@@ -72,7 +72,7 @@ function Sidebar() {
     {
       name: "Settings",
       icon: Settings,
-      path: null,
+      path: "settings",
       description: "Manage your rental management settings.",
     },
   ];

@@ -18,6 +18,7 @@ import RentBills from "./components/RentBills";
 import Payments from "./components/Payments";
 import Documents from "./components/Documents";
 import Reports from "./components/Reports";
+import Settings from "./components/Settings";
 function App() {
   return (
     <Routes>
@@ -94,6 +95,10 @@ function App() {
       <Route
         path="/reports"
         element={<Reports/>}
+      />
+      <Route 
+        path="/settings"
+        element={<Settings/>}
       />
               
     </Routes>

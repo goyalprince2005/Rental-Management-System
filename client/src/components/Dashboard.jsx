@@ -93,6 +93,7 @@ function Dashboard() {
       icon: Settings,
       description:
         "Manage your rental system preferences and settings.",
+      path:"/settings",
     },
   ];
 
