@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   User,
   Building2,
   DoorOpen,
@@ -9,9 +8,12 @@ import {
   Eye,
   Pencil,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function Tenants() {
   const navigate = useNavigate();
+
+  // ================= TENANT DATA =================
 
   const tenants = [
     {
@@ -43,29 +45,10 @@ function Tenants() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
+      <Navbar />
 
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Tenants
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Manage your rental tenants
-          </p>
-        </div>
-
-      </header>
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -85,6 +68,7 @@ function Tenants() {
 
         </div>
 
+
         {/* ================= TENANT CARDS ================= */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -103,10 +87,12 @@ function Tenants() {
                 <div className="flex items-center gap-3">
 
                   <div className="p-3 bg-blue-50 rounded-xl">
+
                     <User
                       size={26}
                       className="text-blue-600"
                     />
+
                   </div>
 
                   <div>
@@ -123,7 +109,8 @@ function Tenants() {
 
                 </div>
 
-                {/* Status */}
+
+                {/* ================= STATUS ================= */}
 
                 <span
                   className={`px-3 py-1 rounded-full text-sm ${
@@ -137,11 +124,12 @@ function Tenants() {
 
               </div>
 
+
               {/* ================= TENANT INFORMATION ================= */}
 
               <div className="p-5 space-y-3">
 
-                {/* Property */}
+                {/* PROPERTY */}
 
                 <div className="flex items-center gap-3 text-gray-600">
 
@@ -153,7 +141,8 @@ function Tenants() {
 
                 </div>
 
-                {/* Room */}
+
+                {/* ROOM */}
 
                 <div className="flex items-center gap-3 text-gray-600">
 
@@ -165,7 +154,8 @@ function Tenants() {
 
                 </div>
 
-                {/* Rent */}
+
+                {/* RENT */}
 
                 <div className="flex items-center gap-3 text-gray-600">
 
@@ -179,24 +169,40 @@ function Tenants() {
 
               </div>
 
+
               {/* ================= ACTION BUTTONS ================= */}
 
               <div className="p-5 border-t flex gap-3">
 
-                <button
-                  onClick={() => navigate(`/tenant-details/${tenant.id}`)}
-                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <Eye size={18} />
-                  View Details
-                </button>
+                {/* VIEW DETAILS */}
 
                 <button
-                  onClick={() => navigate(`/edit-tenant/${tenant.id}`)}
+                  onClick={() =>
+                    navigate(`/tenant-details/${tenant.id}`)
+                  }
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                >
+
+                  <Eye size={18} />
+
+                  View Details
+
+                </button>
+
+
+                {/* EDIT */}
+
+                <button
+                  onClick={() =>
+                    navigate(`/edit-tenant/${tenant.id}`)
+                  }
                   className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition"
                 >
+
                   <Pencil size={18} />
+
                   Edit
+
                 </button>
 
               </div>
