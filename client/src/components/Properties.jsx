@@ -5,9 +5,9 @@ import {
   Plus,
   Eye,
   Pencil,
-  ArrowLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 function Properties() {
   const navigate = useNavigate();
@@ -15,65 +15,45 @@ function Properties() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
-
-        <div className="flex items-center gap-3">
-
-          <button
-            onClick={() => navigate("/owner-dashboard")}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
-            title="Back to Dashboard"
-          >
-            <ArrowLeft size={22} />
-          </button>
-
-          <div>
-
-            <h1 className="text-xl font-bold text-blue-600">
-              Properties
-            </h1>
-
-            <p className="text-xs text-gray-500 hidden sm:block">
-              Manage your rental properties
-            </p>
-
-          </div>
-
-        </div>
-
-
-        {/* Add Property Button */}
-
-        <button
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          <Plus size={20} />
-
-          <span className="hidden sm:block">
-            Add Property
-          </span>
-        </button>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
-        {/* Page Heading */}
+        {/* ================= PAGE HEADER ================= */}
 
-        <div className="mb-6">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-            My Properties
-          </h2>
+          <div>
 
-          <p className="text-gray-500 mt-1">
-            View and manage all your rental properties.
-          </p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              My Properties
+            </h2>
+
+            <p className="text-gray-500 mt-1">
+              View and manage all your rental properties.
+            </p>
+
+          </div>
+
+
+          {/* ADD PROPERTY */}
+
+          <button
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+
+            <Plus size={20} />
+
+            <span>
+              Add Property
+            </span>
+
+          </button>
 
         </div>
 
@@ -87,7 +67,7 @@ function Properties() {
 
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-            {/* Property Header */}
+            {/* PROPERTY HEADER */}
 
             <div className="p-5 border-b flex justify-between items-start">
 
@@ -121,7 +101,7 @@ function Properties() {
               </div>
 
 
-              {/* Status */}
+              {/* STATUS */}
 
               <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
                 Active
@@ -130,14 +110,13 @@ function Properties() {
             </div>
 
 
-            {/* Property Information */}
+            {/* PROPERTY INFORMATION */}
 
             <div className="p-5">
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
 
-
-                {/* Floors */}
+                {/* FLOORS */}
 
                 <div className="bg-gray-50 rounded-lg p-3">
 
@@ -152,7 +131,7 @@ function Properties() {
                 </div>
 
 
-                {/* Rooms */}
+                {/* ROOMS */}
 
                 <div className="bg-gray-50 rounded-lg p-3">
 
@@ -167,7 +146,7 @@ function Properties() {
                 </div>
 
 
-                {/* Available */}
+                {/* AVAILABLE */}
 
                 <div className="bg-green-50 rounded-lg p-3">
 
@@ -182,7 +161,7 @@ function Properties() {
                 </div>
 
 
-                {/* Occupied */}
+                {/* OCCUPIED */}
 
                 <div className="bg-blue-50 rounded-lg p-3">
 
@@ -199,17 +178,19 @@ function Properties() {
               </div>
 
 
-              {/* Buttons */}
+              {/* ACTION BUTTONS */}
 
               <div className="flex gap-3 mt-5">
 
                 <button
-                onClick={() => navigate("/property-details")}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                  onClick={() => navigate("/property-details")}
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
-          
-               <Eye size={18} />
-                View Details
+
+                  <Eye size={18} />
+
+                  View Details
+
                 </button>
 
 
@@ -236,7 +217,7 @@ function Properties() {
 
           <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-            {/* Property Header */}
+            {/* PROPERTY HEADER */}
 
             <div className="p-5 border-b flex justify-between items-start">
 
@@ -270,7 +251,7 @@ function Properties() {
               </div>
 
 
-              {/* Status */}
+              {/* STATUS */}
 
               <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
                 Active
@@ -279,14 +260,13 @@ function Properties() {
             </div>
 
 
-            {/* Property Information */}
+            {/* PROPERTY INFORMATION */}
 
             <div className="p-5">
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
 
-
-                {/* Floors */}
+                {/* FLOORS */}
 
                 <div className="bg-gray-50 rounded-lg p-3">
 
@@ -301,7 +281,7 @@ function Properties() {
                 </div>
 
 
-                {/* Rooms */}
+                {/* ROOMS */}
 
                 <div className="bg-gray-50 rounded-lg p-3">
 
@@ -316,7 +296,7 @@ function Properties() {
                 </div>
 
 
-                {/* Available */}
+                {/* AVAILABLE */}
 
                 <div className="bg-green-50 rounded-lg p-3">
 
@@ -331,7 +311,7 @@ function Properties() {
                 </div>
 
 
-                {/* Occupied */}
+                {/* OCCUPIED */}
 
                 <div className="bg-blue-50 rounded-lg p-3">
 
@@ -348,16 +328,19 @@ function Properties() {
               </div>
 
 
-              {/* Buttons */}
+              {/* ACTION BUTTONS */}
 
               <div className="flex gap-3 mt-5">
 
                 <button
-                onClick={() => navigate("/property-details")}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                  onClick={() => navigate("/property-details")}
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
-                <Eye size={18} />
-                View Details
+
+                  <Eye size={18} />
+
+                  View Details
+
                 </button>
 
 
