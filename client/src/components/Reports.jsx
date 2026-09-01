@@ -1,7 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   BarChart3,
   IndianRupee,
   Building2,
@@ -10,9 +8,9 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-function Reports() {
-  const navigate = useNavigate();
+import Navbar from "./Navbar";
 
+function Reports() {
   const reportData = {
     totalProperties: 2,
     totalRooms: 6,
@@ -33,31 +31,9 @@ function Reports() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-
-          <h1 className="text-xl font-bold text-blue-600">
-            Reports
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            View rental reports and statistics
-          </p>
-
-        </div>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -68,9 +44,9 @@ function Reports() {
 
         <div className="mb-6">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Rental Reports
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             Overview of your properties, rooms, tenants and rental
@@ -251,8 +227,7 @@ function Reports() {
                   </p>
 
                   <h3 className="text-2xl font-bold text-gray-800">
-                    ₹
-                    {reportData.monthlyRent.toLocaleString("en-IN")}
+                    ₹{reportData.monthlyRent.toLocaleString("en-IN")}
                   </h3>
 
                 </div>
@@ -280,8 +255,7 @@ function Reports() {
                   </p>
 
                   <h3 className="text-2xl font-bold text-green-600">
-                    ₹
-                    {reportData.collectedRent.toLocaleString("en-IN")}
+                    ₹{reportData.collectedRent.toLocaleString("en-IN")}
                   </h3>
 
                 </div>
@@ -309,8 +283,7 @@ function Reports() {
                   </p>
 
                   <h3 className="text-2xl font-bold text-yellow-600">
-                    ₹
-                    {reportData.pendingRent.toLocaleString("en-IN")}
+                    ₹{reportData.pendingRent.toLocaleString("en-IN")}
                   </h3>
 
                 </div>
@@ -365,8 +338,7 @@ function Reports() {
               </span>
 
               <span className="text-sm font-semibold text-gray-800">
-                {reportData.occupiedRooms} /{" "}
-                {reportData.totalRooms}
+                {reportData.occupiedRooms} / {reportData.totalRooms}
               </span>
 
             </div>
@@ -389,21 +361,6 @@ function Reports() {
             </p>
 
           </div>
-
-        </div>
-
-
-        {/* ================= BACK BUTTON ================= */}
-
-        <div className="mt-6">
-
-          <button
-            onClick={() => navigate("/owner-dashboard")}
-            className="flex items-center gap-2 border border-gray-300 bg-white px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
-          >
-            <ArrowLeft size={18} />
-            Back to Dashboard
-          </button>
 
         </div>
 
