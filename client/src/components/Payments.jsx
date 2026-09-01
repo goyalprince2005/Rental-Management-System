@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   CreditCard,
   User,
   Building2,
@@ -9,6 +8,8 @@ import {
   IndianRupee,
   Eye,
 } from "lucide-react";
+
+import Navbar from "./Navbar";
 
 function Payments() {
   const navigate = useNavigate();
@@ -53,31 +54,9 @@ function Payments() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-
-          <h1 className="text-xl font-bold text-blue-600">
-            Payments
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            View and manage rental payments
-          </p>
-
-        </div>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -88,9 +67,9 @@ function Payments() {
 
         <div className="mb-6">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Payment Management
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             Track completed and pending rental payments.
