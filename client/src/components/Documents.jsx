@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   FileText,
   User,
   Building2,
@@ -9,6 +8,7 @@ import {
   Eye,
   Download,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function Documents() {
   const navigate = useNavigate();
@@ -44,9 +44,11 @@ function Documents() {
   ];
 
   const totalDocuments = documents.length;
+
   const activeDocuments = documents.filter(
     (document) => document.status === "Active"
   ).length;
+
   const verifiedDocuments = documents.filter(
     (document) => document.status === "Verified"
   ).length;
@@ -54,31 +56,9 @@ function Documents() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-
-          <h1 className="text-xl font-bold text-blue-600">
-            Documents
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Manage rental-related documents
-          </p>
-
-        </div>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -89,9 +69,9 @@ function Documents() {
 
         <div className="mb-6">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Document Management
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             View and manage documents related to your rental properties
