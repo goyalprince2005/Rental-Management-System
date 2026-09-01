@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   Receipt,
   User,
   Building2,
@@ -9,6 +8,7 @@ import {
   IndianRupee,
   Eye,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function RentBills() {
   const navigate = useNavigate();
@@ -47,31 +47,9 @@ function RentBills() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-
-          <h1 className="text-xl font-bold text-blue-600">
-            Rent & Bills
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Manage monthly rent and bill information
-          </p>
-
-        </div>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -104,10 +82,12 @@ function RentBills() {
             <div className="flex items-center gap-3">
 
               <div className="p-3 bg-blue-50 rounded-xl">
+
                 <IndianRupee
                   size={26}
                   className="text-blue-600"
                 />
+
               </div>
 
               <div>
@@ -134,10 +114,12 @@ function RentBills() {
             <div className="flex items-center gap-3">
 
               <div className="p-3 bg-green-50 rounded-xl">
+
                 <Receipt
                   size={26}
                   className="text-green-600"
                 />
+
               </div>
 
               <div>
@@ -164,10 +146,12 @@ function RentBills() {
             <div className="flex items-center gap-3">
 
               <div className="p-3 bg-yellow-50 rounded-xl">
+
                 <Receipt
                   size={26}
                   className="text-yellow-600"
                 />
+
               </div>
 
               <div>
