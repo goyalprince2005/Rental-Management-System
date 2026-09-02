@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "./Navbar";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -62,7 +61,7 @@ function Dashboard() {
       icon: Receipt,
       description:
         "Track rent collection, pending bills and monthly dues.",
-      path:"/rent-bills",
+      path: "/rent-bills",
     },
     {
       id: "payments",
@@ -70,7 +69,7 @@ function Dashboard() {
       icon: CreditCard,
       description:
         "View and manage rental payment transactions.",
-      path:"/payments",
+      path: "/payments",
     },
     {
       id: "documents",
@@ -78,7 +77,7 @@ function Dashboard() {
       icon: FileText,
       description:
         "Manage tenant agreements and important rental documents.",
-      path:"/documents",
+      path: "/documents",
     },
     {
       id: "reports",
@@ -86,7 +85,7 @@ function Dashboard() {
       icon: BarChart3,
       description:
         "View rental income, occupancy and property reports.",
-      path:"/reports",
+      path: "/reports",
     },
     {
       id: "settings",
@@ -94,24 +93,24 @@ function Dashboard() {
       icon: Settings,
       description:
         "Manage your rental system preferences and settings.",
-      path:"/settings",
+      path: "/settings",
     },
   ];
 
-useEffect(() => {
-  if (menuOpen) {
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-  }
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
 
-  return () => {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-  };
-}, [menuOpen]);
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -622,6 +621,7 @@ useEffect(() => {
             </div>
 
           </div>
+
           {/* ATTENTION REQUIRED */}
 
           <div className="bg-white rounded-xl shadow-sm border">
@@ -899,6 +899,7 @@ useEffect(() => {
             </div>
 
             <button
+              onClick={() => navigate("/payments")}
               className="text-blue-600 text-sm font-medium hover:underline"
             >
               View All →
@@ -1053,7 +1054,8 @@ useEffect(() => {
           </div>
 
         </div>
-        </main>
+
+      </main>
 
     </div>
   );
