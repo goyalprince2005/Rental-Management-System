@@ -8,6 +8,7 @@ import {
   IndianRupee,
   Building2,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function RoomDetails() {
   const navigate = useNavigate();
@@ -57,24 +58,30 @@ function RoomDetails() {
 
   const room = rooms[id];
 
+  // ================= ROOM NOT FOUND =================
+
   if (!room) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Room Not Found
-          </h2>
+      <div className="min-h-screen bg-gray-100">
+        <Navbar />
 
-          <p className="text-gray-500 mt-2">
-            The requested room does not exist.
-          </p>
+        <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
+          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+            <h2 className="text-2xl font-bold text-gray-800">
+              Room Not Found
+            </h2>
 
-          <button
-            onClick={() => navigate("/rooms")}
-            className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Back to Rooms
-          </button>
+            <p className="text-gray-500 mt-2">
+              The requested room does not exist.
+            </p>
+
+            <button
+              onClick={() => navigate("/rooms")}
+              className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Back to Rooms
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -83,29 +90,9 @@ function RoomDetails() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/rooms")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Rooms"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Room Details
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            View complete room information
-          </p>
-        </div>
-
-      </header>
+      <Navbar />
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -114,34 +101,30 @@ function RoomDetails() {
         {/* ================= PAGE HEADING ================= */}
 
         <div className="mb-6">
-
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Room {room.roomNumber}
-          </h2>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Room Details
+          </h1>
 
           <p className="text-gray-500 mt-1">
-            Complete information about this room.
+            View complete information about this room.
           </p>
-
         </div>
 
         {/* ================= ROOM CARD ================= */}
 
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-          {/* Room Header */}
+          {/* ================= ROOM HEADER ================= */}
 
           <div className="p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
             <div className="flex items-center gap-4">
 
               <div className="p-4 bg-blue-50 rounded-xl">
-
                 <DoorOpen
                   size={32}
                   className="text-blue-600"
                 />
-
               </div>
 
               <div>
@@ -151,26 +134,20 @@ function RoomDetails() {
                 </h3>
 
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
-
                   <Building2 size={16} />
-
                   {room.property}
-
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
-
                   <MapPin size={16} />
-
                   {room.location}
-
                 </div>
 
               </div>
 
             </div>
 
-            {/* Status */}
+            {/* ================= STATUS ================= */}
 
             <span
               className={`px-4 py-2 rounded-full text-sm font-medium ${
@@ -201,13 +178,11 @@ function RoomDetails() {
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
-
                   <DoorOpen size={18} />
 
                   <p className="text-sm">
                     Floor
                   </p>
-
                 </div>
 
                 <p className="text-2xl font-bold mt-2">
@@ -221,13 +196,11 @@ function RoomDetails() {
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
-
                   <IndianRupee size={18} />
 
                   <p className="text-sm">
                     Monthly Rent
                   </p>
-
                 </div>
 
                 <p className="text-2xl font-bold mt-2">
@@ -241,13 +214,11 @@ function RoomDetails() {
               <div className="bg-blue-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-blue-600">
-
                   <User size={18} />
 
                   <p className="text-sm">
                     Tenant
                   </p>
-
                 </div>
 
                 <p className="text-xl font-bold text-blue-600 mt-2">
@@ -322,9 +293,7 @@ function RoomDetails() {
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
                 <ArrowLeft size={18} />
-
                 Back to Rooms
-
               </button>
 
               {/* Edit Room Button */}
