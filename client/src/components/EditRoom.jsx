@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
+import Navbar from "./Navbar";
 
 function EditRoom() {
   const navigate = useNavigate();
@@ -17,47 +18,25 @@ function EditRoom() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate(`/room-details/${id}`)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Room Details"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Edit Room
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Update room information
-          </p>
-        </div>
-
-      </header>
-
+      <Navbar />
 
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="p-4 md:p-6 max-w-3xl mx-auto">
 
-        <div className="mb-6">
+        {/* ================= PAGE HEADING ================= */}
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Edit Room {id}
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             Update the information of this room.
           </p>
-
         </div>
-
 
         {/* ================= FORM CARD ================= */}
 
@@ -68,7 +47,6 @@ function EditRoom() {
             {/* Room Number */}
 
             <div>
-
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Room Number
               </label>
@@ -84,14 +62,11 @@ function EditRoom() {
                 }
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
-
             </div>
-
 
             {/* Floor */}
 
             <div>
-
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Floor
               </label>
@@ -108,14 +83,11 @@ function EditRoom() {
                 placeholder="Enter floor number"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
-
             </div>
-
 
             {/* Monthly Rent */}
 
             <div>
-
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Monthly Rent
               </label>
@@ -132,14 +104,11 @@ function EditRoom() {
                 placeholder="Enter monthly rent"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
-
             </div>
-
 
             {/* Tenant */}
 
             <div>
-
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tenant
               </label>
@@ -156,14 +125,11 @@ function EditRoom() {
                 placeholder="Enter tenant name"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
-
             </div>
-
 
             {/* Status */}
 
             <div>
-
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
@@ -178,7 +144,6 @@ function EditRoom() {
                 }
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               >
-
                 <option value="Occupied">
                   Occupied
                 </option>
@@ -190,11 +155,8 @@ function EditRoom() {
                 <option value="Due">
                   Due
                 </option>
-
               </select>
-
             </div>
-
 
             {/* ================= BUTTONS ================= */}
 
@@ -210,7 +172,6 @@ function EditRoom() {
                 <ArrowLeft size={18} />
                 Cancel
               </button>
-
 
               {/* Save */}
 
