@@ -1,20 +1,60 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
+import Navbar from "./Navbar";
 
 function EditTenant() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [tenantData, setTenantData] = useState({
-    name: "",
-    phone: "",
-    property: "",
-    room: "",
-    rent: "",
-    status: "Active",
-    joiningDate: "",
-  });
+  const tenants = [
+    {
+      id: "1",
+      name: "Rahul Sharma",
+      phone: "9876543210",
+      property: "Green View Apartments",
+      room: "101",
+      rent: "5000",
+      status: "Active",
+      joiningDate: "2026-01-10",
+    },
+    {
+      id: "2",
+      name: "Aman Kumar",
+      phone: "9876543211",
+      property: "Green View Apartments",
+      room: "102",
+      rent: "6000",
+      status: "Active",
+      joiningDate: "2026-02-05",
+    },
+    {
+      id: "3",
+      name: "Neha Sharma",
+      phone: "9876543212",
+      property: "Shyam Residency",
+      room: "203",
+      rent: "5500",
+      status: "Due",
+      joiningDate: "2026-03-15",
+    },
+  ];
+
+  const existingTenant = tenants.find(
+    (tenant) => tenant.id === id
+  );
+
+  const [tenantData, setTenantData] = useState(
+    existingTenant || {
+      name: "",
+      phone: "",
+      property: "",
+      room: "",
+      rent: "",
+      status: "Active",
+      joiningDate: "",
+    }
+  );
 
   const handleChange = (e) => {
     setTenantData({
@@ -30,39 +70,21 @@ function EditTenant() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate(`/tenant-details/${id}`)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Tenant Details"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Edit Tenant
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Update tenant information
-          </p>
-        </div>
-
-      </header>
+      <Navbar />
 
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="p-4 md:p-6 max-w-3xl mx-auto">
 
+        {/* ================= PAGE HEADING ================= */}
+
         <div className="mb-6">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Edit Tenant {id}
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             Update the information of this tenant.
@@ -200,14 +222,20 @@ function EditTenant() {
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
 
+              {/* Cancel */}
+
               <button
                 type="button"
-                onClick={() => navigate(`/tenant-details/${id}`)}
+                onClick={() =>
+                  navigate(`/tenant-details/${id}`)
+                }
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
                 <ArrowLeft size={18} />
                 Cancel
               </button>
+
+              {/* Save */}
 
               <button
                 type="button"
