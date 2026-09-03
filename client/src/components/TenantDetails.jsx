@@ -9,6 +9,7 @@ import {
   Phone,
   Calendar,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function TenantDetails() {
   const navigate = useNavigate();
@@ -53,23 +54,31 @@ function TenantDetails() {
 
   if (!tenant) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Tenant Not Found
-          </h2>
+      <div className="min-h-screen bg-gray-100">
 
-          <p className="text-gray-500 mt-2">
-            The requested tenant does not exist.
-          </p>
+        <Navbar />
 
-          <button
-            onClick={() => navigate("/tenants")}
-            className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Back to Tenants
-          </button>
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+
+            <h2 className="text-2xl font-bold text-gray-800">
+              Tenant Not Found
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              The requested tenant does not exist.
+            </p>
+
+            <button
+              onClick={() => navigate("/tenants")}
+              className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Back to Tenants
+            </button>
+
+          </div>
         </div>
+
       </div>
     );
   }
@@ -77,29 +86,10 @@ function TenantDetails() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
+      <Navbar />
 
-        <button
-          onClick={() => navigate("/tenants")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Tenants"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Tenant Details
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            View complete tenant information
-          </p>
-        </div>
-
-      </header>
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -119,6 +109,7 @@ function TenantDetails() {
 
         </div>
 
+
         {/* ================= TENANT CARD ================= */}
 
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -130,10 +121,12 @@ function TenantDetails() {
             <div className="flex items-center gap-4">
 
               <div className="p-4 bg-blue-50 rounded-xl">
+
                 <User
                   size={32}
                   className="text-blue-600"
                 />
+
               </div>
 
               <div>
@@ -150,6 +143,9 @@ function TenantDetails() {
 
             </div>
 
+
+            {/* ================= STATUS ================= */}
+
             <span
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 tenant.status === "Active"
@@ -161,6 +157,7 @@ function TenantDetails() {
             </span>
 
           </div>
+
 
           {/* ================= TENANT INFORMATION ================= */}
 
@@ -177,10 +174,13 @@ function TenantDetails() {
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <Phone size={18} />
+
                   <p className="text-sm">
                     Phone
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -189,15 +189,19 @@ function TenantDetails() {
 
               </div>
 
+
               {/* Property */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <Building2 size={18} />
+
                   <p className="text-sm">
                     Property
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -206,15 +210,19 @@ function TenantDetails() {
 
               </div>
 
+
               {/* Room */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <DoorOpen size={18} />
+
                   <p className="text-sm">
                     Room
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -223,15 +231,19 @@ function TenantDetails() {
 
               </div>
 
+
               {/* Rent */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <IndianRupee size={18} />
+
                   <p className="text-sm">
                     Monthly Rent
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -240,15 +252,19 @@ function TenantDetails() {
 
               </div>
 
+
               {/* Joining Date */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <Calendar size={18} />
+
                   <p className="text-sm">
                     Joining Date
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -257,15 +273,19 @@ function TenantDetails() {
 
               </div>
 
+
               {/* Location */}
 
               <div className="bg-gray-50 rounded-xl p-4">
 
                 <div className="flex items-center gap-2 text-gray-500">
+
                   <Building2 size={18} />
+
                   <p className="text-sm">
                     Location
                   </p>
+
                 </div>
 
                 <p className="font-bold mt-2">
@@ -275,6 +295,7 @@ function TenantDetails() {
               </div>
 
             </div>
+
 
             {/* ================= PROPERTY INFORMATION ================= */}
 
@@ -289,10 +310,12 @@ function TenantDetails() {
                 <div className="flex items-center gap-3">
 
                   <div className="p-3 bg-blue-50 rounded-lg">
+
                     <Building2
                       size={24}
                       className="text-blue-600"
                     />
+
                   </div>
 
                   <div>
@@ -313,6 +336,7 @@ function TenantDetails() {
 
             </div>
 
+
             {/* ================= ACTION BUTTONS ================= */}
 
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
@@ -321,9 +345,13 @@ function TenantDetails() {
                 onClick={() => navigate("/tenants")}
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
+
                 <ArrowLeft size={18} />
+
                 Back to Tenants
+
               </button>
+
 
               <button
                 onClick={() => navigate(`/edit-tenant/${id}`)}
