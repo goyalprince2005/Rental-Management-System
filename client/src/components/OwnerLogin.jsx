@@ -1,9 +1,18 @@
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function OwnerLogin() {
   const navigate = useNavigate();
 
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
+
   const handleLogin = () => {
+    if (!mobileNumber || !password) {
+      alert("Please enter your mobile number and password.");
+      return;
+    }
+
     navigate("/owner-dashboard");
   };
 
@@ -22,6 +31,8 @@ function OwnerLogin() {
 
         <form className="space-y-5">
 
+          {/* Mobile Number */}
+
           <div>
             <label className="block mb-2 font-medium">
               Mobile Number
@@ -29,10 +40,14 @@ function OwnerLogin() {
 
             <input
               type="tel"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
               placeholder="Enter your mobile number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
+          {/* Password */}
 
           <div>
             <label className="block mb-2 font-medium">
@@ -41,10 +56,14 @@ function OwnerLogin() {
 
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
+          {/* Login */}
 
           <button
             type="button"
