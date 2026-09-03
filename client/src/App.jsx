@@ -19,6 +19,7 @@ import Payments from "./components/Payments";
 import Documents from "./components/Documents";
 import Reports from "./components/Reports";
 import Settings from "./components/Settings";
+
 function App() {
   return (
     <Routes>
@@ -28,79 +29,97 @@ function App() {
         path="/owner-login"
         element={<OwnerLogin />}
       />
+
       <Route
         path="/tenant-login"
         element={<TenantLogin />}
       />
+
       <Route
         path="/forgot-password"
         element={<ForgotPassword />}
       />
+
       <Route
         path="/otp-verification"
         element={<OTPVerification />}
       />
+
       <Route
         path="/reset-password"
         element={<ResetPassword />}
       />
+
       <Route
         path="/owner-dashboard"
         element={<Dashboard />}
       />
+
       <Route
         path="/properties"
         element={<Properties />}
       />
+
       <Route
         path="/property-details"
         element={<PropertyDetails />}
       />
+
       <Route
         path="/rooms"
         element={<Rooms />}
       />
+
       <Route
         path="/room-details/:id"
         element={<RoomDetails />}
       />
+
       <Route
         path="/edit-room/:id"
         element={<EditRoom />}
       />
+
       <Route
         path="/tenants"
         element={<Tenants />}
       />
+
       <Route
         path="/tenant-details/:id"
         element={<TenantDetails />}
       />
+
       <Route
         path="/edit-tenant/:id"
         element={<EditTenant />}
       />
+
       <Route
         path="/rent-bills"
         element={<RentBills />}
       />
+
       <Route
-        path="payments"
-        element={<Payments/>}
+        path="/payments"
+        element={<Payments />}
       />
+
       <Route
         path="/documents"
         element={<Documents />}
       />
+
       <Route
         path="/reports"
-        element={<Reports/>}
+        element={<Reports />}
       />
-      <Route 
+
+      <Route
         path="/settings"
-        element={<Settings/>}
+        element={<Settings />}
       />
-              
+
     </Routes>
   );
 }
