@@ -1,6 +1,28 @@
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function ResetPassword() {
+  const navigate = useNavigate();
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleResetPassword = () => {
+    if (!newPassword || !confirmPassword) {
+      alert("Please enter both password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    alert("Password reset successfully.");
+
+    navigate("/tenant-login");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
@@ -16,6 +38,8 @@ function ResetPassword() {
 
         <form className="space-y-5">
 
+          {/* New Password */}
+
           <div>
             <label className="block mb-2 font-medium">
               New Password
@@ -23,10 +47,14 @@ function ResetPassword() {
 
             <input
               type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
+
+          {/* Confirm Password */}
 
           <div>
             <label className="block mb-2 font-medium">
@@ -35,13 +63,18 @@ function ResetPassword() {
 
             <input
               type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
+          {/* Reset Password */}
+
           <button
             type="button"
+            onClick={handleResetPassword}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
             Reset Password
