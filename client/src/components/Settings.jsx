@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   User,
   Shield,
   Bell,
   Home,
   Save,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function Settings() {
   const navigate = useNavigate();
@@ -42,29 +42,9 @@ function Settings() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center px-4 md:px-6">
-
-        <button
-          onClick={() => navigate("/owner-dashboard")}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
-          title="Back to Dashboard"
-        >
-          <ArrowLeft size={22} />
-        </button>
-
-        <div className="ml-3">
-          <h1 className="text-xl font-bold text-blue-600">
-            Settings
-          </h1>
-
-          <p className="text-xs text-gray-500 hidden sm:block">
-            Manage your rental management settings
-          </p>
-        </div>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -75,9 +55,9 @@ function Settings() {
 
         <div className="mb-6">
 
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Settings
-          </h2>
+          </h1>
 
           <p className="text-gray-500 mt-1">
             Manage your account, notifications and rental preferences.
@@ -96,13 +76,16 @@ function Settings() {
             <div className="p-5 border-b flex items-center gap-3">
 
               <div className="p-3 bg-blue-50 rounded-xl">
+
                 <User
                   size={24}
                   className="text-blue-600"
                 />
+
               </div>
 
               <div>
+
                 <h3 className="text-lg font-bold text-gray-800">
                   Profile Settings
                 </h3>
@@ -110,6 +93,7 @@ function Settings() {
                 <p className="text-sm text-gray-500">
                   Manage your owner profile information.
                 </p>
+
               </div>
 
             </div>
@@ -120,6 +104,7 @@ function Settings() {
               {/* Name */}
 
               <div>
+
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Owner Name
                 </label>
@@ -131,12 +116,14 @@ function Settings() {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
               </div>
 
 
               {/* Email */}
 
               <div>
+
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
@@ -148,12 +135,14 @@ function Settings() {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
               </div>
 
 
               {/* Phone */}
 
               <div>
+
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
                 </label>
@@ -165,6 +154,7 @@ function Settings() {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
               </div>
 
             </div>
@@ -179,13 +169,16 @@ function Settings() {
             <div className="p-5 border-b flex items-center gap-3">
 
               <div className="p-3 bg-purple-50 rounded-xl">
+
                 <Shield
                   size={24}
                   className="text-purple-600"
                 />
+
               </div>
 
               <div>
+
                 <h3 className="text-lg font-bold text-gray-800">
                   Security
                 </h3>
@@ -193,6 +186,7 @@ function Settings() {
                 <p className="text-sm text-gray-500">
                   Manage your account security settings.
                 </p>
+
               </div>
 
             </div>
@@ -220,13 +214,16 @@ function Settings() {
             <div className="p-5 border-b flex items-center gap-3">
 
               <div className="p-3 bg-yellow-50 rounded-xl">
+
                 <Bell
                   size={24}
                   className="text-yellow-600"
                 />
+
               </div>
 
               <div>
+
                 <h3 className="text-lg font-bold text-gray-800">
                   Notifications
                 </h3>
@@ -234,6 +231,7 @@ function Settings() {
                 <p className="text-sm text-gray-500">
                   Choose which notifications you want to receive.
                 </p>
+
               </div>
 
             </div>
@@ -246,6 +244,7 @@ function Settings() {
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
                 <div>
+
                   <p className="font-medium text-gray-800">
                     Email Notifications
                   </p>
@@ -253,6 +252,7 @@ function Settings() {
                   <p className="text-sm text-gray-500">
                     Receive important rental updates by email.
                   </p>
+
                 </div>
 
                 <input
@@ -271,6 +271,7 @@ function Settings() {
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
                 <div>
+
                   <p className="font-medium text-gray-800">
                     Payment Notifications
                   </p>
@@ -278,6 +279,7 @@ function Settings() {
                   <p className="text-sm text-gray-500">
                     Get notified when a tenant makes a payment.
                   </p>
+
                 </div>
 
                 <input
@@ -296,6 +298,7 @@ function Settings() {
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
                 <div>
+
                   <p className="font-medium text-gray-800">
                     Rent Reminders
                   </p>
@@ -303,6 +306,7 @@ function Settings() {
                   <p className="text-sm text-gray-500">
                     Receive reminders about pending rent payments.
                   </p>
+
                 </div>
 
                 <input
@@ -327,13 +331,16 @@ function Settings() {
             <div className="p-5 border-b flex items-center gap-3">
 
               <div className="p-3 bg-green-50 rounded-xl">
+
                 <Home
                   size={24}
                   className="text-green-600"
                 />
+
               </div>
 
               <div>
+
                 <h3 className="text-lg font-bold text-gray-800">
                   Rental Preferences
                 </h3>
@@ -341,6 +348,7 @@ function Settings() {
                 <p className="text-sm text-gray-500">
                   Configure your default rental preferences.
                 </p>
+
               </div>
 
             </div>
@@ -358,11 +366,27 @@ function Settings() {
                 onChange={handleChange}
                 className="w-full md:w-64 border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="1">1st of every month</option>
-                <option value="5">5th of every month</option>
-                <option value="10">10th of every month</option>
-                <option value="15">15th of every month</option>
-                <option value="20">20th of every month</option>
+
+                <option value="1">
+                  1st of every month
+                </option>
+
+                <option value="5">
+                  5th of every month
+                </option>
+
+                <option value="10">
+                  10th of every month
+                </option>
+
+                <option value="15">
+                  15th of every month
+                </option>
+
+                <option value="20">
+                  20th of every month
+                </option>
+
               </select>
 
             </div>
@@ -378,8 +402,11 @@ function Settings() {
               type="submit"
               className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
             >
+
               <Save size={18} />
+
               Save Changes
+
             </button>
 
           </div>
