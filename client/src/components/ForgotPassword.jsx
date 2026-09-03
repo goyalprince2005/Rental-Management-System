@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function ForgotPassword() {
+  const navigate = useNavigate();
+
+  const [mobileNumber, setMobileNumber] = useState("");
+
+  const handleSendOTP = () => {
+    navigate("/otp-verification");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
@@ -23,6 +32,8 @@ function ForgotPassword() {
 
             <input
               type="tel"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
               placeholder="Enter registered mobile number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
@@ -30,6 +41,7 @@ function ForgotPassword() {
 
           <button
             type="button"
+            onClick={handleSendOTP}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
             Send OTP
