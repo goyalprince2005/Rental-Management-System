@@ -10,6 +10,7 @@ import {
   Pencil,
   Eye,
 } from "lucide-react";
+import Navbar from "./Navbar";
 
 function PropertyDetails() {
   const navigate = useNavigate();
@@ -67,58 +68,52 @@ function PropertyDetails() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= COMMON NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
-
-        <div className="flex items-center gap-3">
-
-          {/* Back Button */}
-
-          <button
-            onClick={() => navigate("/properties")}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
-            title="Back to Properties"
-          >
-            <ArrowLeft size={22} />
-          </button>
-
-          {/* Page Title */}
-
-          <div>
-
-            <h1 className="text-xl font-bold text-blue-600">
-              Property Details
-            </h1>
-
-            <p className="text-xs text-gray-500 hidden sm:block">
-              View and manage property information
-            </p>
-
-          </div>
-
-        </div>
-
-
-        {/* Edit Property */}
-
-        <button
-          onClick={() => alert("Edit property feature coming soon")}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          <Pencil size={18} />
-
-          <span className="hidden sm:block">
-            Edit Property
-          </span>
-        </button>
-
-      </header>
+      <Navbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
+
+        {/* ================= PAGE HEADING ================= */}
+
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+          <div>
+
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              Property Details
+            </h1>
+
+            <p className="text-gray-500 mt-1">
+              View and manage property information.
+            </p>
+
+          </div>
+
+
+          {/* EDIT PROPERTY */}
+
+          <button
+            type="button"
+            onClick={() =>
+              alert("Edit property feature coming soon.")
+            }
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+
+            <Pencil size={18} />
+
+            <span>
+              Edit Property
+            </span>
+
+          </button>
+
+        </div>
+
 
         {/* ================= PROPERTY HEADER ================= */}
 
@@ -158,7 +153,7 @@ function PropertyDetails() {
             </div>
 
 
-            {/* Status */}
+            {/* STATUS */}
 
             <span className="w-fit bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium">
               {property.status}
@@ -343,7 +338,7 @@ function PropertyDetails() {
 
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-          {/* Section Header */}
+          {/* SECTION HEADER */}
 
           <div className="p-5 border-b">
 
@@ -358,7 +353,7 @@ function PropertyDetails() {
           </div>
 
 
-          {/* Room List */}
+          {/* ROOM LIST */}
 
           <div className="divide-y">
 
@@ -369,7 +364,7 @@ function PropertyDetails() {
                 className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
               >
 
-                {/* Room */}
+                {/* ROOM */}
 
                 <div className="flex items-center gap-4">
 
@@ -397,7 +392,7 @@ function PropertyDetails() {
                 </div>
 
 
-                {/* Tenant */}
+                {/* TENANT */}
 
                 <div className="flex items-center gap-2 text-gray-600">
 
@@ -410,7 +405,7 @@ function PropertyDetails() {
                 </div>
 
 
-                {/* Rent */}
+                {/* RENT */}
 
                 <div className="flex items-center gap-2">
 
@@ -430,7 +425,7 @@ function PropertyDetails() {
                 </div>
 
 
-                {/* Status */}
+                {/* STATUS */}
 
                 <span
                   className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${
@@ -443,9 +438,10 @@ function PropertyDetails() {
                 </span>
 
 
-                {/* View Room */}
+                {/* VIEW ROOM */}
 
                 <button
+                  type="button"
                   onClick={() =>
                     navigate(`/room-details/${room.id}`)
                   }
@@ -472,6 +468,7 @@ function PropertyDetails() {
         <div className="mt-6">
 
           <button
+            type="button"
             onClick={() => navigate("/properties")}
             className="flex items-center gap-2 border border-gray-300 bg-white px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
           >
