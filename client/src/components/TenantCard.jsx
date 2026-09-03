@@ -1,71 +1,133 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {
+  User,
+  Building2,
+  DoorOpen,
+  IndianRupee,
+  Eye,
+  Pencil,
+} from "lucide-react";
 
-function TenantLogin() {
+function TenantCard({ tenant }) {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-      <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
+      {/* ================= CARD HEADER ================= */}
 
-        <h1 className="text-3xl font-bold text-center">
-          Tenant Login
-        </h1>
+      <div className="p-5 border-b flex items-center justify-between">
 
-        <p className="text-center text-gray-500 mt-2 mb-6">
-          Login to view your room details and payments.
-        </p>
+        <div className="flex items-center gap-3">
 
-        <form className="space-y-5">
+          <div className="p-3 bg-blue-50 rounded-xl">
 
-          <div>
-            <label className="block mb-2 font-medium">
-              Mobile Number
-            </label>
-
-            <input
-              type="tel"
-              placeholder="Enter your mobile number"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            <User
+              size={26}
+              className="text-blue-600"
             />
+
           </div>
 
           <div>
-            <label className="block mb-2 font-medium">
-              Password
-            </label>
 
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <h3 className="font-bold text-lg text-gray-800">
+              {tenant.name}
+            </h3>
+
+            <p className="text-sm text-gray-500">
+              Tenant
+            </p>
+
           </div>
-
-          <button
-            type="button"
-            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
-          >
-            Login
-          </button>
-
-        </form>
-
-        <div className="flex justify-between mt-6">
-
-          <Link
-            to="/tenant-login"
-            className="text-blue-600 hover:underline"
-          >
-            ← Back
-          </Link>
-
-          <Link
-            to="/forgot-password"
-            className="text-red-500 hover:underline"
-          >
-            Forgot Password?
-          </Link>
 
         </div>
+
+        {/* ================= STATUS ================= */}
+
+        <span
+          className={`px-3 py-1 rounded-full text-sm ${
+            tenant.status === "Active"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
+          }`}
+        >
+          {tenant.status}
+        </span>
+
+      </div>
+
+      {/* ================= TENANT INFORMATION ================= */}
+
+      <div className="p-5 space-y-3">
+
+        {/* PROPERTY */}
+
+        <div className="flex items-center gap-3 text-gray-600">
+
+          <Building2 size={18} />
+
+          <span className="text-sm">
+            {tenant.property}
+          </span>
+
+        </div>
+
+        {/* ROOM */}
+
+        <div className="flex items-center gap-3 text-gray-600">
+
+          <DoorOpen size={18} />
+
+          <span className="text-sm">
+            Room {tenant.room}
+          </span>
+
+        </div>
+
+        {/* RENT */}
+
+        <div className="flex items-center gap-3 text-gray-600">
+
+          <IndianRupee size={18} />
+
+          <span className="text-sm font-medium">
+            {tenant.rent} / month
+          </span>
+
+        </div>
+
+      </div>
+
+      {/* ================= ACTION BUTTONS ================= */}
+
+      <div className="p-5 border-t flex gap-3">
+
+        {/* VIEW DETAILS */}
+
+        <button
+          onClick={() =>
+            navigate(`/tenant-details/${tenant.id}`)
+          }
+          className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition"
+        >
+          <Eye size={18} />
+
+          View Details
+        </button>
+
+        {/* EDIT */}
+
+        <button
+          onClick={() =>
+            navigate(`/edit-tenant/${tenant.id}`)
+          }
+          className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition"
+        >
+          <Pencil size={18} />
+
+          Edit
+        </button>
 
       </div>
 
@@ -73,4 +135,4 @@ function TenantLogin() {
   );
 }
 
-export default TenantLogin;
+export default TenantCard;
