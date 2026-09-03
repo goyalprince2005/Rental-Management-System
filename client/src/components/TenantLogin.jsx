@@ -1,8 +1,23 @@
-import React from 'react'
-
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function TenantLogin() {
+  const navigate = useNavigate();
+
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    if (!mobileNumber || !password) {
+      alert("Please enter mobile number and password.");
+      return;
+    }
+
+    // Frontend-only login for now.
+    // Actual authentication will be connected with the backend later.
+    navigate("/tenant-dashboard");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
@@ -25,6 +40,8 @@ function TenantLogin() {
 
             <input
               type="tel"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
               placeholder="Enter your mobile number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
@@ -37,6 +54,8 @@ function TenantLogin() {
 
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
@@ -44,6 +63,7 @@ function TenantLogin() {
 
           <button
             type="button"
+            onClick={handleLogin}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
             Login
