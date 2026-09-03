@@ -12,6 +12,14 @@ import Navbar from "./Navbar";
 function Properties() {
   const navigate = useNavigate();
 
+  const handleAddProperty = () => {
+    alert("Add Property feature will be connected with the backend later.");
+  };
+
+  const handleEditProperty = (propertyName) => {
+    alert(`Edit Property: ${propertyName}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
 
@@ -44,6 +52,8 @@ function Properties() {
           {/* ADD PROPERTY */}
 
           <button
+            type="button"
+            onClick={handleAddProperty}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
 
@@ -183,6 +193,7 @@ function Properties() {
               <div className="flex gap-3 mt-5">
 
                 <button
+                  type="button"
                   onClick={() => navigate("/property-details")}
                   className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
@@ -195,6 +206,10 @@ function Properties() {
 
 
                 <button
+                  type="button"
+                  onClick={() =>
+                    handleEditProperty("Green View Apartments")
+                  }
                   className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
 
@@ -333,6 +348,7 @@ function Properties() {
               <div className="flex gap-3 mt-5">
 
                 <button
+                  type="button"
                   onClick={() => navigate("/property-details")}
                   className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
@@ -345,6 +361,10 @@ function Properties() {
 
 
                 <button
+                  type="button"
+                  onClick={() =>
+                    handleEditProperty("Shyam Residency")
+                  }
                   className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
 
