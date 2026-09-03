@@ -1,6 +1,30 @@
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function OTPVerification() {
+  const navigate = useNavigate();
+
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+
+  const handleChange = (index, value) => {
+    if (!/^\d?$/.test(value)) {
+      return;
+    }
+
+    const updatedOtp = [...otp];
+    updatedOtp[index] = value;
+
+    setOtp(updatedOtp);
+  };
+
+  const handleVerifyOTP = () => {
+    navigate("/reset-password");
+  };
+
+  const handleResendOTP = () => {
+    alert("OTP has been resent.");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
 
@@ -16,46 +40,25 @@ function OTPVerification() {
 
         <div className="flex justify-center gap-3 mb-8">
 
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-
-          <input
-            type="text"
-            maxLength="1"
-            className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+          {otp.map((digit, index) => (
+            <input
+              key={index}
+              type="text"
+              inputMode="numeric"
+              maxLength="1"
+              value={digit}
+              onChange={(e) =>
+                handleChange(index, e.target.value)
+              }
+              className="w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          ))}
 
         </div>
 
         <button
           type="button"
+          onClick={handleVerifyOTP}
           className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
         >
           Verify OTP
@@ -65,6 +68,7 @@ function OTPVerification() {
 
           <button
             type="button"
+            onClick={handleResendOTP}
             className="text-green-600 hover:underline"
           >
             Resend OTP
