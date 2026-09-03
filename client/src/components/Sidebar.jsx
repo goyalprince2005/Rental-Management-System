@@ -72,7 +72,7 @@ function Sidebar() {
     {
       name: "Settings",
       icon: Settings,
-      path: "settings",
+      path: "/settings",
       description: "Manage your rental management settings.",
     },
   ];
@@ -81,6 +81,7 @@ function Sidebar() {
     if (item.path) {
       navigate(item.path);
       setHoveredItem(null);
+      setIsOpen(false);
     }
   };
 
@@ -96,9 +97,7 @@ function Sidebar() {
       <button
         onClick={() => setIsOpen(true)}
         className={`fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md hover:bg-gray-100 transition ${
-          isOpen
-            ? "opacity-0 pointer-events-none"
-            : "opacity-100"
+          isOpen ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
         <Menu size={24} />
@@ -119,17 +118,13 @@ function Sidebar() {
 
       <div
         className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${
-          isOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         onMouseLeave={() => setHoveredItem(null)}
       >
-
         {/* ================= SIDEBAR HEADER ================= */}
 
         <div className="h-32 border-b px-6 flex items-center justify-between">
-
           <div>
             <h2 className="text-2xl font-bold text-blue-600">
               Rental Menu
@@ -146,15 +141,12 @@ function Sidebar() {
           >
             <X size={22} />
           </button>
-
         </div>
 
         {/* ================= MENU ITEMS ================= */}
 
         <div className="p-3 overflow-y-auto h-[calc(100vh-8rem)]">
-
           {menuItems.map((item) => {
-
             const Icon = item.icon;
 
             return (
@@ -163,14 +155,12 @@ function Sidebar() {
                 className="relative"
                 onMouseEnter={() => setHoveredItem(item.name)}
               >
-
                 {/* MENU BUTTON */}
 
                 <button
                   onClick={() => handleNavigation(item)}
                   className="w-full flex items-center gap-4 px-4 py-4 rounded-xl hover:bg-gray-100 transition text-left"
                 >
-
                   <Icon size={24} />
 
                   <span className="text-lg">
@@ -180,27 +170,21 @@ function Sidebar() {
                   <span className="ml-auto text-xl">
                     ›
                   </span>
-
                 </button>
 
                 {/* ================= HOVER INFORMATION ================= */}
 
                 {hoveredItem === item.name && (
                   <div className="absolute left-[calc(100%+12px)] top-1/2 -translate-y-1/2 w-72 bg-white rounded-xl shadow-xl border p-5 z-50">
-
                     <div className="flex items-start gap-3">
-
                       <div className="p-2 bg-blue-50 rounded-full">
-
                         <Icon
                           size={20}
                           className="text-blue-600"
                         />
-
                       </div>
 
                       <div>
-
                         <h3 className="font-semibold text-gray-800">
                           {item.name}
                         </h3>
@@ -208,18 +192,13 @@ function Sidebar() {
                         <p className="text-sm text-gray-500 mt-1 leading-5">
                           {item.description}
                         </p>
-
                       </div>
-
                     </div>
-
                   </div>
                 )}
-
               </div>
             );
           })}
-
         </div>
       </div>
     </>
