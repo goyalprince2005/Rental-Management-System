@@ -7,13 +7,48 @@ function TenantLogin() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
 
+  // ================= MOCK TENANT DATA =================
+
+  const tenants = [
+    {
+      id: 1,
+      mobileNumber: "9876543210",
+      name: "Rahul Sharma",
+    },
+    {
+      id: 2,
+      mobileNumber: "9876543211",
+      name: "Aman Kumar",
+    },
+    {
+      id: 3,
+      mobileNumber: "9876543212",
+      name: "Neha Sharma",
+    },
+  ];
+
+  // ================= LOGIN =================
+
   const handleLogin = () => {
-    if (!mobileNumber || !password) {
+    const enteredMobile = mobileNumber.trim();
+
+    if (!enteredMobile || !password) {
       alert("Please enter mobile number and password.");
       return;
     }
 
-    // Frontend-only login for now.
+    const tenant = tenants.find(
+      (tenant) => tenant.mobileNumber === enteredMobile
+    );
+
+    if (!tenant) {
+      alert("Tenant not found. Please enter a registered mobile number.");
+      return;
+    }
+
+    // Store the logged-in tenant ID for the frontend mock flow.
+    localStorage.setItem("tenantId", tenant.id.toString());
+
     // Actual authentication will be connected with the backend later.
     navigate("/tenant-dashboard");
   };
@@ -33,7 +68,10 @@ function TenantLogin() {
 
         <form className="space-y-5">
 
+          {/* ================= MOBILE NUMBER ================= */}
+
           <div>
+
             <label className="block mb-2 font-medium">
               Mobile Number
             </label>
@@ -45,9 +83,14 @@ function TenantLogin() {
               placeholder="Enter your mobile number"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
+
           </div>
 
+
+          {/* ================= PASSWORD ================= */}
+
           <div>
+
             <label className="block mb-2 font-medium">
               Password
             </label>
@@ -59,7 +102,11 @@ function TenantLogin() {
               placeholder="Enter your password"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
+
           </div>
+
+
+          {/* ================= LOGIN BUTTON ================= */}
 
           <button
             type="button"
@@ -70,6 +117,9 @@ function TenantLogin() {
           </button>
 
         </form>
+
+
+        {/* ================= LINKS ================= */}
 
         <div className="flex justify-between mt-6">
 
