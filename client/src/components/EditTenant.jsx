@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 import Navbar from "./Navbar";
+import TenantNavbar from "./TenantNavbar";
 
 function EditTenant() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const isTenantView = searchParams.get("view") === "tenant";
 
   const tenants = [
     {
@@ -64,15 +68,25 @@ function EditTenant() {
   };
 
   const handleSave = () => {
-    navigate(`/tenant-details/${id}`);
+    if (!tenantData.name || !tenantData.phone) {
+      alert("Please enter tenant name and phone number.");
+      return;
+    }
+
+    navigate(
+      isTenantView
+        ? `/tenant-details/${id}?view=tenant`
+        : `/tenant-details/${id}`
+    );
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= COMMON NAVBAR ================= */}
+      {/* ================= NAVBAR ================= */}
 
-      <Navbar />
+      {isTenantView ? <TenantNavbar /> : <Navbar />}
+
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -83,14 +97,19 @@ function EditTenant() {
         <div className="mb-6">
 
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            Edit Tenant {id}
+            {isTenantView
+              ? "Edit My Details"
+              : `Edit Tenant ${id}`}
           </h1>
 
           <p className="text-gray-500 mt-1">
-            Update the information of this tenant.
+            {isTenantView
+              ? "Update your personal information."
+              : "Update the information of this tenant."}
           </p>
 
         </div>
+
 
         {/* ================= FORM CARD ================= */}
 
@@ -98,9 +117,10 @@ function EditTenant() {
 
           <div className="space-y-5">
 
-            {/* Name */}
+            {/* ================= NAME ================= */}
 
             <div>
+
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tenant Name
               </label>
@@ -113,11 +133,14 @@ function EditTenant() {
                 placeholder="Enter tenant name"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
+
             </div>
 
-            {/* Phone */}
+
+            {/* ================= PHONE ================= */}
 
             <div>
+
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Phone
               </label>
@@ -130,93 +153,140 @@ function EditTenant() {
                 placeholder="Enter phone number"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
               />
+
             </div>
 
-            {/* Property */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property
-              </label>
+            {/* ================= OWNER ONLY FIELDS ================= */}
 
-              <input
-                type="text"
-                name="property"
-                value={tenantData.property}
-                onChange={handleChange}
-                placeholder="Enter property name"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+            {!isTenantView && (
+              <>
 
-            {/* Room */}
+                {/* Property */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Room
-              </label>
+                <div>
 
-              <input
-                type="text"
-                name="room"
-                value={tenantData.room}
-                onChange={handleChange}
-                placeholder="Enter room number"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Property
+                  </label>
 
-            {/* Monthly Rent */}
+                  <input
+                    type="text"
+                    name="property"
+                    value={tenantData.property}
+                    onChange={handleChange}
+                    placeholder="Enter property name"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Monthly Rent
-              </label>
+                </div>
 
-              <input
-                type="number"
-                name="rent"
-                value={tenantData.rent}
-                onChange={handleChange}
-                placeholder="Enter monthly rent"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
 
-            {/* Status */}
+                {/* Room */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
+                <div>
 
-              <select
-                name="status"
-                value={tenantData.status}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Active">Active</option>
-                <option value="Due">Due</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Room
+                  </label>
 
-            {/* Joining Date */}
+                  <input
+                    type="text"
+                    name="room"
+                    value={tenantData.room}
+                    onChange={handleChange}
+                    placeholder="Enter room number"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Joining Date
-              </label>
+                </div>
 
-              <input
-                type="date"
-                name="joiningDate"
-                value={tenantData.joiningDate}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+
+                {/* Monthly Rent */}
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Monthly Rent
+                  </label>
+
+                  <input
+                    type="number"
+                    name="rent"
+                    value={tenantData.rent}
+                    onChange={handleChange}
+                    placeholder="Enter monthly rent"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                </div>
+
+
+                {/* Status */}
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+
+                  <select
+                    name="status"
+                    value={tenantData.status}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Active">
+                      Active
+                    </option>
+
+                    <option value="Due">
+                      Due
+                    </option>
+
+                    <option value="Inactive">
+                      Inactive
+                    </option>
+
+                  </select>
+
+                </div>
+
+
+                {/* Joining Date */}
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Joining Date
+                  </label>
+
+                  <input
+                    type="date"
+                    name="joiningDate"
+                    value={tenantData.joiningDate}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+
+                </div>
+
+              </>
+            )}
+
+
+            {/* ================= TENANT INFORMATION NOTE ================= */}
+
+            {isTenantView && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+
+                <p className="text-sm text-blue-700">
+                  Property, room, rent, status, and joining date are managed by the owner.
+                </p>
+
+              </div>
+            )}
+
 
             {/* ================= BUTTONS ================= */}
 
@@ -227,13 +297,21 @@ function EditTenant() {
               <button
                 type="button"
                 onClick={() =>
-                  navigate(`/tenant-details/${id}`)
+                  navigate(
+                    isTenantView
+                      ? `/tenant-details/${id}?view=tenant`
+                      : `/tenant-details/${id}`
+                  )
                 }
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
+
                 <ArrowLeft size={18} />
+
                 Cancel
+
               </button>
+
 
               {/* Save */}
 
@@ -242,8 +320,11 @@ function EditTenant() {
                 onClick={handleSave}
                 className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition"
               >
+
                 <Save size={18} />
+
                 Save Changes
+
               </button>
 
             </div>

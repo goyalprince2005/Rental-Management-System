@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   User,
@@ -10,10 +10,14 @@ import {
   Calendar,
 } from "lucide-react";
 import Navbar from "./Navbar";
+import TenantNavbar from "./TenantNavbar";
 
 function TenantDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const isTenantView = searchParams.get("view") === "tenant";
 
   const tenants = {
     1: {
@@ -56,9 +60,10 @@ function TenantDetails() {
     return (
       <div className="min-h-screen bg-gray-100">
 
-        <Navbar />
+        {isTenantView ? <TenantNavbar /> : <Navbar />}
 
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+
           <div className="bg-white p-8 rounded-xl shadow-sm text-center">
 
             <h2 className="text-2xl font-bold text-gray-800">
@@ -70,13 +75,22 @@ function TenantDetails() {
             </p>
 
             <button
-              onClick={() => navigate("/tenants")}
+              onClick={() =>
+                navigate(
+                  isTenantView
+                    ? "/tenant-dashboard"
+                    : "/tenants"
+                )
+              }
               className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
             >
-              Back to Tenants
+              {isTenantView
+                ? "Back to Dashboard"
+                : "Back to Tenants"}
             </button>
 
           </div>
+
         </div>
 
       </div>
@@ -86,9 +100,9 @@ function TenantDetails() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= COMMON NAVBAR ================= */}
+      {/* ================= NAVBAR ================= */}
 
-      <Navbar />
+      {isTenantView ? <TenantNavbar /> : <Navbar />}
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -100,11 +114,15 @@ function TenantDetails() {
         <div className="mb-6">
 
           <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-            {tenant.name}
+            {isTenantView
+              ? "My Details"
+              : tenant.name}
           </h2>
 
           <p className="text-gray-500 mt-1">
-            Complete information about this tenant.
+            {isTenantView
+              ? "View your rental and personal information."
+              : "Complete information about this tenant."}
           </p>
 
         </div>
@@ -342,22 +360,38 @@ function TenantDetails() {
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
 
               <button
-                onClick={() => navigate("/tenants")}
+                onClick={() =>
+                  navigate(
+                    isTenantView
+                      ? "/tenant-dashboard"
+                      : "/tenants"
+                  )
+                }
                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
               >
 
                 <ArrowLeft size={18} />
 
-                Back to Tenants
+                {isTenantView
+                  ? "Back to Dashboard"
+                  : "Back to Tenants"}
 
               </button>
 
 
               <button
-                onClick={() => navigate(`/edit-tenant/${id}`)}
+                onClick={() =>
+                  navigate(
+                    isTenantView
+                      ? `/edit-tenant/${id}?view=tenant`
+                      : `/edit-tenant/${id}`
+                  )
+                }
                 className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
               >
-                Edit Tenant
+                {isTenantView
+                  ? "Edit My Details"
+                  : "Edit Tenant"}
               </button>
 
             </div>
