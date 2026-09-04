@@ -9,83 +9,126 @@ import {
   CreditCard,
   CheckCircle,
   Clock,
-  LogOut,
+  FileText,
 } from "lucide-react";
+import TenantNavbar from "./TenantNavbar";
 
 function TenantDashboard() {
   const navigate = useNavigate();
 
   // ================= MOCK TENANT DATA =================
 
-  const tenant = {
-    name: "Rahul Sharma",
-    property: "Green View Apartments",
-    location: "Bhopal",
-    room: "101",
-    monthlyRent: "₹5,000",
-    paymentStatus: "Paid",
-    nextDueDate: "September 10, 2026",
+  const tenants = {
+    "1": {
+      id: "1",
+      name: "Rahul Sharma",
+      phone: "9876543210",
+      property: "Green View Apartments",
+      location: "Bhopal",
+      room: "101",
+      monthlyRent: "₹5,000",
+      paymentStatus: "Paid",
+      nextDueDate: "September 10, 2026",
+    },
+
+    "2": {
+      id: "2",
+      name: "Aman Kumar",
+      phone: "9876543211",
+      property: "Green View Apartments",
+      location: "Bhopal",
+      room: "102",
+      monthlyRent: "₹6,000",
+      paymentStatus: "Paid",
+      nextDueDate: "September 10, 2026",
+    },
+
+    "3": {
+      id: "3",
+      name: "Neha Sharma",
+      phone: "9876543212",
+      property: "Shyam Residency",
+      location: "Bhopal",
+      room: "203",
+      monthlyRent: "₹5,500",
+      paymentStatus: "Due",
+      nextDueDate: "September 10, 2026",
+    },
   };
+
+  // ================= GET LOGGED-IN TENANT =================
+
+  const tenantId = localStorage.getItem("tenantId");
+
+  const tenant = tenants[tenantId];
+
+  // ================= INVALID TENANT =================
+
+  if (!tenant) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+
+        <TenantNavbar />
+
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+
+          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+
+            <h2 className="text-2xl font-bold text-gray-800">
+              Tenant Session Not Found
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Please login again to access your dashboard.
+            </p>
+
+            <button
+              onClick={() => navigate("/tenant-login")}
+              className="mt-5 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
+            >
+              Go to Tenant Login
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  // ================= RECENT PAYMENTS =================
 
   const recentPayments = [
     {
       id: 1,
       month: "August 2026",
-      amount: "₹5,000",
+      amount: tenant.monthlyRent,
       date: "August 10, 2026",
       status: "Paid",
     },
     {
       id: 2,
       month: "July 2026",
-      amount: "₹5,000",
+      amount: tenant.monthlyRent,
       date: "July 10, 2026",
       status: "Paid",
     },
     {
       id: 3,
       month: "June 2026",
-      amount: "₹5,000",
+      amount: tenant.monthlyRent,
       date: "June 10, 2026",
       status: "Paid",
     },
   ];
 
-  const handleLogout = () => {
-    navigate("/tenant-login");
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= HEADER ================= */}
+      {/* ================= TENANT NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm">
-
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-green-600">
-              Tenant Dashboard
-            </h1>
-
-          
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
-            <LogOut size={18} />
-
-            <span className="hidden sm:inline">
-              Logout
-            </span>
-          </button>
-
-        </div>
-
-      </header>
+      <TenantNavbar />
 
 
       {/* ================= MAIN CONTENT ================= */}
@@ -139,7 +182,7 @@ function TenantDashboard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
 
-            {/* Property */}
+            {/* ================= PROPERTY ================= */}
 
             <div className="bg-gray-50 rounded-xl p-4">
 
@@ -164,7 +207,7 @@ function TenantDashboard() {
             </div>
 
 
-            {/* Room */}
+            {/* ================= ROOM ================= */}
 
             <div className="bg-gray-50 rounded-xl p-4">
 
@@ -185,7 +228,7 @@ function TenantDashboard() {
             </div>
 
 
-            {/* Monthly Rent */}
+            {/* ================= MONTHLY RENT ================= */}
 
             <div className="bg-gray-50 rounded-xl p-4">
 
@@ -221,7 +264,7 @@ function TenantDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-            {/* Monthly Rent */}
+            {/* ================= MONTHLY RENT ================= */}
 
             <div className="bg-white rounded-xl shadow-sm border p-5">
 
@@ -253,7 +296,7 @@ function TenantDashboard() {
             </div>
 
 
-            {/* Current Status */}
+            {/* ================= CURRENT STATUS ================= */}
 
             <div className="bg-white rounded-xl shadow-sm border p-5">
 
@@ -265,7 +308,13 @@ function TenantDashboard() {
                     Current Status
                   </p>
 
-                  <p className="text-2xl font-bold text-green-600 mt-2">
+                  <p
+                    className={`text-2xl font-bold mt-2 ${
+                      tenant.paymentStatus === "Paid"
+                        ? "text-green-600"
+                        : "text-yellow-600"
+                    }`}
+                  >
                     {tenant.paymentStatus}
                   </p>
 
@@ -285,7 +334,7 @@ function TenantDashboard() {
             </div>
 
 
-            {/* Next Due Date */}
+            {/* ================= NEXT DUE DATE ================= */}
 
             <div className="bg-white rounded-xl shadow-sm border p-5">
 
@@ -329,24 +378,52 @@ function TenantDashboard() {
             Quick Actions
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            {/* ================= VIEW PAYMENTS ================= */}
 
             <button
-              onClick={() => navigate("/payments")}
+              onClick={() => navigate("/tenant-payments")}
               className="flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
             >
+
               <CreditCard size={18} />
 
               View Payments
+
             </button>
 
+
+            {/* ================= VIEW MY DETAILS ================= */}
+
             <button
-              onClick={() => navigate("/tenant-details/1")}
+              onClick={() =>
+                navigate(
+                  `/tenant-details/${tenant.id}?view=tenant`
+                )
+              }
               className="flex items-center justify-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition"
             >
+
               <User size={18} />
 
               View My Details
+
+            </button>
+
+
+            {/* ================= MY DOCUMENTS ================= */}
+
+            <button
+              onClick={() => navigate("/tenant-documents")}
+              className="flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
+            >
+
+              <FileText size={18} />
+
+              My Documents
+
             </button>
 
           </div>

@@ -20,6 +20,9 @@ import Documents from "./components/Documents";
 import Reports from "./components/Reports";
 import Settings from "./components/Settings";
 import TenantDashboard from "./components/TenantDashboard";
+import TenantNavbar from "./components/TenantNavbar";
+import TenantPayments from "./components/TenantPayments";
+import TenantDocuments from "./components/TenantDocuments";
 
 function App() {
   return (
@@ -123,6 +126,14 @@ function App() {
       <Route
         path="/tenant-dashboard"
         element={<TenantDashboard />}
+      />
+      <Route
+        path="/tenant-payments"
+        element={<TenantPayments />}
+      />
+      <Route
+        path="/tenant-documents"
+        element={<TenantDocuments />}
       />
 
     </Routes>
