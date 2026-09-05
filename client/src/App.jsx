@@ -1,26 +1,30 @@
 import { Routes, Route } from "react-router-dom";
+
 import ForgotPassword from "./components/ForgotPassword";
 import Home from "./components/Home";
 import OwnerLogin from "./components/OwnerLogin";
 import TenantLogin from "./components/TenantLogin";
 import OTPVerification from "./components/OTPVerification";
 import ResetPassword from "./components/ResetPassword";
+
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";
 import PropertyDetails from "./components/PropertyDetails";
 import Rooms from "./components/Rooms";
 import RoomDetails from "./components/RoomDetails";
 import EditRoom from "./components/EditRoom";
+
 import Tenants from "./components/Tenants";
 import TenantDetails from "./components/TenantDetails";
 import EditTenant from "./components/EditTenant";
+
 import RentBills from "./components/RentBills";
 import Payments from "./components/Payments";
 import Documents from "./components/Documents";
 import Reports from "./components/Reports";
 import Settings from "./components/Settings";
+
 import TenantDashboard from "./components/TenantDashboard";
-import TenantNavbar from "./components/TenantNavbar";
 import TenantPayments from "./components/TenantPayments";
 import TenantDocuments from "./components/TenantDocuments";
 import TenantNotices from "./components/TenantNotices";
@@ -28,7 +32,19 @@ import TenantNotices from "./components/TenantNotices";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+
+      {/* ===================================================== */}
+      {/* ================= GENERAL ROUTES ==================== */}
+      {/* ===================================================== */}
+
+      <Route
+        path="/"
+        element={<Home />}
+      />
+
+      {/* ===================================================== */}
+      {/* ================= AUTHENTICATION ===================== */}
+      {/* ===================================================== */}
 
       <Route
         path="/owner-login"
@@ -54,6 +70,10 @@ function App() {
         path="/reset-password"
         element={<ResetPassword />}
       />
+
+      {/* ===================================================== */}
+      {/* ================= OWNER PORTAL ======================= */}
+      {/* ===================================================== */}
 
       <Route
         path="/owner-dashboard"
@@ -124,21 +144,29 @@ function App() {
         path="/settings"
         element={<Settings />}
       />
+
+      {/* ===================================================== */}
+      {/* ================= TENANT PORTAL ====================== */}
+      {/* ===================================================== */}
+
       <Route
         path="/tenant-dashboard"
         element={<TenantDashboard />}
       />
+
       <Route
         path="/tenant-payments"
         element={<TenantPayments />}
       />
+
       <Route
         path="/tenant-documents"
         element={<TenantDocuments />}
       />
+
       <Route
-          path="/tenant-notices"
-          element={<TenantNotices />}
+        path="/tenant-notices"
+        element={<TenantNotices />}
       />
 
     </Routes>

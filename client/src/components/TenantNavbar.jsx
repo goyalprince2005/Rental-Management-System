@@ -6,6 +6,7 @@ import {
   CreditCard,
   FileText,
   Bell,
+  Wrench,
   LogOut,
   Menu,
   X,
@@ -46,6 +47,16 @@ function TenantNavbar() {
 
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  const isDetailsActive = () => {
+    return location.pathname.startsWith("/tenant-details");
+  };
+
+  // ================= TOP NAVIGATION =================
+
+  const navigateFromNavbar = (path) => {
+    navigate(path);
   };
 
   return (
@@ -99,6 +110,84 @@ function TenantNavbar() {
             </button>
 
           </div>
+
+
+          {/* ================================================= */}
+          {/* ================= TOP NAV LINKS ================= */}
+          {/* ================================================= */}
+
+          <nav className="hidden lg:flex items-center gap-1">
+
+            {/* ================= DASHBOARD ================= */}
+
+            <button
+              onClick={() => navigateFromNavbar("/tenant-dashboard")}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                isActive("/tenant-dashboard")
+                  ? "bg-green-50 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Dashboard
+            </button>
+
+
+            {/* ================= PAYMENTS ================= */}
+
+            <button
+              onClick={() => navigateFromNavbar("/tenant-payments")}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                isActive("/tenant-payments")
+                  ? "bg-green-50 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Payments
+            </button>
+
+
+            {/* ================= DOCUMENTS ================= */}
+
+            <button
+              onClick={() => navigateFromNavbar("/tenant-documents")}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                isActive("/tenant-documents")
+                  ? "bg-green-50 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Documents
+            </button>
+
+
+            {/* ================= NOTICES ================= */}
+
+            <button
+              onClick={() => navigateFromNavbar("/tenant-notices")}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                isActive("/tenant-notices")
+                  ? "bg-green-50 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Notices
+            </button>
+
+
+            {/* ================= MAINTENANCE ================= */}
+
+            <button
+              onClick={() => navigateFromNavbar("/tenant-maintenance")}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
+                isActive("/tenant-maintenance")
+                  ? "bg-green-50 text-green-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              Maintenance
+            </button>
+
+          </nav>
 
 
           {/* ================= LOGOUT ================= */}
@@ -224,7 +313,7 @@ function TenantNavbar() {
           <button
             onClick={handleMyDetails}
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              location.pathname.startsWith("/tenant-details")
+              isDetailsActive()
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
@@ -303,6 +392,29 @@ function TenantNavbar() {
 
             <span className="text-base font-medium">
               Notices
+            </span>
+
+          </button>
+
+
+          {/* ================= MAINTENANCE ================= */}
+
+          <button
+            onClick={() => {
+              closeSidebar();
+              navigate("/tenant-maintenance");
+            }}
+            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
+              isActive("/tenant-maintenance")
+                ? "bg-green-50 text-green-600"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+
+            <Wrench size={22} />
+
+            <span className="text-base font-medium">
+              Maintenance & Complaints
             </span>
 
           </button>
