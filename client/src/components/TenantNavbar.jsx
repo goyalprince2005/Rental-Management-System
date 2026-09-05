@@ -5,6 +5,7 @@ import {
   User,
   CreditCard,
   FileText,
+  Bell,
   LogOut,
   Menu,
   X,
@@ -279,6 +280,29 @@ function TenantNavbar() {
 
             <span className="text-base font-medium">
               Documents
+            </span>
+
+          </button>
+
+
+          {/* ================= NOTICES ================= */}
+
+          <button
+            onClick={() => {
+              closeSidebar();
+              navigate("/tenant-notices");
+            }}
+            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
+              isActive("/tenant-notices")
+                ? "bg-green-50 text-green-600"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+
+            <Bell size={22} />
+
+            <span className="text-base font-medium">
+              Notices
             </span>
 
           </button>
