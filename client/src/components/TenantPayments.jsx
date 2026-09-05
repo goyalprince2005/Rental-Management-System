@@ -5,7 +5,10 @@ import {
   CheckCircle,
   Clock,
   IndianRupee,
+  QrCode,
+  Smartphone,
 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import TenantNavbar from "./TenantNavbar";
 
 function TenantPayments() {
@@ -17,16 +20,19 @@ function TenantPayments() {
     "1": {
       name: "Rahul Sharma",
       monthlyRent: "₹5,000",
+      rentAmount: 5000,
     },
 
     "2": {
       name: "Aman Kumar",
       monthlyRent: "₹6,000",
+      rentAmount: 6000,
     },
 
     "3": {
       name: "Neha Sharma",
       monthlyRent: "₹5,500",
+      rentAmount: 5500,
     },
   };
 
@@ -38,7 +44,7 @@ function TenantPayments() {
 
         <TenantNavbar />
 
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4">
 
           <div className="bg-white p-8 rounded-xl shadow-sm text-center">
 
@@ -64,6 +70,8 @@ function TenantPayments() {
       </div>
     );
   }
+
+  // ================= PAYMENT DATA =================
 
   const payments = [
     {
@@ -92,6 +100,19 @@ function TenantPayments() {
     },
   ];
 
+  // ================= DEMO UPI DETAILS =================
+
+  const ownerUpiId = "rentalowner@upi";
+
+  const upiPaymentUrl =
+    `upi://pay?pa=${ownerUpiId}` +
+    `&pn=Rental%20Management` +
+    `&am=${tenant.rentAmount}` +
+    `&cu=INR` +
+    `&tn=${encodeURIComponent(
+      `${tenant.name} Rent Payment`
+    )}`;
+
   return (
     <div className="min-h-screen bg-gray-100">
 
@@ -113,7 +134,7 @@ function TenantPayments() {
           </h1>
 
           <p className="text-gray-500 mt-1">
-            View your rental payment history.
+            View your rental payments and pay your monthly rent.
           </p>
 
         </div>
@@ -168,9 +189,11 @@ function TenantPayments() {
                 </p>
 
                 <p className="text-2xl font-bold text-green-600 mt-2">
-                  {payments.filter(
-                    (payment) => payment.status === "Paid"
-                  ).length}
+                  {
+                    payments.filter(
+                      (payment) => payment.status === "Paid"
+                    ).length
+                  }
                 </p>
 
               </div>
@@ -223,7 +246,174 @@ function TenantPayments() {
         </div>
 
 
-        {/* ================= PAYMENT HISTORY ================= */}
+        {/* ===================================================== */}
+        {/* ================= PAY RENT / QR ===================== */}
+        {/* ===================================================== */}
+
+        <div className="bg-white rounded-xl shadow-sm border mb-6 overflow-hidden">
+
+          <div className="p-6 border-b">
+
+            <div className="flex items-center gap-3">
+
+              <div className="p-3 bg-green-50 rounded-xl">
+
+                <QrCode
+                  size={24}
+                  className="text-green-600"
+                />
+
+              </div>
+
+              <div>
+
+                <h2 className="text-xl font-bold text-gray-800">
+                  Pay Monthly Rent
+                </h2>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Scan the QR code using your preferred UPI app.
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* ================= QR PAYMENT CONTENT ================= */}
+
+          <div className="p-6">
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+
+              {/* ================= PAYMENT INFORMATION ================= */}
+
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Tenant
+                </p>
+
+                <p className="text-lg font-semibold text-gray-800 mt-1">
+                  {tenant.name}
+                </p>
+
+
+                <div className="mt-5">
+
+                  <p className="text-sm text-gray-500">
+                    Amount to Pay
+                  </p>
+
+                  <div className="flex items-center gap-1 mt-1">
+
+                    <IndianRupee
+                      size={26}
+                      className="text-green-600"
+                    />
+
+                    <span className="text-3xl font-bold text-green-600">
+                      {tenant.rentAmount.toLocaleString("en-IN")}
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div className="mt-5 bg-gray-50 rounded-xl p-4">
+
+                  <p className="text-sm text-gray-500">
+                    UPI ID
+                  </p>
+
+                  <p className="font-semibold text-gray-800 mt-1">
+                    {ownerUpiId}
+                  </p>
+
+                </div>
+
+
+                <div className="mt-5 flex items-start gap-3">
+
+                  <Smartphone
+                    size={20}
+                    className="text-green-600 mt-0.5"
+                  />
+
+                  <p className="text-sm text-gray-500">
+                    Open any UPI app such as Google Pay, PhonePe,
+                    Paytm, or BHIM and scan the QR code to make
+                    the payment.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              {/* ================= QR CODE ================= */}
+
+              <div className="flex justify-center">
+
+                <div className="text-center">
+
+                  <div className="inline-flex p-5 bg-white border-2 border-gray-200 rounded-2xl shadow-sm">
+
+                    <QRCodeSVG
+                      value={upiPaymentUrl}
+                      size={220}
+                      bgColor="#ffffff"
+                      fgColor="#111827"
+                      level="H"
+                      includeMargin={true}
+                    />
+
+                  </div>
+
+                  <p className="font-semibold text-gray-800 mt-4">
+                    Scan to Pay
+                  </p>
+
+                  <p className="text-sm text-gray-500 mt-1">
+                    Amount: ₹
+                    {tenant.rentAmount.toLocaleString("en-IN")}
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* ================= DEMO NOTICE ================= */}
+
+            <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+
+              <p className="text-sm text-yellow-800">
+
+                <span className="font-semibold">
+                  Demo Payment:
+                </span>{" "}
+                This QR code uses a demo UPI ID for the frontend
+                project. Real payment verification will be added
+                after backend and payment integration.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* ===================================================== */}
+        {/* ================= PAYMENT HISTORY =================== */}
+        {/* ===================================================== */}
 
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
