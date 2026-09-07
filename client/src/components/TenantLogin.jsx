@@ -7,6 +7,9 @@ function TenantLogin() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
 
+  const [mobileError, setMobileError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   // ================= MOCK TENANT DATA =================
 
   const tenants = [
@@ -14,42 +17,74 @@ function TenantLogin() {
       id: 1,
       mobileNumber: "9876543210",
       name: "Rahul Sharma",
+      password: "Rahul@123",
     },
     {
       id: 2,
       mobileNumber: "9876543211",
       name: "Aman Kumar",
+      password: "Aman@123",
     },
     {
       id: 3,
       mobileNumber: "9876543212",
       name: "Neha Sharma",
+      password: "Neha@123",
     },
   ];
 
   // ================= LOGIN =================
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
+
     const enteredMobile = mobileNumber.trim();
 
+    // Clear previous errors
+    setMobileError("");
+    setPasswordError("");
+
+    // ================= BASIC VALIDATION =================
+
+    if (!enteredMobile) {
+      setMobileError("Please enter your mobile number");
+    }
+
+    if (!password) {
+      setPasswordError("Please enter your password");
+    }
+
     if (!enteredMobile || !password) {
-      alert("Please enter mobile number and password.");
       return;
     }
+
+    // ================= FIND TENANT =================
 
     const tenant = tenants.find(
       (tenant) => tenant.mobileNumber === enteredMobile
     );
 
+    // ================= MOBILE CHECK =================
+
     if (!tenant) {
-      alert("Tenant not found. Please enter a registered mobile number.");
+      setMobileError("Please enter correct mobile number");
+      setPasswordError("Incorrect password");
       return;
     }
 
-    // Store the logged-in tenant ID for the frontend mock flow.
+    // ================= PASSWORD CHECK =================
+
+    if (tenant.password !== password) {
+      setPasswordError("Incorrect password");
+      return;
+    }
+
+    // ================= LOGIN SUCCESS =================
+
+    // Store logged-in tenant ID for frontend mock flow.
     localStorage.setItem("tenantId", tenant.id.toString());
 
-    // Actual authentication will be connected with the backend later.
+    // Actual authentication will be connected with backend later.
     navigate("/tenant-dashboard");
   };
 
@@ -66,7 +101,13 @@ function TenantLogin() {
           Login to view your room details and payments.
         </p>
 
-        <form className="space-y-5">
+
+        {/* ================= LOGIN FORM ================= */}
+
+        <form
+          onSubmit={handleLogin}
+          className="space-y-5"
+        >
 
           {/* ================= MOBILE NUMBER ================= */}
 
@@ -79,10 +120,23 @@ function TenantLogin() {
             <input
               type="tel"
               value={mobileNumber}
-              onChange={(e) => setMobileNumber(e.target.value)}
+              onChange={(e) => {
+                setMobileNumber(e.target.value);
+                setMobileError("");
+              }}
               placeholder="Enter your mobile number"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                mobileError
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
             />
+
+            {mobileError && (
+              <p className="text-red-500 text-sm mt-2">
+                {mobileError}
+              </p>
+            )}
 
           </div>
 
@@ -98,10 +152,23 @@ function TenantLogin() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError("");
+              }}
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                passwordError
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
             />
+
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-2">
+                {passwordError}
+              </p>
+            )}
 
           </div>
 
@@ -109,8 +176,7 @@ function TenantLogin() {
           {/* ================= LOGIN BUTTON ================= */}
 
           <button
-            type="button"
-            onClick={handleLogin}
+            type="submit"
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
             Login
