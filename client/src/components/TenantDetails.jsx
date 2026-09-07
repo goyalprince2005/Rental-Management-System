@@ -8,6 +8,7 @@ import {
   IndianRupee,
   Phone,
   Calendar,
+  Clock,
 } from "lucide-react";
 import Navbar from "./Navbar";
 import TenantNavbar from "./TenantNavbar";
@@ -26,6 +27,7 @@ function TenantDetails() {
       location: "Bhopal",
       room: "101",
       rent: "₹5,000",
+      rentDueDay: 10,
       status: "Active",
       phone: "9876543210",
       joiningDate: "January 10, 2026",
@@ -37,6 +39,7 @@ function TenantDetails() {
       location: "Bhopal",
       room: "102",
       rent: "₹6,000",
+      rentDueDay: 5,
       status: "Active",
       phone: "9876543211",
       joiningDate: "February 05, 2026",
@@ -48,6 +51,7 @@ function TenantDetails() {
       location: "Bhopal",
       room: "203",
       rent: "₹5,500",
+      rentDueDay: 15,
       status: "Due",
       phone: "9876543212",
       joiningDate: "March 15, 2026",
@@ -60,7 +64,11 @@ function TenantDetails() {
     return (
       <div className="min-h-screen bg-gray-100">
 
+        {/* ================= NAVBAR ================= */}
+
         {isTenantView ? <TenantNavbar /> : <Navbar />}
+
+        {/* ================= ERROR CONTENT ================= */}
 
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
 
@@ -266,6 +274,35 @@ function TenantDetails() {
 
                 <p className="font-bold mt-2">
                   {tenant.rent}
+                </p>
+
+              </div>
+
+
+              {/* Rent Due Day */}
+
+              <div className="bg-gray-50 rounded-xl p-4">
+
+                <div className="flex items-center gap-2 text-gray-500">
+
+                  <Clock size={18} />
+
+                  <p className="text-sm">
+                    Rent Due Day
+                  </p>
+
+                </div>
+
+                <p className="font-bold mt-2">
+                  {tenant.rentDueDay}
+                  {tenant.rentDueDay === 1
+                    ? "st"
+                    : tenant.rentDueDay === 2
+                    ? "nd"
+                    : tenant.rentDueDay === 3
+                    ? "rd"
+                    : "th"}{" "}
+                  of every month
                 </p>
 
               </div>
