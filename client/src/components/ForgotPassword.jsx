@@ -5,9 +5,68 @@ function ForgotPassword() {
   const navigate = useNavigate();
 
   const [mobileNumber, setMobileNumber] = useState("");
+  const [mobileError, setMobileError] = useState("");
 
-  const handleSendOTP = () => {
-    navigate("/otp-verification");
+  // ================= MOCK TENANT DATA =================
+
+  const tenants = [
+    {
+      id: 1,
+      mobileNumber: "9876543210",
+      name: "Rahul Sharma",
+    },
+    {
+      id: 2,
+      mobileNumber: "9876543211",
+      name: "Aman Kumar",
+    },
+    {
+      id: 3,
+      mobileNumber: "9876543212",
+      name: "Neha Sharma",
+    },
+  ];
+
+  // ================= SEND OTP =================
+
+  const handleSendOTP = (e) => {
+    e.preventDefault();
+
+    const enteredMobile = mobileNumber.trim();
+
+    // Clear previous error
+    setMobileError("");
+
+    // ================= EMPTY VALIDATION =================
+
+    if (!enteredMobile) {
+      setMobileError("Please enter your mobile number");
+      return;
+    }
+
+    // ================= MOBILE NUMBER FORMAT =================
+
+    if (!/^\d{10}$/.test(enteredMobile)) {
+      setMobileError("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
+    // ================= REGISTERED MOBILE CHECK =================
+
+    const tenant = tenants.find(
+      (tenant) => tenant.mobileNumber === enteredMobile
+    );
+
+    if (!tenant) {
+      setMobileError("Please enter correct registered mobile number");
+      return;
+    }
+
+    // ================= OTP PAGE =================
+
+    navigate(
+      `/otp-verification?mobile=${enteredMobile}`
+    );
   };
 
   return (
@@ -23,9 +82,18 @@ function ForgotPassword() {
           Enter your registered mobile number to receive an OTP.
         </p>
 
-        <form className="space-y-5">
+
+        {/* ================= FORM ================= */}
+
+        <form
+          onSubmit={handleSendOTP}
+          className="space-y-5"
+        >
+
+          {/* ================= MOBILE NUMBER ================= */}
 
           <div>
+
             <label className="block mb-2 font-medium">
               Mobile Number
             </label>
@@ -33,21 +101,40 @@ function ForgotPassword() {
             <input
               type="tel"
               value={mobileNumber}
-              onChange={(e) => setMobileNumber(e.target.value)}
+              onChange={(e) => {
+                setMobileNumber(e.target.value);
+                setMobileError("");
+              }}
               placeholder="Enter registered mobile number"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                mobileError
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
             />
+
+            {mobileError && (
+              <p className="text-red-500 text-sm mt-2">
+                {mobileError}
+              </p>
+            )}
+
           </div>
 
+
+          {/* ================= SEND OTP BUTTON ================= */}
+
           <button
-            type="button"
-            onClick={handleSendOTP}
+            type="submit"
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
             Send OTP
           </button>
 
         </form>
+
+
+        {/* ================= BACK LINK ================= */}
 
         <div className="mt-6 text-center">
 
