@@ -28,6 +28,7 @@ import TenantDashboard from "./components/TenantDashboard";
 import TenantPayments from "./components/TenantPayments";
 import TenantDocuments from "./components/TenantDocuments";
 import TenantNotices from "./components/TenantNotices";
+import TenantMaintenance from "./components/TenantMaintenance";
 
 function App() {
   return (
@@ -167,6 +168,10 @@ function App() {
       <Route
         path="/tenant-notices"
         element={<TenantNotices />}
+      />
+      <Route
+        path="/tenant-maintenance"
+        element={<TenantMaintenance />}
       />
 
     </Routes>
