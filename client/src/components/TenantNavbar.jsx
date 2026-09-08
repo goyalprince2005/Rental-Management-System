@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
@@ -10,6 +10,8 @@ import {
   LogOut,
   Menu,
   X,
+  Settings,
+  ChevronDown,
 } from "lucide-react";
 
 function TenantNavbar() {
@@ -17,24 +19,55 @@ function TenantNavbar() {
   const location = useLocation();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const profileRef = useRef(null);
+
+  // ================= MOCK TENANT DATA =================
+
+  const tenants = {
+    "1": {
+      name: "Rahul Sharma",
+    },
+    "2": {
+      name: "Aman Kumar",
+    },
+    "3": {
+      name: "Neha Sharma",
+    },
+  };
+
+  // ================= GET LOGGED-IN TENANT =================
+
+  const tenantId = localStorage.getItem("tenantId");
+  const tenant = tenants[tenantId];
 
   // ================= LOGOUT =================
 
   const handleLogout = () => {
     localStorage.removeItem("tenantId");
     setIsOpen(false);
+    setIsProfileOpen(false);
     navigate("/tenant-login");
   };
 
   // ================= MY DETAILS =================
 
   const handleMyDetails = () => {
-    const tenantId = localStorage.getItem("tenantId");
+    const currentTenantId = localStorage.getItem("tenantId");
 
-    if (tenantId) {
+    if (currentTenantId) {
       setIsOpen(false);
-      navigate(`/tenant-details/${tenantId}?view=tenant`);
+      setIsProfileOpen(false);
+      navigate(`/tenant-details/${currentTenantId}?view=tenant`);
     }
+  };
+
+  // ================= CHANGE PASSWORD =================
+
+  const handleChangePassword = () => {
+    setIsProfileOpen(false);
+    navigate("/tenant-change-password");
   };
 
   // ================= SIDEBAR CLOSE =================
@@ -42,6 +75,25 @@ function TenantNavbar() {
   const closeSidebar = () => {
     setIsOpen(false);
   };
+
+  // ================= PROFILE DROPDOWN CLOSE =================
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // ================= ACTIVE PAGE =================
 
@@ -51,6 +103,10 @@ function TenantNavbar() {
 
   const isDetailsActive = () => {
     return location.pathname.startsWith("/tenant-details");
+  };
+
+  const isChangePasswordActive = () => {
+    return location.pathname === "/tenant-change-password";
   };
 
   // ================= TOP NAVIGATION =================
@@ -190,20 +246,181 @@ function TenantNavbar() {
           </nav>
 
 
-          {/* ================= LOGOUT ================= */}
+          {/* ================================================= */}
+          {/* ================= PROFILE + LOGOUT ============== */}
+          {/* ================================================= */}
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-          >
+          <div className="flex items-center gap-2">
 
-            <LogOut size={18} />
+            {/* ================= PROFILE DROPDOWN ================= */}
 
-            <span className="hidden sm:inline">
-              Logout
-            </span>
+            <div
+              ref={profileRef}
+              className="relative"
+            >
 
-          </button>
+              <button
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
+                  isProfileOpen
+                    ? "bg-green-50 text-green-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+                aria-label="Open tenant profile"
+              >
+
+                <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+
+                  <User
+                    size={20}
+                    className="text-green-600"
+                  />
+
+                </div>
+
+                <div className="hidden md:block text-left">
+
+                  <p className="text-sm font-semibold text-gray-800">
+                    {tenant ? tenant.name : "Tenant"}
+                  </p>
+
+                  <p className="text-xs text-gray-500">
+                    My Account
+                  </p>
+
+                </div>
+
+                <ChevronDown
+                  size={17}
+                  className={`hidden sm:block transition-transform ${
+                    isProfileOpen ? "rotate-180" : ""
+                  }`}
+                />
+
+              </button>
+
+
+              {/* ================= PROFILE MENU ================= */}
+
+              {isProfileOpen && (
+
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
+
+                  {/* PROFILE HEADER */}
+
+                  <div className="p-4 border-b bg-gray-50">
+
+                    <div className="flex items-center gap-3">
+
+                      <div className="w-11 h-11 rounded-full bg-green-100 flex items-center justify-center">
+
+                        <User
+                          size={22}
+                          className="text-green-600"
+                        />
+
+                      </div>
+
+                      <div className="min-w-0">
+
+                        <p className="font-semibold text-gray-800 truncate">
+                          {tenant ? tenant.name : "Tenant"}
+                        </p>
+
+                        <p className="text-xs text-gray-500">
+                          Tenant Account
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  {/* MY DETAILS */}
+
+                  <button
+                    onClick={handleMyDetails}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
+                      isDetailsActive()
+                        ? "bg-green-50 text-green-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+
+                    <User size={18} />
+
+                    <span className="text-sm font-medium">
+                      My Details
+                    </span>
+
+                  </button>
+
+
+                  {/* CHANGE PASSWORD */}
+
+                  <button
+                    onClick={handleChangePassword}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
+                      isChangePasswordActive()
+                        ? "bg-green-50 text-green-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+
+                    <Settings size={18} />
+
+                    <span className="text-sm font-medium">
+                      Change Password
+                    </span>
+
+                  </button>
+
+
+                  {/* DIVIDER */}
+
+                  <div className="border-t" />
+
+
+                  {/* LOGOUT */}
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
+                  >
+
+                    <LogOut size={18} />
+
+                    <span className="text-sm font-medium">
+                      Logout
+                    </span>
+
+                  </button>
+
+                </div>
+
+              )}
+
+            </div>
+
+
+            {/* ================= LOGOUT ================= */}
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+            >
+
+              <LogOut size={18} />
+
+              <span className="hidden sm:inline">
+                Logout
+              </span>
+
+            </button>
+
+          </div>
 
         </div>
 
