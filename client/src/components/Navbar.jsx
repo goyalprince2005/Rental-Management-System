@@ -27,7 +27,9 @@ function Navbar() {
   const profileRef = useRef(null);
   const scrollPositionRef = useRef(0);
 
-  // ================= NAVIGATION ITEMS =================
+  // =========================================================
+  // NAVIGATION ITEMS
+  // =========================================================
 
   const navItems = [
     {
@@ -72,13 +74,17 @@ function Navbar() {
     },
   ];
 
-  // ================= ACTIVE PAGE =================
+  // =========================================================
+  // ACTIVE PAGE
+  // =========================================================
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
-  // ================= NAVIGATION =================
+  // =========================================================
+  // NAVIGATION
+  // =========================================================
 
   const handleNavigation = (path) => {
     setMenuOpen(false);
@@ -86,7 +92,9 @@ function Navbar() {
     navigate(path);
   };
 
-  // ================= LOGOUT =================
+  // =========================================================
+  // LOGOUT
+  // =========================================================
 
   const handleLogout = () => {
     setMenuOpen(false);
@@ -94,14 +102,18 @@ function Navbar() {
     navigate("/");
   };
 
-  // ================= SETTINGS =================
+  // =========================================================
+  // SETTINGS
+  // =========================================================
 
   const handleSettings = () => {
     setProfileOpen(false);
     navigate("/settings");
   };
 
-  // ================= CLOSE PROFILE =================
+  // =========================================================
+  // CLOSE PROFILE WHEN CLICKING OUTSIDE
+  // =========================================================
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -123,7 +135,9 @@ function Navbar() {
     };
   }, []);
 
-  // ================= LOCK BACKGROUND SCROLL =================
+  // =========================================================
+  // LOCK BACKGROUND SCROLL WHEN MENU IS OPEN
+  // =========================================================
 
   useEffect(() => {
     if (menuOpen) {
@@ -169,7 +183,9 @@ function Navbar() {
     };
   }, [menuOpen]);
 
-  // ================= CLOSE MENU =================
+  // =========================================================
+  // CLOSE MENU
+  // =========================================================
 
   const closeMenu = () => {
     setMenuOpen(false);
@@ -178,27 +194,27 @@ function Navbar() {
   return (
     <>
       {/* ===================================================== */}
-      {/* ================= TOP NAVBAR ======================== */}
+      {/* TOP NAVBAR */}
       {/* ===================================================== */}
 
-      <nav className="bg-white border-b shadow-sm sticky top-0 z-40">
+      <nav className="sticky top-0 z-40 w-full bg-white border-b shadow-sm">
+        <div className="w-full px-3 sm:px-4 lg:px-5">
+          <div className="h-16 flex items-center justify-between gap-2">
 
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+            {/* ================================================= */}
+            {/* LEFT SIDE */}
+            {/* ================================================= */}
 
-          <div className="h-16 flex items-center justify-between">
+            <div className="flex items-center gap-2 min-w-0 shrink-0">
 
-            {/* ================= LEFT SIDE ================= */}
-
-            <div className="flex items-center gap-3">
-
-              {/* ================= HAMBURGER ================= */}
+              {/* HAMBURGER */}
 
               <button
                 onClick={() => {
                   setMenuOpen(true);
                   setProfileOpen(false);
                 }}
-                className="p-2 rounded-lg hover:bg-blue-50 transition"
+                className="p-2 rounded-lg hover:bg-blue-50 transition shrink-0"
                 aria-label="Open owner menu"
                 title="Open Menu"
               >
@@ -208,8 +224,7 @@ function Navbar() {
                 />
               </button>
 
-
-              {/* ================= LOGO ================= */}
+              {/* LOGO */}
 
               <button
                 onClick={() =>
@@ -217,33 +232,27 @@ function Navbar() {
                 }
                 className="flex items-center gap-2 shrink-0"
               >
-
                 <div className="p-2 bg-blue-50 rounded-lg">
-
                   <Home
-                    size={22}
+                    size={21}
                     className="text-blue-600"
                   />
-
                 </div>
 
-                <span className="text-lg font-bold text-blue-600 hidden sm:block">
+                <span className="hidden sm:block text-lg font-bold text-blue-600 whitespace-nowrap">
                   Rental Management
                 </span>
-
               </button>
-
             </div>
 
-
             {/* ================================================= */}
-            {/* ================= DESKTOP NAV =================== */}
+            {/* DESKTOP NAVIGATION */}
+            {/* Only shown on extra-large screens */}
             {/* ================================================= */}
 
-            <div className="hidden lg:flex items-center gap-1 overflow-x-auto">
+            <div className="hidden xl:flex flex-1 items-center justify-center gap-1 min-w-0 mx-3">
 
               {navItems.map((item) => {
-
                 const Icon = item.icon;
                 const active = isActive(item.path);
 
@@ -253,36 +262,30 @@ function Navbar() {
                     onClick={() =>
                       handleNavigation(item.path)
                     }
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap ${
+                    className={`flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
                       active
                         ? "bg-blue-50 text-blue-600"
                         : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
                     }`}
                   >
-
-                    <Icon size={18} />
+                    <Icon size={17} />
 
                     <span>
                       {item.name}
                     </span>
-
                   </button>
                 );
-
               })}
-
             </div>
 
-
             {/* ================================================= */}
-            {/* ================= OWNER PROFILE ================= */}
+            {/* OWNER PROFILE */}
             {/* ================================================= */}
 
             <div
               ref={profileRef}
               className="relative shrink-0"
             >
-
               <button
                 onClick={() =>
                   setProfileOpen((prev) => !prev)
@@ -296,7 +299,6 @@ function Navbar() {
                 title="Owner Settings"
                 aria-label="Open owner settings"
               >
-
                 <UserCircle
                   size={28}
                   className={
@@ -307,36 +309,31 @@ function Navbar() {
                   }
                 />
 
-                <span className="hidden xl:block text-sm font-medium text-gray-700">
+                <span className="hidden sm:block text-sm font-medium text-gray-700">
                   Owner
                 </span>
-
               </button>
 
-
-              {/* ================= PROFILE DROPDOWN ================= */}
+              {/* ================================================= */}
+              {/* PROFILE DROPDOWN */}
+              {/* ================================================= */}
 
               {profileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border overflow-hidden z-50">
 
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
-
-                  {/* PROFILE */}
+                  {/* PROFILE HEADER */}
 
                   <div className="p-4 border-b bg-gray-50">
-
                     <div className="flex items-center gap-3">
 
                       <div className="p-2 bg-blue-50 rounded-full">
-
                         <UserCircle
                           size={24}
                           className="text-blue-600"
                         />
-
                       </div>
 
                       <div>
-
                         <p className="font-semibold text-gray-800">
                           Owner
                         </p>
@@ -344,13 +341,10 @@ function Navbar() {
                         <p className="text-xs text-gray-500">
                           Owner Account
                         </p>
-
                       </div>
 
                     </div>
-
                   </div>
-
 
                   {/* SETTINGS */}
 
@@ -362,20 +356,14 @@ function Navbar() {
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-
                     <Settings size={18} />
 
                     <span className="text-sm font-medium">
                       Settings
                     </span>
-
                   </button>
 
-
-                  {/* DIVIDER */}
-
                   <div className="border-t" />
-
 
                   {/* LOGOUT */}
 
@@ -383,30 +371,21 @@ function Navbar() {
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
                   >
-
                     <LogOut size={18} />
 
                     <span className="text-sm font-medium">
                       Logout
                     </span>
-
                   </button>
-
                 </div>
-
               )}
-
             </div>
-
           </div>
-
         </div>
-
       </nav>
 
-
       {/* ===================================================== */}
-      {/* ================= BACKGROUND OVERLAY ================= */}
+      {/* BACKGROUND OVERLAY */}
       {/* ===================================================== */}
 
       <div
@@ -418,72 +397,67 @@ function Navbar() {
         onClick={closeMenu}
       />
 
-
       {/* ===================================================== */}
-      {/* ================= HAMBURGER SIDEBAR ================= */}
+      {/* HAMBURGER SIDEBAR */}
       {/* ===================================================== */}
 
       <aside
-        className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-screen w-[300px] max-w-[85vw] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
           menuOpen
             ? "translate-x-0"
             : "-translate-x-full"
         }`}
       >
 
-        {/* ================= SIDEBAR HEADER ================= */}
+        {/* ================================================= */}
+        {/* SIDEBAR HEADER */}
+        {/* ================================================= */}
 
-        <div className="h-20 border-b px-5 flex items-center justify-between">
+        <div className="h-20 px-5 border-b flex items-center justify-between">
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
 
-            <div className="p-2 bg-blue-50 rounded-lg">
-
+            <div className="p-2 bg-blue-50 rounded-lg shrink-0">
               <Home
                 size={22}
                 className="text-blue-600"
               />
-
             </div>
 
-            <div>
-
-              <h2 className="text-xl font-bold text-blue-600">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-blue-600 leading-tight whitespace-nowrap">
                 Rental Management
               </h2>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 mt-0.5">
                 Owner Panel
               </p>
-
             </div>
-
           </div>
 
-
-          {/* ================= CLOSE ================= */}
+          {/* CLOSE BUTTON */}
 
           <button
             onClick={closeMenu}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            className="p-2 rounded-lg hover:bg-gray-100 transition shrink-0"
             aria-label="Close owner menu"
           >
-
-            <X size={22} />
-
+            <X
+              size={22}
+              className="text-gray-700"
+            />
           </button>
-
         </div>
 
+        {/* ================================================= */}
+        {/* SIDEBAR MENU */}
+        {/* ================================================= */}
 
-        {/* ================= SIDEBAR MENU ================= */}
-
-        <div className="p-3 overflow-y-auto h-[calc(100vh-5rem)] overscroll-contain">
+        <div className="h-[calc(100vh-5rem)] overflow-y-auto overscroll-contain px-3 py-4">
 
           <nav className="space-y-1">
 
             {navItems.map((item) => {
-
               const Icon = item.icon;
               const active = isActive(item.path);
 
@@ -493,71 +467,73 @@ function Navbar() {
                   onClick={() =>
                     handleNavigation(item.path)
                   }
-                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition text-left ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
                     active
                       ? "bg-blue-50 text-blue-600"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
+                  <Icon
+                    size={20}
+                    className="shrink-0"
+                  />
 
-                  <Icon size={21} />
-
-                  <span className="text-base font-medium">
+                  <span className="text-[15px] font-medium">
                     {item.name}
                   </span>
-
                 </button>
               );
-
             })}
 
-
-            {/* ================= SETTINGS ================= */}
+            {/* ================================================= */}
+            {/* SETTINGS */}
+            {/* ================================================= */}
 
             <button
               onClick={() =>
                 handleNavigation("/settings")
               }
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition text-left ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
                 isActive("/settings")
                   ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
+              <Settings
+                size={20}
+                className="shrink-0"
+              />
 
-              <Settings size={21} />
-
-              <span className="text-base font-medium">
+              <span className="text-[15px] font-medium">
                 Settings
               </span>
-
             </button>
 
-
-            {/* ================= DIVIDER ================= */}
+            {/* ================================================= */}
+            {/* DIVIDER */}
+            {/* ================================================= */}
 
             <div className="border-t my-4" />
 
-
-            {/* ================= LOGOUT ================= */}
+            {/* ================================================= */}
+            {/* LOGOUT */}
+            {/* ================================================= */}
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
             >
+              <LogOut
+                size={20}
+                className="shrink-0"
+              />
 
-              <LogOut size={21} />
-
-              <span className="text-base font-medium">
+              <span className="text-[15px] font-medium">
                 Logout
               </span>
-
             </button>
-
           </nav>
-
         </div>
-
       </aside>
     </>
   );
