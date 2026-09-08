@@ -1,361 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  Menu,
-  Home,
   Building2,
   DoorOpen,
   Users,
-  Receipt,
   CreditCard,
-  FileText,
-  BarChart3,
-  Settings,
-  LogOut,
-  Bell,
-  Printer,
-  ChevronRight,
   AlertTriangle,
-  Info,
 } from "lucide-react";
 
-function Dashboard() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [hoveredItem, setHoveredItem] = useState(null);
-  const [hoverPosition, setHoverPosition] = useState({
-    top: 0,
-    left: 0,
-  });
+import Navbar from "./Navbar";
 
+function Dashboard() {
   const navigate = useNavigate();
 
-  const menuItems = [
-    {
-      id: "properties",
-      label: "Properties",
-      icon: Building2,
-      description:
-        "View and manage all your rental properties.",
-      path: "/properties",
-    },
-    {
-      id: "rooms",
-      label: "Rooms",
-      icon: DoorOpen,
-      description:
-        "View and manage rooms across your properties.",
-      path: "/rooms",
-    },
-    {
-      id: "tenants",
-      label: "Tenants",
-      icon: Users,
-      description:
-        "Manage tenant information and occupancy.",
-      path: "/tenants",
-    },
-    {
-      id: "rent",
-      label: "Rent & Bills",
-      icon: Receipt,
-      description:
-        "Track rent collection, pending bills and monthly dues.",
-      path: "/rent-bills",
-    },
-    {
-      id: "payments",
-      label: "Payments",
-      icon: CreditCard,
-      description:
-        "View and manage rental payment transactions.",
-      path: "/payments",
-    },
-    {
-      id: "documents",
-      label: "Documents",
-      icon: FileText,
-      description:
-        "Manage tenant agreements and important rental documents.",
-      path: "/documents",
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: BarChart3,
-      description:
-        "View rental income, occupancy and property reports.",
-      path: "/reports",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      description:
-        "Manage your rental system preferences and settings.",
-      path: "/settings",
-    },
-  ];
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    };
-  }, [menuOpen]);
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-    setHoveredItem(null);
-  };
-
-  const handleMenuHover = (itemId, event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-
-    setHoveredItem(itemId);
-
-    setHoverPosition({
-      top: rect.top,
-      left: rect.right + 12,
-    });
-  };
-
-  const handleNavigation = (path) => {
-    if (!path) return;
-
-    closeMenu();
-    navigate(path);
-  };
-
-  const activeItem = menuItems.find(
-    (item) => item.id === hoveredItem
-  );
-
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
 
-      {/* ================= TOP NAVBAR ================= */}
+      {/* ================= OWNER NAVBAR ================= */}
 
-      <header className="bg-white shadow-sm h-16 flex items-center justify-between px-4 md:px-6">
+      <Navbar />
 
-        <div className="flex items-center gap-4">
-
-          {/* HAMBURGER */}
-
-          <button
-            onClick={() => {
-              setMenuOpen(!menuOpen);
-              setHoveredItem(null);
-            }}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
-            title="Rental Menu"
-          >
-            <Menu size={24} />
-          </button>
-
-          {/* TITLE */}
-
-          <div>
-            <h1 className="text-xl font-bold text-blue-600">
-              Rental Management
-            </h1>
-
-            <p className="text-xs text-gray-500 hidden sm:block">
-              Owner Dashboard
-            </p>
-          </div>
-
-        </div>
-
-        {/* RIGHT SIDE */}
-
-        <div className="flex items-center gap-2">
-
-          <button
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
-            title="Notifications"
-          >
-            <Bell size={21} />
-          </button>
-
-          <button
-            onClick={() => window.print()}
-            className="p-2 rounded-lg hover:bg-gray-100 transition"
-            title="Print"
-          >
-            <Printer size={21} />
-          </button>
-
-          <button className="hidden sm:block px-4 py-2 border rounded-lg hover:bg-gray-100">
-            Owner
-          </button>
-
-        </div>
-
-      </header>
-
-      {/* ================= RENTAL MENU ================= */}
-
-      {menuOpen && (
-        <div className="fixed inset-0 z-50">
-
-          {/* OVERLAY */}
-
-          <div
-            className="absolute inset-0 bg-black/30"
-            onClick={closeMenu}
-          />
-
-          {/* MENU PANEL */}
-
-          <aside
-            className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl"
-            onMouseLeave={() => setHoveredItem(null)}
-          >
-
-            {/* MENU HEADER */}
-
-            <div className="p-5 border-b">
-
-              <h2 className="text-xl font-bold text-blue-600">
-                Rental Menu
-              </h2>
-
-              <p className="text-sm text-gray-500 mt-1">
-                Owner Panel
-              </p>
-
-            </div>
-
-            {/* SCROLLABLE MENU AREA */}
-
-            <div className="h-[calc(100%-89px)] overflow-y-auto">
-
-              <nav className="p-4 space-y-1">
-
-                {/* DASHBOARD */}
-
-                <button
-                  onClick={() =>
-                    handleNavigation("/owner-dashboard")
-                  }
-                  onMouseEnter={() => setHoveredItem(null)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white"
-                >
-                  <Home size={20} />
-                  Dashboard
-                </button>
-
-                {/* OTHER OPTIONS */}
-
-                {menuItems.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() =>
-                        handleNavigation(item.path)
-                      }
-                      onMouseEnter={(event) =>
-                        handleMenuHover(item.id, event)
-                      }
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-gray-100 transition"
-                    >
-
-                      <span className="flex items-center gap-3">
-
-                        <Icon size={20} />
-
-                        {item.label}
-
-                      </span>
-
-                      <ChevronRight size={18} />
-
-                    </button>
-                  );
-                })}
-
-                {/* LOGOUT */}
-
-                <div className="border-t pt-3 mt-3">
-
-                  <button
-                    onClick={() => {
-                      closeMenu();
-                      navigate("/");
-                    }}
-                    onMouseEnter={() => setHoveredItem(null)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition"
-                  >
-                    <LogOut size={20} />
-                    Logout
-                  </button>
-
-                </div>
-
-              </nav>
-
-            </div>
-
-          </aside>
-
-          {/* HOVER INFORMATION CARD */}
-
-          {activeItem && (
-            <div
-              className="fixed w-72 bg-white border border-gray-200 shadow-xl rounded-xl p-4 z-50"
-              style={{
-                top: hoverPosition.top,
-                left: hoverPosition.left,
-              }}
-            >
-
-              <div className="flex items-start gap-3">
-
-                <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-
-                  <Info
-                    size={18}
-                    className="text-blue-600"
-                  />
-
-                </div>
-
-                <div>
-
-                  <h3 className="font-semibold text-gray-800">
-                    {activeItem.label}
-                  </h3>
-
-                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-                    {activeItem.description}
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-          )}
-
-        </div>
-      )}
 
       {/* ================= MAIN DASHBOARD ================= */}
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
-        {/* WELCOME */}
+        {/* ================= WELCOME ================= */}
 
         <div className="mb-6">
 
@@ -369,7 +40,8 @@ function Dashboard() {
 
         </div>
 
-        {/* SUMMARY CARDS */}
+
+        {/* ================= SUMMARY CARDS ================= */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
@@ -392,6 +64,7 @@ function Dashboard() {
 
           </div>
 
+
           {/* TOTAL ROOMS */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
@@ -411,6 +84,7 @@ function Dashboard() {
 
           </div>
 
+
           {/* ACTIVE TENANTS */}
 
           <div className="bg-white rounded-xl shadow-sm p-5 border">
@@ -429,6 +103,7 @@ function Dashboard() {
             </h3>
 
           </div>
+
 
           {/* PENDING RENT */}
 
@@ -451,11 +126,12 @@ function Dashboard() {
 
         </div>
 
-        {/* PROPERTY + ATTENTION */}
+
+        {/* ================= PROPERTY + ATTENTION ================= */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
 
-          {/* MY PROPERTIES */}
+          {/* ================= MY PROPERTIES ================= */}
 
           <div className="bg-white rounded-xl shadow-sm border">
 
@@ -481,6 +157,7 @@ function Dashboard() {
               </button>
 
             </div>
+
 
             <div className="p-5 space-y-4">
 
@@ -509,6 +186,7 @@ function Dashboard() {
 
                 </div>
 
+
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
                   <div className="bg-gray-50 rounded-lg p-2">
@@ -523,6 +201,7 @@ function Dashboard() {
 
                   </div>
 
+
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -534,6 +213,7 @@ function Dashboard() {
                     </p>
 
                   </div>
+
 
                   <div className="bg-green-50 rounded-lg p-2">
 
@@ -550,6 +230,7 @@ function Dashboard() {
                 </div>
 
               </div>
+
 
               {/* PROPERTY B */}
 
@@ -576,6 +257,7 @@ function Dashboard() {
 
                 </div>
 
+
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
 
                   <div className="bg-gray-50 rounded-lg p-2">
@@ -590,6 +272,7 @@ function Dashboard() {
 
                   </div>
 
+
                   <div className="bg-gray-50 rounded-lg p-2">
 
                     <p className="text-xs text-gray-500">
@@ -601,6 +284,7 @@ function Dashboard() {
                     </p>
 
                   </div>
+
 
                   <div className="bg-green-50 rounded-lg p-2">
 
@@ -622,7 +306,8 @@ function Dashboard() {
 
           </div>
 
-          {/* ATTENTION REQUIRED */}
+
+          {/* ================= ATTENTION REQUIRED ================= */}
 
           <div className="bg-white rounded-xl shadow-sm border">
 
@@ -646,6 +331,7 @@ function Dashboard() {
               />
 
             </div>
+
 
             <div className="p-5 space-y-4">
 
@@ -671,6 +357,7 @@ function Dashboard() {
 
               </div>
 
+
               {/* VACANT ROOMS */}
 
               <div className="flex items-center justify-between p-4 rounded-xl bg-yellow-50">
@@ -692,6 +379,7 @@ function Dashboard() {
                 </span>
 
               </div>
+
 
               {/* DOCUMENTS */}
 
@@ -721,6 +409,7 @@ function Dashboard() {
 
         </div>
 
+
         {/* ================= RECENT TENANTS ================= */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -747,6 +436,7 @@ function Dashboard() {
             </button>
 
           </div>
+
 
           <div className="overflow-x-auto">
 
@@ -780,6 +470,7 @@ function Dashboard() {
 
               </thead>
 
+
               <tbody>
 
                 {/* TENANT 1 */}
@@ -812,6 +503,7 @@ function Dashboard() {
 
                 </tr>
 
+
                 {/* TENANT 2 */}
 
                 <tr className="border-t">
@@ -841,6 +533,7 @@ function Dashboard() {
                   </td>
 
                 </tr>
+
 
                 {/* TENANT 3 */}
 
@@ -880,6 +573,7 @@ function Dashboard() {
 
         </div>
 
+
         {/* ================= RECENT PAYMENTS ================= */}
 
         <div className="mt-8 bg-white rounded-xl shadow-sm border overflow-hidden">
@@ -906,6 +600,7 @@ function Dashboard() {
             </button>
 
           </div>
+
 
           <div className="overflow-x-auto">
 
@@ -943,6 +638,7 @@ function Dashboard() {
 
               </thead>
 
+
               <tbody>
 
                 {/* PAYMENT 1 */}
@@ -979,6 +675,7 @@ function Dashboard() {
 
                 </tr>
 
+
                 {/* PAYMENT 2 */}
 
                 <tr className="border-t">
@@ -1012,6 +709,7 @@ function Dashboard() {
                   </td>
 
                 </tr>
+
 
                 {/* PAYMENT 3 */}
 
