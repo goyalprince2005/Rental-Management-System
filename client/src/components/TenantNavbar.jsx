@@ -95,6 +95,20 @@ function TenantNavbar() {
     };
   }, []);
 
+  // ================= LOCK BACKGROUND SCROLL =================
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   // ================= ACTIVE PAGE =================
 
   const isActive = (path) => {
@@ -247,12 +261,10 @@ function TenantNavbar() {
 
 
           {/* ================================================= */}
-          {/* ================= PROFILE + LOGOUT ============== */}
+          {/* ================= PROFILE ======================== */}
           {/* ================================================= */}
 
-          <div className="flex items-center gap-2">
-
-            {/* ================= PROFILE DROPDOWN ================= */}
+          <div className="flex items-center">
 
             <div
               ref={profileRef}
@@ -403,9 +415,6 @@ function TenantNavbar() {
               )}
 
             </div>
-
-
-        
 
           </div>
 
