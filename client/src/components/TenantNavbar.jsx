@@ -405,20 +405,7 @@ function TenantNavbar() {
             </div>
 
 
-            {/* ================= LOGOUT ================= */}
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-            >
-
-              <LogOut size={18} />
-
-              <span className="hidden sm:inline">
-                Logout
-              </span>
-
-            </button>
+        
 
           </div>
 
