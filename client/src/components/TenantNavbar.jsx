@@ -22,6 +22,7 @@ function TenantNavbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
+  const scrollPositionRef = useRef(0);
 
   // ================= MOCK TENANT DATA =================
 
@@ -95,17 +96,49 @@ function TenantNavbar() {
     };
   }, []);
 
-  // ================= LOCK BACKGROUND SCROLL =================
+  // ================= LOCK BACKGROUND PAGE =================
 
   useEffect(() => {
     if (isOpen) {
+      // Save current page position
+      scrollPositionRef.current = window.scrollY;
+
+      // Completely lock the background page
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
+
+      // Prevent overscroll from reaching the page
+      document.documentElement.style.overscrollBehavior = "none";
     } else {
+      // Restore normal page behavior
+      const savedScrollPosition = scrollPositionRef.current;
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
       document.body.style.overflow = "";
+
+      document.documentElement.style.overscrollBehavior = "";
+
+      // Restore exact previous scroll position
+      window.scrollTo(0, savedScrollPosition);
     }
 
     return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
       document.body.style.overflow = "";
+
+      document.documentElement.style.overscrollBehavior = "";
     };
   }, [isOpen]);
 
@@ -428,7 +461,7 @@ function TenantNavbar() {
       {/* ===================================================== */}
 
       <div
-        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 touch-none ${
           isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -442,7 +475,7 @@ function TenantNavbar() {
       {/* ===================================================== */}
 
       <aside
-        className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overscroll-contain ${
           isOpen
             ? "translate-x-0"
             : "-translate-x-full"
@@ -496,7 +529,7 @@ function TenantNavbar() {
 
         {/* ================= SIDEBAR MENU ================= */}
 
-        <div className="p-3 overflow-y-auto h-[calc(100vh-5rem)]">
+        <div className="p-3 overflow-y-auto h-[calc(100vh-5rem)] overscroll-contain">
 
           {/* ================= DASHBOARD ================= */}
 
