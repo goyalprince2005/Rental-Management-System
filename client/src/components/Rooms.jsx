@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import { Plus, X } from "lucide-react";
 
 import RoomCard from "./RoomCard";
@@ -69,6 +74,60 @@ function Rooms() {
   const [error, setError] = useState("");
 
   // =========================================================
+  // SCROLL POSITION
+  // =========================================================
+
+  const scrollPositionRef = useRef(0);
+
+  // =========================================================
+  // LOCK BACKGROUND SCROLL WHEN MODAL IS OPEN
+  // =========================================================
+
+  useEffect(() => {
+    if (showAddRoom) {
+      scrollPositionRef.current = window.scrollY;
+
+      document.body.style.position = "fixed";
+      document.body.style.top =
+        `-${scrollPositionRef.current}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+      document.body.style.overflow = "hidden";
+
+      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.overscrollBehavior = "none";
+    } else {
+      const savedScrollPosition =
+        scrollPositionRef.current;
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.overscrollBehavior = "";
+
+      window.scrollTo(0, savedScrollPosition);
+    }
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.overscrollBehavior = "";
+    };
+  }, [showAddRoom]);
+
+  // =========================================================
   // HANDLE INPUT CHANGE
   // =========================================================
 
@@ -128,7 +187,7 @@ function Rooms() {
       return;
     }
 
-    // ---------------- CHECK DUPLICATE ROOM ----------------
+    // ---------------- DUPLICATE CHECK ----------------
 
     const roomAlreadyExists = rooms.some(
       (room) =>
@@ -151,7 +210,9 @@ function Rooms() {
       roomNumber: formData.roomNumber.trim(),
       property: formData.property.trim(),
       floor: Number(formData.floor),
-      rent: `₹${Number(formData.rent).toLocaleString("en-IN")}`,
+      rent: `₹${Number(formData.rent).toLocaleString(
+        "en-IN"
+      )}`,
       tenant: "None",
       status: formData.status,
     };
@@ -250,7 +311,7 @@ function Rooms() {
       {showAddRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
 
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
 
             {/* ================================================= */}
             {/* MODAL HEADER */}
@@ -282,153 +343,157 @@ function Rooms() {
             </div>
 
             {/* ================================================= */}
-            {/* FORM */}
+            {/* SCROLLABLE FORM CONTENT */}
             {/* ================================================= */}
 
-            <form
-              onSubmit={handleAddRoom}
-              className="p-5 space-y-4"
-            >
+            <div className="max-h-[calc(90vh-85px)] overflow-y-auto">
 
-              {/* ROOM NUMBER */}
+              <form
+                onSubmit={handleAddRoom}
+                className="p-5 space-y-4"
+              >
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Room Number
-                </label>
+                {/* ROOM NUMBER */}
 
-                <input
-                  type="text"
-                  name="roomNumber"
-                  value={formData.roomNumber}
-                  onChange={handleChange}
-                  placeholder="e.g. 205"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Room Number
+                  </label>
 
-              {/* PROPERTY */}
+                  <input
+                    type="text"
+                    name="roomNumber"
+                    value={formData.roomNumber}
+                    onChange={handleChange}
+                    placeholder="e.g. 205"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Property
-                </label>
+                {/* PROPERTY */}
 
-                <select
-                  name="property"
-                  value={formData.property}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">
-                    Select Property
-                  </option>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Property
+                  </label>
 
-                  <option value="Green View Apartments">
-                    Green View Apartments
-                  </option>
+                  <select
+                    name="property"
+                    value={formData.property}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">
+                      Select Property
+                    </option>
 
-                  <option value="Shyam Residency">
-                    Shyam Residency
-                  </option>
-                </select>
-              </div>
+                    <option value="Green View Apartments">
+                      Green View Apartments
+                    </option>
 
-              {/* FLOOR */}
+                    <option value="Shyam Residency">
+                      Shyam Residency
+                    </option>
+                  </select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Floor
-                </label>
+                {/* FLOOR */}
 
-                <input
-                  type="number"
-                  name="floor"
-                  value={formData.floor}
-                  onChange={handleChange}
-                  placeholder="e.g. 2"
-                  min="0"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Floor
+                  </label>
 
-              {/* MONTHLY RENT */}
+                  <input
+                    type="number"
+                    name="floor"
+                    value={formData.floor}
+                    onChange={handleChange}
+                    placeholder="e.g. 2"
+                    min="0"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Monthly Rent
-                </label>
+                {/* MONTHLY RENT */}
 
-                <input
-                  type="number"
-                  name="rent"
-                  value={formData.rent}
-                  onChange={handleChange}
-                  placeholder="e.g. 5500"
-                  min="0"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Monthly Rent
+                  </label>
 
-              {/* STATUS */}
+                  <input
+                    type="number"
+                    name="rent"
+                    value={formData.rent}
+                    onChange={handleChange}
+                    placeholder="e.g. 5500"
+                    min="0"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
+                {/* STATUS */}
 
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="Available">
-                    Available
-                  </option>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
 
-                  <option value="Occupied">
-                    Occupied
-                  </option>
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="Available">
+                      Available
+                    </option>
 
-                  <option value="Due">
-                    Due
-                  </option>
-                </select>
-              </div>
+                    <option value="Occupied">
+                      Occupied
+                    </option>
 
-              {/* ERROR */}
+                    <option value="Due">
+                      Due
+                    </option>
+                  </select>
+                </div>
 
-              {error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                  {error}
-                </p>
-              )}
+                {/* ERROR */}
 
-              {/* ================================================= */}
-              {/* FORM BUTTONS */}
-              {/* ================================================= */}
+                {error && (
+                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    {error}
+                  </p>
+                )}
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                {/* ================================================= */}
+                {/* FORM BUTTONS */}
+                {/* ================================================= */}
 
-                <button
-                  type="button"
-                  onClick={handleCloseAddRoom}
-                  className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
-                >
-                  Cancel
-                </button>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
 
-                <button
-                  type="submit"
-                  className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
-                >
-                  Add Room
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleCloseAddRoom}
+                    className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                  >
+                    Cancel
+                  </button>
 
-              </div>
+                  <button
+                    type="submit"
+                    className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                  >
+                    Add Room
+                  </button>
 
-            </form>
+                </div>
+
+              </form>
+
+            </div>
 
           </div>
 
