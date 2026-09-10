@@ -4,7 +4,11 @@ import React, {
   useState,
 } from "react";
 
-import { Plus, X } from "lucide-react";
+import {
+  Plus,
+  X,
+  AlertCircle,
+} from "lucide-react";
 
 import Navbar from "./Navbar";
 import TenantCard from "./TenantCard";
@@ -61,7 +65,7 @@ function Tenants() {
   // FORM DATA
   // =========================================================
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     name: "",
     mobile: "",
     property: "",
@@ -70,7 +74,10 @@ function Tenants() {
     joiningDate: "",
     rentDueDay: "",
     status: "Active",
-  });
+  };
+
+  const [formData, setFormData] =
+    useState(initialFormData);
 
   const [error, setError] = useState("");
 
@@ -85,21 +92,25 @@ function Tenants() {
   // =========================================================
 
   useEffect(() => {
-    if (showAddTenant) {
-      scrollPositionRef.current = window.scrollY;
+    if (!showAddTenant) {
+      return;
+    }
 
-      document.body.style.position = "fixed";
-      document.body.style.top =
-        `-${scrollPositionRef.current}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
+    scrollPositionRef.current = window.scrollY;
 
-      document.documentElement.style.overflow = "hidden";
-      document.documentElement.style.overscrollBehavior =
-        "none";
-    } else {
+    document.body.style.position = "fixed";
+    document.body.style.top =
+      `-${scrollPositionRef.current}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.overscrollBehavior =
+      "none";
+
+    return () => {
       const savedScrollPosition =
         scrollPositionRef.current;
 
@@ -115,19 +126,6 @@ function Tenants() {
         "";
 
       window.scrollTo(0, savedScrollPosition);
-    }
-
-    return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior =
-        "";
     };
   }, [showAddTenant]);
 
@@ -151,17 +149,7 @@ function Tenants() {
   // =========================================================
 
   const handleOpenAddTenant = () => {
-    setFormData({
-      name: "",
-      mobile: "",
-      property: "",
-      room: "",
-      rent: "",
-      joiningDate: "",
-      rentDueDay: "",
-      status: "Active",
-    });
-
+    setFormData(initialFormData);
     setError("");
     setShowAddTenant(true);
   };
@@ -172,6 +160,7 @@ function Tenants() {
 
   const handleCloseAddTenant = () => {
     setShowAddTenant(false);
+    setFormData(initialFormData);
     setError("");
   };
 
@@ -182,30 +171,50 @@ function Tenants() {
   const handleAddTenant = (event) => {
     event.preventDefault();
 
+    const name = formData.name.trim();
+    const mobile = formData.mobile.trim();
+    const property = formData.property;
+    const room = formData.room;
+    const rent = Number(formData.rent);
+    const rentDueDay = Number(formData.rentDueDay);
+
     // =====================================================
     // REQUIRED FIELD VALIDATION
     // =====================================================
 
     if (
-      !formData.name.trim() ||
-      !formData.mobile.trim() ||
-      !formData.property ||
-      !formData.room ||
+      !name ||
+      !mobile ||
+      !property ||
+      !room ||
       !formData.rent ||
       !formData.joiningDate ||
       !formData.rentDueDay
     ) {
-      setError("Please fill in all required fields.");
+      setError(
+        "Please fill in all required fields."
+      );
       return;
     }
 
     // =====================================================
-    // MOBILE NUMBER VALIDATION
+    // NAME VALIDATION
     // =====================================================
 
-    if (!/^\d{10}$/.test(formData.mobile.trim())) {
+    if (name.length < 2) {
       setError(
-        "Mobile number must contain exactly 10 digits."
+        "Tenant name must contain at least 2 characters."
+      );
+      return;
+    }
+
+    // =====================================================
+    // MOBILE VALIDATION
+    // =====================================================
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      setError(
+        "Please enter a valid 10-digit Indian mobile number."
       );
       return;
     }
@@ -214,8 +223,10 @@ function Tenants() {
     // RENT VALIDATION
     // =====================================================
 
-    if (Number(formData.rent) <= 0) {
-      setError("Monthly rent must be greater than 0.");
+    if (!Number.isFinite(rent) || rent <= 0) {
+      setError(
+        "Monthly rent must be greater than 0."
+      );
       return;
     }
 
@@ -224,8 +235,9 @@ function Tenants() {
     // =====================================================
 
     if (
-      Number(formData.rentDueDay) < 1 ||
-      Number(formData.rentDueDay) > 31
+      !Number.isInteger(rentDueDay) ||
+      rentDueDay < 1 ||
+      rentDueDay > 31
     ) {
       setError(
         "Rent due day must be between 1 and 31."
@@ -239,7 +251,7 @@ function Tenants() {
 
     const mobileAlreadyExists = tenants.some(
       (tenant) =>
-        tenant.mobile === formData.mobile.trim()
+        tenant.mobile === mobile
     );
 
     if (mobileAlreadyExists) {
@@ -255,8 +267,8 @@ function Tenants() {
 
     const roomAlreadyAssigned = tenants.some(
       (tenant) =>
-        tenant.property === formData.property &&
-        tenant.room === formData.room &&
+        tenant.property === property &&
+        tenant.room === room &&
         tenant.status === "Active"
     );
 
@@ -273,15 +285,13 @@ function Tenants() {
 
     const newTenant = {
       id: Date.now(),
-      name: formData.name.trim(),
-      mobile: formData.mobile.trim(),
-      property: formData.property,
-      room: formData.room,
-      rent: `₹${Number(formData.rent).toLocaleString(
-        "en-IN"
-      )}`,
+      name,
+      mobile,
+      property,
+      room,
+      rent: `₹${rent.toLocaleString("en-IN")}`,
       joiningDate: formData.joiningDate,
-      rentDueDay: Number(formData.rentDueDay),
+      rentDueDay,
       status: formData.status,
     };
 
@@ -298,20 +308,7 @@ function Tenants() {
     // CLOSE MODAL
     // =====================================================
 
-    setShowAddTenant(false);
-
-    setFormData({
-      name: "",
-      mobile: "",
-      property: "",
-      room: "",
-      rent: "",
-      joiningDate: "",
-      rentDueDay: "",
-      status: "Active",
-    });
-
-    setError("");
+    handleCloseAddTenant();
   };
 
   return (
@@ -336,6 +333,7 @@ function Tenants() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
           <div>
+
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
               All Tenants
             </h2>
@@ -343,6 +341,7 @@ function Tenants() {
             <p className="text-gray-500 mt-1">
               View and manage tenants across your properties.
             </p>
+
           </div>
 
           {/* ================================================= */}
@@ -352,13 +351,15 @@ function Tenants() {
           <button
             type="button"
             onClick={handleOpenAddTenant}
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm shrink-0"
+            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 active:bg-blue-800 transition shadow-sm shrink-0"
           >
+
             <Plus size={20} />
 
             <span>
               Add Tenant
             </span>
+
           </button>
 
         </div>
@@ -367,16 +368,59 @@ function Tenants() {
         {/* TENANT CARDS */}
         {/* ===================================================== */}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {tenants.length > 0 ? (
 
-          {tenants.map((tenant) => (
-            <TenantCard
-              key={tenant.id}
-              tenant={tenant}
-            />
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-        </div>
+            {tenants.map((tenant) => (
+              <TenantCard
+                key={tenant.id}
+                tenant={tenant}
+              />
+            ))}
+
+          </div>
+
+        ) : (
+
+          /* ================================================= */
+          /* EMPTY STATE */
+          /* ================================================= */
+
+          <div className="bg-white rounded-xl border shadow-sm p-10 text-center">
+
+            <div className="mx-auto w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center">
+
+              <Plus
+                size={26}
+                className="text-blue-600"
+              />
+
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-800 mt-4">
+              No Tenants Found
+            </h3>
+
+            <p className="text-gray-500 text-sm mt-1">
+              Add your first tenant to get started.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleOpenAddTenant}
+              className="mt-5 inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition"
+            >
+
+              <Plus size={18} />
+
+              Add Tenant
+
+            </button>
+
+          </div>
+
+        )}
 
       </main>
 
@@ -385,7 +429,13 @@ function Tenants() {
       {/* ===================================================== */}
 
       {showAddTenant && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-tenant-title"
+        >
 
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
 
@@ -396,31 +446,41 @@ function Tenants() {
             <div className="flex items-center justify-between px-5 py-4 border-b">
 
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+
+                <h3
+                  id="add-tenant-title"
+                  className="text-xl font-bold text-gray-800"
+                >
                   Add New Tenant
                 </h3>
 
                 <p className="text-sm text-gray-500 mt-1">
                   Add a tenant and assign a room.
                 </p>
+
               </div>
+
+              {/* CLOSE BUTTON */}
 
               <button
                 type="button"
                 onClick={handleCloseAddTenant}
-                className="p-2 rounded-lg hover:bg-gray-100 transition"
+                className="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition"
                 aria-label="Close add tenant form"
+                title="Close"
               >
+
                 <X
                   size={22}
                   className="text-gray-600"
                 />
+
               </button>
 
             </div>
 
             {/* ================================================= */}
-            {/* SCROLLABLE FORM CONTENT */}
+            {/* SCROLLABLE FORM */}
             {/* ================================================= */}
 
             <div className="max-h-[calc(90vh-85px)] overflow-y-auto">
@@ -435,18 +495,25 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Tenant Name
                   </label>
 
                   <input
+                    id="tenant-name"
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    autoComplete="name"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
                 {/* ================================================= */}
@@ -454,20 +521,31 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-mobile"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Mobile Number
                   </label>
 
                   <input
+                    id="tenant-mobile"
                     type="tel"
                     name="mobile"
                     value={formData.mobile}
                     onChange={handleChange}
                     placeholder="e.g. 9876543210"
-                    maxLength="10"
+                    maxLength={10}
                     inputMode="numeric"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    autoComplete="tel"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Enter a valid 10-digit mobile number.
+                  </p>
+
                 </div>
 
                 {/* ================================================= */}
@@ -475,16 +553,22 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-property"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Property
                   </label>
 
                   <select
+                    id="tenant-property"
                     name="property"
                     value={formData.property}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="">
                       Select Property
                     </option>
@@ -496,7 +580,9 @@ function Tenants() {
                     <option value="Shyam Residency">
                       Shyam Residency
                     </option>
+
                   </select>
+
                 </div>
 
                 {/* ================================================= */}
@@ -504,16 +590,22 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-room"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Room
                   </label>
 
                   <select
+                    id="tenant-room"
                     name="room"
                     value={formData.room}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="">
                       Select Available Room
                     </option>
@@ -521,7 +613,13 @@ function Tenants() {
                     <option value="204">
                       Room 204 - Shyam Residency
                     </option>
+
                   </select>
+
+                  <p className="text-xs text-gray-400 mt-1">
+                    Only currently available rooms should be assigned.
+                  </p>
+
                 </div>
 
                 {/* ================================================= */}
@@ -529,11 +627,16 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-rent"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Monthly Rent
                   </label>
 
                   <input
+                    id="tenant-rent"
                     type="number"
                     name="rent"
                     value={formData.rent}
@@ -541,8 +644,9 @@ function Tenants() {
                     placeholder="e.g. 5500"
                     min="1"
                     inputMode="numeric"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
                 {/* ================================================= */}
@@ -550,17 +654,23 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-joining-date"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Joining Date
                   </label>
 
                   <input
+                    id="tenant-joining-date"
                     type="date"
                     name="joiningDate"
                     value={formData.joiningDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
                 {/* ================================================= */}
@@ -568,11 +678,16 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-due-day"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Rent Due Day
                   </label>
 
                   <input
+                    id="tenant-due-day"
                     type="number"
                     name="rentDueDay"
                     value={formData.rentDueDay}
@@ -581,12 +696,13 @@ function Tenants() {
                     min="1"
                     max="31"
                     inputMode="numeric"
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
 
                   <p className="text-xs text-gray-500 mt-1">
                     Enter the day of the month when rent is due.
                   </p>
+
                 </div>
 
                 {/* ================================================= */}
@@ -594,16 +710,22 @@ function Tenants() {
                 {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="tenant-status"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Status
                   </label>
 
                   <select
+                    id="tenant-status"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="Active">
                       Active
                     </option>
@@ -611,17 +733,30 @@ function Tenants() {
                     <option value="Due">
                       Due
                     </option>
+
                   </select>
+
                 </div>
 
                 {/* ================================================= */}
-                {/* ERROR */}
+                {/* ERROR MESSAGE */}
                 {/* ================================================= */}
 
                 {error && (
-                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                    {error}
-                  </p>
+
+                  <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-3">
+
+                    <AlertCircle
+                      size={18}
+                      className="shrink-0 mt-0.5"
+                    />
+
+                    <span>
+                      {error}
+                    </span>
+
+                  </div>
+
                 )}
 
                 {/* ================================================= */}
@@ -630,17 +765,21 @@ function Tenants() {
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
 
+                  {/* CANCEL */}
+
                   <button
                     type="button"
                     onClick={handleCloseAddTenant}
-                    className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                    className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 active:bg-gray-100 transition"
                   >
                     Cancel
                   </button>
 
+                  {/* ADD TENANT */}
+
                   <button
                     type="submit"
-                    className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                    className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 active:bg-blue-800 transition"
                   >
                     Add Tenant
                   </button>
@@ -654,6 +793,7 @@ function Tenants() {
           </div>
 
         </div>
+
       )}
 
     </div>
