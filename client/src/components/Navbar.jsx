@@ -25,7 +25,6 @@ function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
-  const scrollPositionRef = useRef(0);
 
   // =========================================================
   // NAVIGATION ITEMS
@@ -140,46 +139,49 @@ function Navbar() {
   // =========================================================
 
   useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
     if (menuOpen) {
-      scrollPositionRef.current = window.scrollY;
+      // Prevent the page behind the sidebar from scrolling.
+      html.style.overflow = "hidden";
+      body.style.overflow = "hidden";
 
-      document.body.style.position = "fixed";
-      document.body.style.top =
-        `-${scrollPositionRef.current}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
+      // Prevent pull/overscroll movement.
+      html.style.overscrollBehavior = "none";
+      body.style.overscrollBehavior = "none";
 
-      document.documentElement.style.overflow = "hidden";
-      document.documentElement.style.overscrollBehavior = "none";
+      // Prevent horizontal overflow.
+      html.style.overflowX = "hidden";
+      body.style.overflowX = "hidden";
+
+      // Keep scrollbar space stable so the page does not
+      // shift left/right when the scrollbar disappears.
+      html.style.scrollbarGutter = "stable";
     } else {
-      const savedScrollPosition =
-        scrollPositionRef.current;
+      html.style.overflow = "";
+      body.style.overflow = "";
 
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
+      html.style.overscrollBehavior = "";
+      body.style.overscrollBehavior = "";
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
+      html.style.overflowX = "";
+      body.style.overflowX = "";
 
-      window.scrollTo(0, savedScrollPosition);
+      html.style.scrollbarGutter = "";
     }
 
     return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
+      html.style.overflow = "";
+      body.style.overflow = "";
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
+      html.style.overscrollBehavior = "";
+      body.style.overscrollBehavior = "";
+
+      html.style.overflowX = "";
+      body.style.overflowX = "";
+
+      html.style.scrollbarGutter = "";
     };
   }, [menuOpen]);
 
@@ -210,6 +212,7 @@ function Navbar() {
               {/* HAMBURGER */}
 
               <button
+                type="button"
                 onClick={() => {
                   setMenuOpen(true);
                   setProfileOpen(false);
@@ -227,6 +230,7 @@ function Navbar() {
               {/* LOGO */}
 
               <button
+                type="button"
                 onClick={() =>
                   handleNavigation("/owner-dashboard")
                 }
@@ -247,7 +251,6 @@ function Navbar() {
 
             {/* ================================================= */}
             {/* DESKTOP NAVIGATION */}
-            {/* Only shown on extra-large screens */}
             {/* ================================================= */}
 
             <div className="hidden xl:flex flex-1 items-center justify-center gap-1 min-w-0 mx-3">
@@ -258,6 +261,7 @@ function Navbar() {
 
                 return (
                   <button
+                    type="button"
                     key={item.name}
                     onClick={() =>
                       handleNavigation(item.path)
@@ -287,6 +291,7 @@ function Navbar() {
               className="relative shrink-0"
             >
               <button
+                type="button"
                 onClick={() =>
                   setProfileOpen((prev) => !prev)
                 }
@@ -349,6 +354,7 @@ function Navbar() {
                   {/* SETTINGS */}
 
                   <button
+                    type="button"
                     onClick={handleSettings}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
                       isActive("/settings")
@@ -368,6 +374,7 @@ function Navbar() {
                   {/* LOGOUT */}
 
                   <button
+                    type="button"
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
                   >
@@ -395,6 +402,7 @@ function Navbar() {
             : "opacity-0 pointer-events-none"
         }`}
         onClick={closeMenu}
+        aria-hidden="true"
       />
 
       {/* ===================================================== */}
@@ -438,6 +446,7 @@ function Navbar() {
           {/* CLOSE BUTTON */}
 
           <button
+            type="button"
             onClick={closeMenu}
             className="p-2 rounded-lg hover:bg-gray-100 transition shrink-0"
             aria-label="Close owner menu"
@@ -453,7 +462,7 @@ function Navbar() {
         {/* SIDEBAR MENU */}
         {/* ================================================= */}
 
-        <div className="h-[calc(100vh-5rem)] overflow-y-auto overscroll-contain px-3 py-4">
+        <div className="h-[calc(100vh-5rem)] overflow-y-auto overscroll-contain overflow-x-hidden px-3 py-4">
 
           <nav className="space-y-1">
 
@@ -463,6 +472,7 @@ function Navbar() {
 
               return (
                 <button
+                  type="button"
                   key={item.name}
                   onClick={() =>
                     handleNavigation(item.path)
@@ -490,6 +500,7 @@ function Navbar() {
             {/* ================================================= */}
 
             <button
+              type="button"
               onClick={() =>
                 handleNavigation("/settings")
               }
@@ -520,6 +531,7 @@ function Navbar() {
             {/* ================================================= */}
 
             <button
+              type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
             >
