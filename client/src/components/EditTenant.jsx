@@ -1,20 +1,9 @@
-import React, { useState } from "react";
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   Save,
   CalendarDays,
-  User,
-  Phone,
-  Building2,
-  DoorOpen,
-  IndianRupee,
-  Clock,
 } from "lucide-react";
 
 import Navbar from "./Navbar";
@@ -25,12 +14,36 @@ function EditTenant() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
 
+  const isTenantView = searchParams.get("view") === "tenant";
+
   // =========================================================
-  // CHECK TENANT VIEW
+  // RESET PAGE SCROLL
   // =========================================================
 
-  const isTenantView =
-    searchParams.get("view") === "tenant";
+  useEffect(() => {
+    // Make sure no previous modal/page has locked body scrolling
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    document.body.style.overflow = "";
+
+    document.documentElement.style.overflow = "";
+    document.documentElement.style.overscrollBehavior = "";
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.overscrollBehavior = "";
+    };
+  }, []);
 
   // =========================================================
   // MOCK TENANT DATA
@@ -88,7 +101,6 @@ function EditTenant() {
 
   const [tenantData, setTenantData] = useState(
     existingTenant || {
-      id,
       name: "",
       phone: "",
       property: "",
@@ -100,111 +112,90 @@ function EditTenant() {
     }
   );
 
-  const [error, setError] = useState("");
-
   // =========================================================
   // HANDLE INPUT CHANGE
   // =========================================================
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "joiningDate") {
+      const selectedDate = new Date(`${value}T00:00:00`);
+
+      if (!Number.isNaN(selectedDate.getTime())) {
+        const joiningDay = selectedDate.getDate();
+
+        setTenantData((previous) => ({
+          ...previous,
+          joiningDate: value,
+          rentDueDay:
+            previous.rentDueDay || String(joiningDay),
+        }));
+
+        return;
+      }
+    }
 
     setTenantData((previous) => ({
       ...previous,
       [name]: value,
     }));
-
-    setError("");
   };
 
   // =========================================================
-  // HANDLE JOINING DATE
+  // SAVE
   // =========================================================
 
-  const handleJoiningDateChange = (event) => {
-    const value = event.target.value;
-
-    setTenantData((previous) => ({
-      ...previous,
-      joiningDate: value,
-    }));
-
-    setError("");
-  };
-
-  // =========================================================
-  // VALIDATION
-  // =========================================================
-
-  const validateForm = () => {
-    if (!tenantData.name.trim()) {
-      return "Please enter tenant name.";
-    }
-
-    if (!tenantData.phone.trim()) {
-      return "Please enter phone number.";
+  const handleSave = () => {
+    if (
+      !tenantData.name.trim() ||
+      !tenantData.phone.trim()
+    ) {
+      alert("Please enter tenant name and phone number.");
+      return;
     }
 
     if (!/^\d{10}$/.test(tenantData.phone.trim())) {
-      return "Phone number must contain exactly 10 digits.";
+      alert("Phone number must contain exactly 10 digits.");
+      return;
     }
 
     if (!isTenantView) {
-      if (!tenantData.property.trim()) {
-        return "Please enter property name.";
+      if (!tenantData.property) {
+        alert("Please enter property.");
+        return;
       }
 
-      if (!tenantData.room.trim()) {
-        return "Please enter room number.";
+      if (!tenantData.room) {
+        alert("Please enter room number.");
+        return;
       }
 
-      if (!tenantData.rent) {
-        return "Please enter monthly rent.";
-      }
-
-      if (Number(tenantData.rent) <= 0) {
-        return "Monthly rent must be greater than 0.";
+      if (!tenantData.rent || Number(tenantData.rent) <= 0) {
+        alert("Please enter a valid monthly rent.");
+        return;
       }
 
       if (!tenantData.joiningDate) {
-        return "Please select joining date.";
+        alert("Please select the tenant joining date.");
+        return;
       }
 
       if (!tenantData.rentDueDay) {
-        return "Please select rent due day.";
+        alert("Please select the rent due day.");
+        return;
       }
 
       if (
         Number(tenantData.rentDueDay) < 1 ||
         Number(tenantData.rentDueDay) > 31
       ) {
-        return "Rent due day must be between 1 and 31.";
+        alert("Rent due day must be between 1 and 31.");
+        return;
       }
     }
 
-    return "";
-  };
-
-  // =========================================================
-  // HANDLE SAVE
-  // =========================================================
-
-  const handleSave = () => {
-    const validationError = validateForm();
-
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    // =======================================================
-    // MOCK SAVE
-    // =======================================================
-
-    console.log(
-      "Updated Tenant Data:",
-      tenantData
-    );
+    console.log("Updated Tenant Data:", tenantData);
 
     alert("Tenant details updated successfully.");
 
@@ -216,7 +207,7 @@ function EditTenant() {
   };
 
   // =========================================================
-  // HANDLE CANCEL
+  // CANCEL
   // =========================================================
 
   const handleCancel = () => {
@@ -233,24 +224,15 @@ function EditTenant() {
 
   if (!existingTenant) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen overflow-y-auto bg-gray-100">
 
         {isTenantView ? <TenantNavbar /> : <Navbar />}
 
-        <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
+        <main className="min-h-[calc(100vh-64px)] flex items-center justify-center p-6">
 
-          <div className="bg-white rounded-xl shadow-sm border p-8 text-center max-w-md w-full">
+          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
 
-            <div className="w-16 h-16 mx-auto bg-red-50 rounded-full flex items-center justify-center">
-
-              <User
-                size={30}
-                className="text-red-500"
-              />
-
-            </div>
-
-            <h2 className="text-2xl font-bold text-gray-800 mt-5">
+            <h2 className="text-2xl font-bold text-gray-800">
               Tenant Not Found
             </h2>
 
@@ -259,27 +241,29 @@ function EditTenant() {
             </p>
 
             <button
-              type="button"
-              onClick={handleCancel}
-              className="mt-5 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition"
+              onClick={() =>
+                navigate(
+                  isTenantView
+                    ? "/tenant-dashboard"
+                    : "/tenants"
+                )
+              }
+              className="mt-5 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
             >
-              Go Back
+              {isTenantView
+                ? "Back to Dashboard"
+                : "Back to Tenants"}
             </button>
 
           </div>
 
-        </div>
-
+        </main>
       </div>
     );
   }
 
-  // =========================================================
-  // MAIN PAGE
-  // =========================================================
-
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 overflow-y-auto overflow-x-hidden">
 
       {/* ===================================================== */}
       {/* NAVBAR */}
@@ -291,28 +275,24 @@ function EditTenant() {
       {/* MAIN CONTENT */}
       {/* ===================================================== */}
 
-      <main className="p-4 md:p-6 max-w-3xl mx-auto">
+      <main className="w-full max-w-3xl mx-auto p-4 md:p-6 pb-12">
 
         {/* ================================================= */}
-        {/* PAGE HEADER */}
+        {/* PAGE HEADING */}
         {/* ================================================= */}
 
         <div className="mb-6">
 
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-
             {isTenantView
               ? "Edit My Details"
               : `Edit Tenant ${id}`}
-
           </h1>
 
           <p className="text-gray-500 mt-1">
-
             {isTenantView
               ? "Update your personal information."
               : "Update the information of this tenant."}
-
           </p>
 
         </div>
@@ -321,26 +301,39 @@ function EditTenant() {
         {/* FORM CARD */}
         {/* ================================================= */}
 
-        <div className="bg-white rounded-xl shadow-sm border p-6">
+        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
-          <div className="space-y-5">
+          {/* CARD HEADER */}
 
-            {/* ================================================= */}
-            {/* NAME */}
-            {/* ================================================= */}
+          <div className="p-5 md:p-6 border-b">
 
-            <div>
+            <h2 className="text-lg font-bold text-gray-800">
+              Tenant Information
+            </h2>
 
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tenant Name
-              </label>
+            <p className="text-sm text-gray-500 mt-1">
+              Update tenant details and rental information.
+            </p>
 
-              <div className="relative">
+          </div>
 
-                <User
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+          {/* ================================================= */}
+          {/* FORM */}
+          {/* ================================================= */}
+
+          <div className="p-5 md:p-6">
+
+            <div className="space-y-5">
+
+              {/* ================================================= */}
+              {/* NAME */}
+              {/* ================================================= */}
+
+              <div>
+
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tenant Name
+                </label>
 
                 <input
                   type="text"
@@ -348,66 +341,48 @@ function EditTenant() {
                   value={tenantData.name}
                   onChange={handleChange}
                   placeholder="Enter tenant name"
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
 
               </div>
 
-            </div>
+              {/* ================================================= */}
+              {/* PHONE */}
+              {/* ================================================= */}
 
-            {/* ================================================= */}
-            {/* PHONE */}
-            {/* ================================================= */}
+              <div>
 
-            <div>
-
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-
-              <div className="relative">
-
-                <Phone
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone
+                </label>
 
                 <input
                   type="tel"
                   name="phone"
                   value={tenantData.phone}
                   onChange={handleChange}
-                  placeholder="Enter 10 digit phone number"
+                  placeholder="Enter phone number"
                   maxLength="10"
                   inputMode="numeric"
-                  className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
 
               </div>
 
-            </div>
+              {/* ================================================= */}
+              {/* OWNER ONLY */}
+              {/* ================================================= */}
 
-            {/* ================================================= */}
-            {/* OWNER ONLY FIELDS */}
-            {/* ================================================= */}
+              {!isTenantView && (
+                <>
 
-            {!isTenantView && (
-              <>
+                  {/* PROPERTY */}
 
-                {/* PROPERTY */}
+                  <div>
 
-                <div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Property
-                  </label>
-
-                  <div className="relative">
-
-                    <Building2
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Property
+                    </label>
 
                     <input
                       type="text"
@@ -415,27 +390,18 @@ function EditTenant() {
                       value={tenantData.property}
                       onChange={handleChange}
                       placeholder="Enter property name"
-                      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
 
                   </div>
 
-                </div>
+                  {/* ROOM */}
 
-                {/* ROOM */}
+                  <div>
 
-                <div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Room
-                  </label>
-
-                  <div className="relative">
-
-                    <DoorOpen
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Room
+                    </label>
 
                     <input
                       type="text"
@@ -443,27 +409,18 @@ function EditTenant() {
                       value={tenantData.room}
                       onChange={handleChange}
                       placeholder="Enter room number"
-                      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
 
                   </div>
 
-                </div>
+                  {/* RENT */}
 
-                {/* RENT */}
+                  <div>
 
-                <div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Rent
-                  </label>
-
-                  <div className="relative">
-
-                    <IndianRupee
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Monthly Rent
+                    </label>
 
                     <input
                       type="number"
@@ -471,93 +428,83 @@ function EditTenant() {
                       value={tenantData.rent}
                       onChange={handleChange}
                       placeholder="Enter monthly rent"
-                      min="1"
+                      min="0"
                       inputMode="numeric"
-                      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
 
                   </div>
 
-                </div>
+                  {/* STATUS */}
 
-                {/* STATUS */}
+                  <div>
 
-                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Status
+                    </label>
 
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
+                    <select
+                      name="status"
+                      value={tenantData.status}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="Active">
+                        Active
+                      </option>
 
-                  <select
-                    name="status"
-                    value={tenantData.status}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                      <option value="Due">
+                        Due
+                      </option>
 
-                    <option value="Active">
-                      Active
-                    </option>
+                      <option value="Inactive">
+                        Inactive
+                      </option>
 
-                    <option value="Due">
-                      Due
-                    </option>
-
-                    <option value="Inactive">
-                      Inactive
-                    </option>
-
-                  </select>
-
-                </div>
-
-                {/* JOINING DATE */}
-
-                <div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Joining Date
-                  </label>
-
-                  <div className="relative">
-
-                    <CalendarDays
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-
-                    <input
-                      type="date"
-                      name="joiningDate"
-                      value={tenantData.joiningDate}
-                      onChange={handleJoiningDateChange}
-                      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                    </select>
 
                   </div>
 
-                </div>
+                  {/* JOINING DATE */}
 
-                {/* RENT DUE DAY */}
+                  <div>
 
-                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Joining Date
+                    </label>
 
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rent Due Day
-                  </label>
+                    <div className="relative">
 
-                  <div className="relative">
+                      <CalendarDays
+                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      />
 
-                    <Clock
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                      <input
+                        type="date"
+                        name="joiningDate"
+                        value={tenantData.joiningDate}
+                        onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+
+                    </div>
+
+                  </div>
+
+                  {/* RENT DUE DAY */}
+
+                  <div>
+
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Rent Due Day
+                    </label>
 
                     <select
                       name="rentDueDay"
                       value={tenantData.rentDueDay}
                       onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
 
                       <option value="">
@@ -578,94 +525,70 @@ function EditTenant() {
 
                     </select>
 
+                    <p className="text-xs text-gray-500 mt-2">
+                      Rent will be due on this day of every month.
+                    </p>
+
                   </div>
 
-                  <p className="text-xs text-gray-500 mt-2">
-                    Rent will be due on this day every month.
+                  {/* PAYMENT RULE */}
+
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+
+                    <p className="text-sm font-medium text-yellow-800">
+                      Rent Payment Rule
+                    </p>
+
+                    <p className="text-sm text-yellow-700 mt-1">
+                      A late penalty of ₹50 per day will be applied
+                      after the rent due date.
+                    </p>
+
+                  </div>
+
+                </>
+              )}
+
+              {/* ================================================= */}
+              {/* TENANT VIEW NOTE */}
+              {/* ================================================= */}
+
+              {isTenantView && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+
+                  <p className="text-sm text-blue-700">
+                    Property, room, rent, status, joining date,
+                    and rent due day are managed by the owner.
                   </p>
 
                 </div>
+              )}
 
-                {/* PAYMENT RULE */}
+              {/* ================================================= */}
+              {/* BUTTONS */}
+              {/* ================================================= */}
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
 
-                  <p className="text-sm font-semibold text-yellow-800">
-                    Rent Payment Rule
-                  </p>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
+                >
+                  <ArrowLeft size={18} />
+                  Cancel
+                </button>
 
-                  <p className="text-sm text-yellow-700 mt-1">
-                    A late penalty of ₹50 per day will be
-                    applied after the rent due date.
-                  </p>
-
-                </div>
-
-              </>
-            )}
-
-            {/* ================================================= */}
-            {/* TENANT VIEW NOTE */}
-            {/* ================================================= */}
-
-            {isTenantView && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-
-                <p className="text-sm text-blue-700">
-                  Property, room, rent, status, joining date,
-                  and rent due day are managed by the owner.
-                </p>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition"
+                >
+                  <Save size={18} />
+                  Save Changes
+                </button>
 
               </div>
-            )}
-
-            {/* ================================================= */}
-            {/* ERROR */}
-            {/* ================================================= */}
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-
-                <p className="text-sm text-red-600">
-                  {error}
-                </p>
-
-              </div>
-            )}
-
-            {/* ================================================= */}
-            {/* BUTTONS */}
-            {/* ================================================= */}
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
-
-              {/* CANCEL */}
-
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
-              >
-
-                <ArrowLeft size={18} />
-
-                Cancel
-
-              </button>
-
-              {/* SAVE */}
-
-              <button
-                type="button"
-                onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition"
-              >
-
-                <Save size={18} />
-
-                Save Changes
-
-              </button>
 
             </div>
 
