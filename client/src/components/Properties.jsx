@@ -463,9 +463,17 @@ function Properties() {
 
                 </div>
 
+                {/* ================================================= */}
                 {/* STATUS */}
+                {/* ================================================= */}
 
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    property.status === "Active"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
                   {property.status}
                 </span>
 
@@ -550,11 +558,9 @@ function Properties() {
                     }
                     className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                   >
-
                     <Eye size={18} />
 
                     View Details
-
                   </button>
 
                   <button
@@ -564,13 +570,11 @@ function Properties() {
                     }
                     className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                   >
-
                     <Pencil size={18} />
 
                     <span className="hidden sm:block">
                       Edit
                     </span>
-
                   </button>
 
                 </div>
@@ -619,12 +623,10 @@ function Properties() {
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close add property form"
               >
-
                 <X
                   size={22}
                   className="text-gray-600"
                 />
-
               </button>
 
             </div>
@@ -731,7 +733,6 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-
                     <option value="Active">
                       Active
                     </option>
@@ -739,7 +740,6 @@ function Properties() {
                     <option value="Inactive">
                       Inactive
                     </option>
-
                   </select>
 
                 </div>
@@ -817,12 +817,10 @@ function Properties() {
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close edit property form"
               >
-
                 <X
                   size={22}
                   className="text-gray-600"
                 />
-
               </button>
 
             </div>
@@ -929,7 +927,6 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-
                     <option value="Active">
                       Active
                     </option>
@@ -937,7 +934,6 @@ function Properties() {
                     <option value="Inactive">
                       Inactive
                     </option>
-
                   </select>
 
                 </div>
