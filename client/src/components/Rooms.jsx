@@ -4,12 +4,16 @@ import React, {
   useState,
 } from "react";
 
-import { Plus, X } from "lucide-react";
+import {
+  Plus,
+  X,
+} from "lucide-react";
 
 import RoomCard from "./RoomCard";
 import Navbar from "./Navbar";
 
 function Rooms() {
+
   // =========================================================
   // ROOM DATA
   // =========================================================
@@ -54,13 +58,14 @@ function Rooms() {
   ]);
 
   // =========================================================
-  // MODAL STATE
+  // ADD ROOM MODAL STATE
   // =========================================================
 
-  const [showAddRoom, setShowAddRoom] = useState(false);
+  const [showAddRoom, setShowAddRoom] =
+    useState(false);
 
   // =========================================================
-  // FORM STATE
+  // FORM DATA
   // =========================================================
 
   const [formData, setFormData] = useState({
@@ -71,6 +76,10 @@ function Rooms() {
     status: "Available",
   });
 
+  // =========================================================
+  // FORM ERROR
+  // =========================================================
+
   const [error, setError] = useState("");
 
   // =========================================================
@@ -80,13 +89,18 @@ function Rooms() {
   const scrollPositionRef = useRef(0);
 
   // =========================================================
-  // LOCK BACKGROUND SCROLL WHEN MODAL IS OPEN
+  // LOCK BACKGROUND SCROLL
   // =========================================================
 
   useEffect(() => {
-    if (showAddRoom) {
-      scrollPositionRef.current = window.scrollY;
 
+    if (showAddRoom) {
+
+      // Save current page position
+      scrollPositionRef.current =
+        window.scrollY;
+
+      // Lock body
       document.body.style.position = "fixed";
       document.body.style.top =
         `-${scrollPositionRef.current}px`;
@@ -95,12 +109,16 @@ function Rooms() {
       document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
 
-      document.documentElement.style.overflow = "hidden";
-      document.documentElement.style.overscrollBehavior = "none";
-    } else {
-      const savedScrollPosition =
-        scrollPositionRef.current;
+      // Lock html
+      document.documentElement.style.overflow =
+        "hidden";
 
+      document.documentElement.style.overscrollBehavior =
+        "none";
+
+    } else {
+
+      // Restore body
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.left = "";
@@ -108,13 +126,23 @@ function Rooms() {
       document.body.style.width = "";
       document.body.style.overflow = "";
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
+      // Restore html
+      document.documentElement.style.overflow =
+        "";
 
-      window.scrollTo(0, savedScrollPosition);
+      document.documentElement.style.overscrollBehavior =
+        "";
+
+      // Restore previous position
+      window.scrollTo(
+        0,
+        scrollPositionRef.current
+      );
     }
 
+    // Cleanup
     return () => {
+
       document.body.style.position = "";
       document.body.style.top = "";
       document.body.style.left = "";
@@ -122,17 +150,25 @@ function Rooms() {
       document.body.style.width = "";
       document.body.style.overflow = "";
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
+      document.documentElement.style.overflow =
+        "";
+
+      document.documentElement.style.overscrollBehavior =
+        "";
     };
+
   }, [showAddRoom]);
 
   // =========================================================
-  // HANDLE INPUT CHANGE
+  // HANDLE FORM INPUT
   // =========================================================
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+
+    const {
+      name,
+      value,
+    } = event.target;
 
     setFormData((previous) => ({
       ...previous,
@@ -147,6 +183,7 @@ function Rooms() {
   // =========================================================
 
   const handleOpenAddRoom = () => {
+
     setFormData({
       roomNumber: "",
       property: "",
@@ -156,6 +193,7 @@ function Rooms() {
     });
 
     setError("");
+
     setShowAddRoom(true);
   };
 
@@ -164,8 +202,18 @@ function Rooms() {
   // =========================================================
 
   const handleCloseAddRoom = () => {
+
     setShowAddRoom(false);
+
     setError("");
+
+    setFormData({
+      roomNumber: "",
+      property: "",
+      floor: "",
+      rent: "",
+      status: "Available",
+    });
   };
 
   // =========================================================
@@ -173,9 +221,12 @@ function Rooms() {
   // =========================================================
 
   const handleAddRoom = (event) => {
+
     event.preventDefault();
 
-    // ---------------- VALIDATION ----------------
+    // =======================================================
+    // REQUIRED FIELD VALIDATION
+    // =======================================================
 
     if (
       !formData.roomNumber.trim() ||
@@ -183,50 +234,116 @@ function Rooms() {
       !formData.floor ||
       !formData.rent
     ) {
-      setError("Please fill in all required fields.");
+
+      setError(
+        "Please fill in all required fields."
+      );
+
       return;
     }
 
-    // ---------------- DUPLICATE CHECK ----------------
+    // =======================================================
+    // FLOOR VALIDATION
+    // =======================================================
 
-    const roomAlreadyExists = rooms.some(
-      (room) =>
-        room.roomNumber === formData.roomNumber.trim() &&
-        room.property.toLowerCase() ===
-          formData.property.trim().toLowerCase()
-    );
+    if (Number(formData.floor) < 0) {
+
+      setError(
+        "Floor cannot be negative."
+      );
+
+      return;
+    }
+
+    // =======================================================
+    // RENT VALIDATION
+    // =======================================================
+
+    if (Number(formData.rent) < 0) {
+
+      setError(
+        "Monthly rent cannot be negative."
+      );
+
+      return;
+    }
+
+    // =======================================================
+    // DUPLICATE ROOM CHECK
+    // =======================================================
+
+    const roomAlreadyExists =
+      rooms.some(
+        (room) =>
+          room.roomNumber
+            .toLowerCase() ===
+            formData.roomNumber
+              .trim()
+              .toLowerCase() &&
+          room.property
+            .toLowerCase() ===
+            formData.property
+              .trim()
+              .toLowerCase()
+      );
 
     if (roomAlreadyExists) {
+
       setError(
         "This room already exists in the selected property."
       );
+
       return;
     }
 
-    // ---------------- CREATE NEW ROOM ----------------
+    // =======================================================
+    // CREATE NEW ROOM
+    // =======================================================
 
     const newRoom = {
+
       id: Date.now(),
-      roomNumber: formData.roomNumber.trim(),
-      property: formData.property.trim(),
-      floor: Number(formData.floor),
-      rent: `₹${Number(formData.rent).toLocaleString(
-        "en-IN"
-      )}`,
+
+      roomNumber:
+        formData.roomNumber.trim(),
+
+      property:
+        formData.property.trim(),
+
+      floor:
+        Number(formData.floor),
+
+      rent:
+        `₹${Number(
+          formData.rent
+        ).toLocaleString("en-IN")}`,
+
       tenant: "None",
-      status: formData.status,
+
+      status:
+        formData.status,
     };
 
-    // ---------------- UPDATE ROOM LIST ----------------
+    // =======================================================
+    // UPDATE ROOMS
+    // =======================================================
 
-    setRooms((previousRooms) => [
-      ...previousRooms,
-      newRoom,
-    ]);
+    setRooms(
+      (previousRooms) => [
+        ...previousRooms,
+        newRoom,
+      ]
+    );
 
-    // ---------------- CLOSE MODAL ----------------
+    // =======================================================
+    // CLOSE MODAL
+    // =======================================================
 
     setShowAddRoom(false);
+
+    // =======================================================
+    // RESET FORM
+    // =======================================================
 
     setFormData({
       roomNumber: "",
@@ -238,6 +355,10 @@ function Rooms() {
 
     setError("");
   };
+
+  // =========================================================
+  // RENDER
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
@@ -255,12 +376,13 @@ function Rooms() {
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
 
         {/* ================================================= */}
-        {/* PAGE HEADING */}
+        {/* PAGE HEADER */}
         {/* ================================================= */}
 
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
           <div>
+
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
               All Rooms
             </h2>
@@ -268,6 +390,7 @@ function Rooms() {
             <p className="text-gray-500 mt-1">
               View and manage rooms across your properties.
             </p>
+
           </div>
 
           {/* ================================================= */}
@@ -275,14 +398,17 @@ function Rooms() {
           {/* ================================================= */}
 
           <button
+            type="button"
             onClick={handleOpenAddRoom}
             className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-sm shrink-0"
           >
+
             <Plus size={19} />
 
             <span>
               Add Room
             </span>
+
           </button>
 
         </div>
@@ -294,10 +420,12 @@ function Rooms() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {rooms.map((room) => (
+
             <RoomCard
               key={room.id}
               room={room}
             />
+
           ))}
 
         </div>
@@ -309,7 +437,17 @@ function Rooms() {
       {/* ===================================================== */}
 
       {showAddRoom && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-room-title"
+        >
+
+          {/* ================================================= */}
+          {/* MODAL */}
+          {/* ================================================= */}
 
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
 
@@ -320,69 +458,96 @@ function Rooms() {
             <div className="flex items-center justify-between px-5 py-4 border-b">
 
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+
+                <h3
+                  id="add-room-title"
+                  className="text-xl font-bold text-gray-800"
+                >
                   Add New Room
                 </h3>
 
                 <p className="text-sm text-gray-500 mt-1">
                   Add a room to one of your properties.
                 </p>
+
               </div>
 
+              {/* CLOSE BUTTON */}
+
               <button
+                type="button"
                 onClick={handleCloseAddRoom}
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close add room form"
               >
+
                 <X
                   size={22}
                   className="text-gray-600"
                 />
+
               </button>
 
             </div>
 
             {/* ================================================= */}
-            {/* SCROLLABLE FORM CONTENT */}
+            {/* SCROLLABLE FORM */}
             {/* ================================================= */}
 
-            <div className="max-h-[calc(90vh-85px)] overflow-y-auto">
+            <div className="max-h-[calc(90vh-85px)] overflow-y-auto overscroll-contain">
 
               <form
                 onSubmit={handleAddRoom}
                 className="p-5 space-y-4"
               >
 
+                {/* ================================================= */}
                 {/* ROOM NUMBER */}
+                {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="roomNumber"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Room Number
                   </label>
 
                   <input
+                    id="roomNumber"
                     type="text"
                     name="roomNumber"
                     value={formData.roomNumber}
                     onChange={handleChange}
                     placeholder="e.g. 205"
+                    autoComplete="off"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
+                {/* ================================================= */}
                 {/* PROPERTY */}
+                {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="property"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Property
                   </label>
 
                   <select
+                    id="property"
                     name="property"
                     value={formData.property}
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="">
                       Select Property
                     </option>
@@ -394,17 +559,26 @@ function Rooms() {
                     <option value="Shyam Residency">
                       Shyam Residency
                     </option>
+
                   </select>
+
                 </div>
 
+                {/* ================================================= */}
                 {/* FLOOR */}
+                {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="floor"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Floor
                   </label>
 
                   <input
+                    id="floor"
                     type="number"
                     name="floor"
                     value={formData.floor}
@@ -413,16 +587,24 @@ function Rooms() {
                     min="0"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
+                {/* ================================================= */}
                 {/* MONTHLY RENT */}
+                {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="rent"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Monthly Rent
                   </label>
 
                   <input
+                    id="rent"
                     type="number"
                     name="rent"
                     value={formData.rent}
@@ -431,21 +613,30 @@ function Rooms() {
                     min="0"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
+
                 </div>
 
+                {/* ================================================= */}
                 {/* STATUS */}
+                {/* ================================================= */}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
                     Status
                   </label>
 
                   <select
+                    id="status"
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="Available">
                       Available
                     </option>
@@ -457,19 +648,28 @@ function Rooms() {
                     <option value="Due">
                       Due
                     </option>
+
                   </select>
+
                 </div>
 
+                {/* ================================================= */}
                 {/* ERROR */}
+                {/* ================================================= */}
 
                 {error && (
-                  <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+
+                  <p
+                    className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+                    role="alert"
+                  >
                     {error}
                   </p>
+
                 )}
 
                 {/* ================================================= */}
-                {/* FORM BUTTONS */}
+                {/* BUTTONS */}
                 {/* ================================================= */}
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
