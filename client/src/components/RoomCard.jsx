@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   DoorOpen,
   Building2,
@@ -12,61 +13,73 @@ import {
 function RoomCard({ room }) {
   const navigate = useNavigate();
 
-  // ================= VIEW ROOM =================
+  // =========================================================
+  // VIEW ROOM
+  // =========================================================
 
   const handleView = () => {
     navigate(`/room-details/${room.id}`);
   };
 
-  // ================= EDIT ROOM =================
+  // =========================================================
+  // EDIT ROOM
+  // =========================================================
 
   const handleEdit = () => {
     navigate(`/edit-room/${room.id}`);
   };
 
-  // ================= STATUS STYLE =================
+  // =========================================================
+  // STATUS STYLE
+  // =========================================================
 
   const getStatusStyle = () => {
-    if (room.status === "Occupied") {
-      return "bg-red-100 text-red-700";
-    }
+    switch (room.status) {
+      case "Occupied":
+        return "bg-red-100 text-red-700";
 
-    if (room.status === "Due") {
-      return "bg-yellow-100 text-yellow-700";
-    }
+      case "Due":
+        return "bg-yellow-100 text-yellow-700";
 
-    if (room.status === "Available") {
-      return "bg-green-100 text-green-700";
-    }
+      case "Available":
+        return "bg-green-100 text-green-700";
 
-    return "bg-gray-100 text-gray-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow duration-200">
 
-      {/* ================= HEADER ================= */}
+      {/* ===================================================== */}
+      {/* ROOM HEADER */}
+      {/* ===================================================== */}
 
       <div className="flex items-start justify-between gap-3">
 
-        <div className="flex items-center gap-3">
+        {/* ROOM INFORMATION */}
 
-          <div className="p-3 bg-blue-50 rounded-xl">
+        <div className="flex items-center gap-3 min-w-0">
 
+          {/* ROOM ICON */}
+
+          <div className="p-3 bg-blue-50 rounded-xl shrink-0">
             <DoorOpen
               size={24}
               className="text-blue-600"
             />
-
           </div>
 
-          <div>
+          {/* ROOM TITLE */}
 
-            <h3 className="text-lg font-bold text-gray-800">
+          <div className="min-w-0">
+
+            <h3 className="text-lg font-bold text-gray-800 truncate">
               Room {room.roomNumber}
             </h3>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-0.5">
               Room ID: {room.id}
             </p>
 
@@ -74,11 +87,12 @@ function RoomCard({ room }) {
 
         </div>
 
-
-        {/* ================= STATUS ================= */}
+        {/* ================================================= */}
+        {/* STATUS */}
+        {/* ================================================= */}
 
         <span
-          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle()}`}
+          className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle()}`}
         >
           {room.status}
         </span>
@@ -86,28 +100,40 @@ function RoomCard({ room }) {
       </div>
 
 
-      {/* ================= ROOM INFORMATION ================= */}
+      {/* ===================================================== */}
+      {/* ROOM INFORMATION */}
+      {/* ===================================================== */}
 
       <div className="mt-5 space-y-3">
 
-        {/* ================= PROPERTY ================= */}
+        {/* ================================================= */}
+        {/* PROPERTY */}
+        {/* ================================================= */}
 
-        <div className="flex items-center gap-3 text-gray-600">
+        <div className="flex items-center gap-3 text-gray-600 min-w-0">
 
-          <Building2 size={18} />
+          <Building2
+            size={18}
+            className="shrink-0 text-gray-500"
+          />
 
-          <span className="text-sm">
+          <span className="text-sm truncate">
             {room.property}
           </span>
 
         </div>
 
 
-        {/* ================= FLOOR ================= */}
+        {/* ================================================= */}
+        {/* FLOOR */}
+        {/* ================================================= */}
 
         <div className="flex items-center gap-3 text-gray-600">
 
-          <Layers size={18} />
+          <Layers
+            size={18}
+            className="shrink-0 text-gray-500"
+          />
 
           <span className="text-sm">
             Floor {room.floor}
@@ -116,11 +142,16 @@ function RoomCard({ room }) {
         </div>
 
 
-        {/* ================= RENT ================= */}
+        {/* ================================================= */}
+        {/* MONTHLY RENT */}
+        {/* ================================================= */}
 
         <div className="flex items-center gap-3 text-gray-600">
 
-          <IndianRupee size={18} />
+          <IndianRupee
+            size={18}
+            className="shrink-0 text-gray-500"
+          />
 
           <span className="text-sm font-medium">
             {room.rent}
@@ -133,7 +164,9 @@ function RoomCard({ room }) {
         </div>
 
 
-        {/* ================= TENANT ================= */}
+        {/* ================================================= */}
+        {/* TENANT */}
+        {/* ================================================= */}
 
         <div className="text-sm text-gray-500">
 
@@ -148,34 +181,46 @@ function RoomCard({ room }) {
       </div>
 
 
-      {/* ================= ACTION BUTTONS ================= */}
+      {/* ===================================================== */}
+      {/* ACTION BUTTONS */}
+      {/* ===================================================== */}
 
-      <div className="mt-5 pt-4 border-t flex gap-3">
+      <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
 
-        {/* VIEW */}
+        {/* ================================================= */}
+        {/* VIEW BUTTON */}
+        {/* ================================================= */}
 
         <button
+          type="button"
           onClick={handleView}
-          className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+          className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
         >
 
           <Eye size={17} />
 
-          View
+          <span>
+            View
+          </span>
 
         </button>
 
 
-        {/* EDIT */}
+        {/* ================================================= */}
+        {/* EDIT BUTTON */}
+        {/* ================================================= */}
 
         <button
+          type="button"
           onClick={handleEdit}
-          className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
         >
 
           <Pencil size={17} />
 
-          Edit
+          <span>
+            Edit
+          </span>
 
         </button>
 
