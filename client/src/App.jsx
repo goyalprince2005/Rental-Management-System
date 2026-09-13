@@ -1,11 +1,20 @@
 import { Routes, Route } from "react-router-dom";
 
-import ForgotPassword from "./components/ForgotPassword";
+// =========================================================
+// AUTHENTICATION
+// =========================================================
+
 import Home from "./components/Home";
 import OwnerLogin from "./components/OwnerLogin";
 import TenantLogin from "./components/TenantLogin";
+import TenantForgotPassword from "./components/TenantForgotPassword";
+import OwnerForgotPassword from "./components/OwnerForgotPassword";
 import OTPVerification from "./components/OTPVerification";
 import ResetPassword from "./components/ResetPassword";
+
+// =========================================================
+// OWNER PORTAL
+// =========================================================
 
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";
@@ -24,13 +33,16 @@ import Documents from "./components/Documents";
 import Reports from "./components/Reports";
 import Settings from "./components/Settings";
 
+// =========================================================
+// TENANT PORTAL
+// =========================================================
+
 import TenantDashboard from "./components/TenantDashboard";
 import TenantPayments from "./components/TenantPayments";
 import TenantDocuments from "./components/TenantDocuments";
 import TenantNotices from "./components/TenantNotices";
 import TenantMaintenance from "./components/TenantMaintenance";
 import TenantChangePassword from "./components/TenantChangePassword";
-import OwnerForgotPassword from "./components/OwnerForgotPassword";
 
 function App() {
   return (
@@ -45,43 +57,66 @@ function App() {
         element={<Home />}
       />
 
+
       {/* ===================================================== */}
-      {/* ================= AUTHENTICATION ===================== */}
+      {/* ================= AUTHENTICATION ==================== */}
       {/* ===================================================== */}
+
+      {/* OWNER LOGIN */}
 
       <Route
         path="/owner-login"
         element={<OwnerLogin />}
       />
 
+      {/* TENANT LOGIN */}
+
       <Route
         path="/tenant-login"
         element={<TenantLogin />}
       />
 
+      {/* TENANT FORGOT PASSWORD */}
+
       <Route
         path="/forgot-password"
-        element={<ForgotPassword />}
+        element={<TenantForgotPassword />}
       />
+
+      {/* OWNER FORGOT PASSWORD */}
+
+      <Route
+        path="/owner-forgot-password"
+        element={<OwnerForgotPassword />}
+      />
+
+      {/* OTP VERIFICATION */}
 
       <Route
         path="/otp-verification"
         element={<OTPVerification />}
       />
 
+      {/* RESET PASSWORD */}
+
       <Route
         path="/reset-password"
         element={<ResetPassword />}
       />
 
+
       {/* ===================================================== */}
-      {/* ================= OWNER PORTAL ======================= */}
+      {/* ================= OWNER PORTAL ====================== */}
       {/* ===================================================== */}
+
+      {/* DASHBOARD */}
 
       <Route
         path="/owner-dashboard"
         element={<Dashboard />}
       />
+
+      {/* PROPERTIES */}
 
       <Route
         path="/properties"
@@ -92,6 +127,8 @@ function App() {
         path="/property-details"
         element={<PropertyDetails />}
       />
+
+      {/* ROOMS */}
 
       <Route
         path="/rooms"
@@ -108,6 +145,8 @@ function App() {
         element={<EditRoom />}
       />
 
+      {/* TENANTS */}
+
       <Route
         path="/tenants"
         element={<Tenants />}
@@ -123,6 +162,8 @@ function App() {
         element={<EditTenant />}
       />
 
+      {/* RENT & PAYMENTS */}
+
       <Route
         path="/rent-bills"
         element={<RentBills />}
@@ -133,55 +174,72 @@ function App() {
         element={<Payments />}
       />
 
+      {/* DOCUMENTS */}
+
       <Route
         path="/documents"
         element={<Documents />}
       />
+
+      {/* REPORTS */}
 
       <Route
         path="/reports"
         element={<Reports />}
       />
 
+      {/* SETTINGS */}
+
       <Route
         path="/settings"
         element={<Settings />}
       />
 
+
       {/* ===================================================== */}
-      {/* ================= TENANT PORTAL ====================== */}
+      {/* ================= TENANT PORTAL ===================== */}
       {/* ===================================================== */}
+
+      {/* TENANT DASHBOARD */}
 
       <Route
         path="/tenant-dashboard"
         element={<TenantDashboard />}
       />
 
+      {/* TENANT PAYMENTS */}
+
       <Route
         path="/tenant-payments"
         element={<TenantPayments />}
       />
+
+      {/* TENANT DOCUMENTS */}
 
       <Route
         path="/tenant-documents"
         element={<TenantDocuments />}
       />
 
+      {/* TENANT NOTICES */}
+
       <Route
         path="/tenant-notices"
         element={<TenantNotices />}
       />
+
+      {/* TENANT MAINTENANCE */}
+
       <Route
         path="/tenant-maintenance"
         element={<TenantMaintenance />}
       />
+
+      {/* TENANT CHANGE PASSWORD */}
+
       <Route
         path="/tenant-change-password"
         element={<TenantChangePassword />}
-      />
-      <Route
-        path="/owner-forgot-password"
-        element={<OwnerForgotPassword />}
       />
 
     </Routes>
