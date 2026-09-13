@@ -42,6 +42,24 @@ function OTPVerification() {
   const MOCK_OTP = "123456";
 
   // =========================================================
+  // ROLE THEME
+  // =========================================================
+
+  const isOwner = role === "owner";
+
+  const buttonColor = isOwner
+    ? "bg-blue-600 hover:bg-blue-700"
+    : "bg-green-600 hover:bg-green-700";
+
+  const focusColor = isOwner
+    ? "focus:ring-blue-500"
+    : "focus:ring-green-500";
+
+  const accentColor = isOwner
+    ? "text-blue-600"
+    : "text-green-600";
+
+  // =========================================================
   // OTP INPUT
   // =========================================================
 
@@ -206,10 +224,13 @@ function OTPVerification() {
 
           {mobileNumber && (
             <p className="text-center text-sm text-gray-500 mb-5">
+
               OTP sent to{" "}
+
               <span className="font-medium text-gray-700">
                 {mobileNumber}
               </span>
+
             </p>
           )}
 
@@ -239,7 +260,7 @@ function OTPVerification() {
                 onKeyDown={(e) =>
                   handleKeyDown(index, e)
                 }
-                className={`w-11 h-12 sm:w-12 sm:h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                className={`w-11 h-12 sm:w-12 sm:h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 ${focusColor} ${
                   otpError
                     ? "border-red-500"
                     : "border-gray-300"
@@ -268,7 +289,7 @@ function OTPVerification() {
           <button
             type="button"
             onClick={handleVerifyOTP}
-            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+            className={`w-full text-white py-3 rounded-lg transition ${buttonColor}`}
           >
             Verify OTP
           </button>
@@ -285,7 +306,7 @@ function OTPVerification() {
             <button
               type="button"
               onClick={handleResendOTP}
-              className="text-green-600 hover:underline"
+              className={`${accentColor} hover:underline`}
             >
               Resend OTP
             </button>
