@@ -8,11 +8,33 @@ function OwnerLogin() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (!mobileNumber || !password) {
+  // =========================================================
+  // LOGIN
+  // =========================================================
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    const enteredMobile = mobileNumber.trim();
+    const enteredPassword = password.trim();
+
+    // ================= BASIC VALIDATION =================
+
+    if (!enteredMobile || !enteredPassword) {
       alert("Please enter your mobile number and password.");
       return;
     }
+
+    // ================= MOBILE VALIDATION =================
+
+    if (!/^\d{10}$/.test(enteredMobile)) {
+      alert("Mobile number must contain exactly 10 digits.");
+      return;
+    }
+
+    // =====================================================
+    // BACKEND AUTHENTICATION WILL BE ADDED LATER
+    // =====================================================
 
     navigate("/owner-dashboard");
   };
@@ -20,11 +42,17 @@ function OwnerLogin() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
 
-      {/* ================= LOGIN CONTENT ================= */}
+      {/* ===================================================== */}
+      {/* LOGIN CONTENT */}
+      {/* ===================================================== */}
 
       <main className="flex-1 flex items-center justify-center p-4">
 
         <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
+
+          {/* ================================================= */}
+          {/* HEADING */}
+          {/* ================================================= */}
 
           <h1 className="text-3xl font-bold text-center">
             Owner Login
@@ -34,11 +62,22 @@ function OwnerLogin() {
             Login to manage your rental properties.
           </p>
 
-          <form className="space-y-5">
 
-            {/* Mobile Number */}
+          {/* ================================================= */}
+          {/* LOGIN FORM */}
+          {/* ================================================= */}
+
+          <form
+            onSubmit={handleLogin}
+            className="space-y-5"
+          >
+
+            {/* ================================================= */}
+            {/* MOBILE NUMBER */}
+            {/* ================================================= */}
 
             <div>
+
               <label className="block mb-2 font-medium">
                 Mobile Number
               </label>
@@ -50,13 +89,20 @@ function OwnerLogin() {
                   setMobileNumber(e.target.value)
                 }
                 placeholder="Enter your mobile number"
+                maxLength="10"
+                inputMode="numeric"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+
             </div>
 
-            {/* Password */}
+
+            {/* ================================================= */}
+            {/* PASSWORD */}
+            {/* ================================================= */}
 
             <div>
+
               <label className="block mb-2 font-medium">
                 Password
               </label>
@@ -70,13 +116,16 @@ function OwnerLogin() {
                 placeholder="Enter your password"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+
             </div>
 
-            {/* Login */}
+
+            {/* ================================================= */}
+            {/* LOGIN BUTTON */}
+            {/* ================================================= */}
 
             <button
-              type="button"
-              onClick={handleLogin}
+              type="submit"
               className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
             >
               Login
@@ -84,9 +133,14 @@ function OwnerLogin() {
 
           </form>
 
-          {/* Back to Home */}
 
-          <div className="mt-6 text-center">
+          {/* ================================================= */}
+          {/* LINKS */}
+          {/* ================================================= */}
+
+          <div className="flex justify-between mt-6">
+
+            {/* BACK TO HOME */}
 
             <Link
               to="/"
@@ -95,13 +149,26 @@ function OwnerLogin() {
               ← Back to Home
             </Link>
 
+
+            {/* FORGOT PASSWORD */}
+
+            <Link
+              to="/forgot-password"
+              className="text-red-500 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+
           </div>
 
         </div>
 
       </main>
 
-      {/* ================= FOOTER ================= */}
+
+      {/* ===================================================== */}
+      {/* FOOTER */}
+      {/* ===================================================== */}
 
       <Footer />
 
