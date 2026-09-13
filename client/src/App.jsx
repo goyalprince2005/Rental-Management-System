@@ -30,6 +30,7 @@ import TenantDocuments from "./components/TenantDocuments";
 import TenantNotices from "./components/TenantNotices";
 import TenantMaintenance from "./components/TenantMaintenance";
 import TenantChangePassword from "./components/TenantChangePassword";
+import OwnerForgotPassword from "./components/OwnerForgotPassword";
 
 function App() {
   return (
@@ -177,6 +178,10 @@ function App() {
       <Route
         path="/tenant-change-password"
         element={<TenantChangePassword />}
+      />
+      <Route
+        path="/owner-forgot-password"
+        element={<OwnerForgotPassword />}
       />
 
     </Routes>

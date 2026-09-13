@@ -153,7 +153,7 @@ function OwnerLogin() {
             {/* FORGOT PASSWORD */}
 
             <Link
-              to="/forgot-password"
+              to="/owner-forgot-password"
               className="text-red-500 hover:underline"
             >
               Forgot Password?
