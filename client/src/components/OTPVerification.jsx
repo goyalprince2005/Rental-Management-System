@@ -1,22 +1,49 @@
 import React, { useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+
+import Footer from "./Footer";
 
 function OTPVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const mobileNumber = searchParams.get("mobile");
+  // =========================================================
+  // GET DATA FROM URL
+  // =========================================================
 
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const mobileNumber = searchParams.get("mobile");
+  const role = searchParams.get("role");
+
+  // =========================================================
+  // OTP STATE
+  // =========================================================
+
+  const [otp, setOtp] = useState([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
+
   const [otpError, setOtpError] = useState("");
 
   const inputRefs = useRef([]);
 
-  // ================= MOCK OTP =================
+  // =========================================================
+  // MOCK OTP
+  // =========================================================
 
   const MOCK_OTP = "123456";
 
-  // ================= OTP INPUT =================
+  // =========================================================
+  // OTP INPUT
+  // =========================================================
 
   const handleChange = (index, value) => {
     if (!/^\d?$/.test(value)) {
@@ -24,6 +51,7 @@ function OTPVerification() {
     }
 
     const updatedOtp = [...otp];
+
     updatedOtp[index] = value;
 
     setOtp(updatedOtp);
@@ -35,7 +63,9 @@ function OTPVerification() {
     }
   };
 
-  // ================= BACKSPACE =================
+  // =========================================================
+  // BACKSPACE
+  // =========================================================
 
   const handleKeyDown = (index, e) => {
     if (
@@ -47,14 +77,18 @@ function OTPVerification() {
     }
   };
 
-  // ================= VERIFY OTP =================
+  // =========================================================
+  // VERIFY OTP
+  // =========================================================
 
   const handleVerifyOTP = () => {
     const enteredOTP = otp.join("");
 
     setOtpError("");
 
-    // ================= MOBILE CHECK =================
+    // =====================================================
+    // MOBILE CHECK
+    // =====================================================
 
     if (!mobileNumber) {
       setOtpError(
@@ -63,125 +97,221 @@ function OTPVerification() {
       return;
     }
 
-    // ================= OTP LENGTH CHECK =================
+    // =====================================================
+    // ROLE CHECK
+    // =====================================================
+
+    if (role !== "owner" && role !== "tenant") {
+      setOtpError(
+        "Invalid password recovery request. Please try again."
+      );
+      return;
+    }
+
+    // =====================================================
+    // OTP LENGTH CHECK
+    // =====================================================
 
     if (enteredOTP.length !== 6) {
-      setOtpError("Please enter the complete 6-digit OTP.");
+      setOtpError(
+        "Please enter the complete 6-digit OTP."
+      );
       return;
     }
 
-    // ================= OTP CHECK =================
+    // =====================================================
+    // OTP CHECK
+    // =====================================================
 
     if (enteredOTP !== MOCK_OTP) {
-      setOtpError("Incorrect OTP. Please try again.");
+      setOtpError(
+        "Incorrect OTP. Please try again."
+      );
       return;
     }
 
-    // ================= SUCCESS =================
+    // =====================================================
+    // SUCCESS
+    // =====================================================
 
     navigate(
-      `/reset-password?mobile=${mobileNumber}`
+      `/reset-password?mobile=${mobileNumber}&role=${role}`
     );
   };
 
-  // ================= RESEND OTP =================
+  // =========================================================
+  // RESEND OTP
+  // =========================================================
 
   const handleResendOTP = () => {
-    setOtp(["", "", "", "", "", ""]);
+    setOtp([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+
     setOtpError("");
 
-    alert("OTP has been resent. Demo OTP: 123456");
+    alert(
+      "OTP has been resent. Demo OTP: 123456"
+    );
 
     inputRefs.current[0]?.focus();
   };
 
+  // =========================================================
+  // BACK URL
+  // =========================================================
+
+  const backUrl =
+    role === "owner"
+      ? "/owner-forgot-password"
+      : "/forgot-password";
+
+  // =========================================================
+  // PAGE
+  // =========================================================
+
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
 
-      <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
+      {/* ===================================================== */}
+      {/* OTP CONTENT */}
+      {/* ===================================================== */}
 
-        <h1 className="text-3xl font-bold text-center">
-          Verify OTP
-        </h1>
+      <main className="flex-1 flex items-center justify-center p-4">
 
-        <p className="text-center text-gray-500 mt-2 mb-6">
-          Enter the 6-digit OTP sent to your registered mobile number.
-        </p>
+        <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
 
+          {/* ================================================= */}
+          {/* HEADING */}
+          {/* ================================================= */}
 
-        {/* ================= OTP INPUTS ================= */}
+          <h1 className="text-3xl font-bold text-center">
+            Verify OTP
+          </h1>
 
-        <div className="flex justify-center gap-3 mb-4">
-
-          {otp.map((digit, index) => (
-            <input
-              key={index}
-              ref={(element) => {
-                inputRefs.current[index] = element;
-              }}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={digit}
-              onChange={(e) =>
-                handleChange(index, e.target.value)
-              }
-              onKeyDown={(e) =>
-                handleKeyDown(index, e)
-              }
-              className={`w-12 h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                otpError
-                  ? "border-red-500"
-                  : "border-gray-300"
-              }`}
-            />
-          ))}
-
-        </div>
-
-
-        {/* ================= OTP ERROR ================= */}
-
-        {otpError && (
-          <p className="text-red-500 text-sm text-center mb-5">
-            {otpError}
+          <p className="text-center text-gray-500 mt-2 mb-6">
+            Enter the 6-digit OTP sent to your registered
+            mobile number.
           </p>
-        )}
 
 
-        {/* ================= VERIFY BUTTON ================= */}
+          {/* ================================================= */}
+          {/* MOBILE NUMBER */}
+          {/* ================================================= */}
 
-        <button
-          type="button"
-          onClick={handleVerifyOTP}
-          className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
-        >
-          Verify OTP
-        </button>
+          {mobileNumber && (
+            <p className="text-center text-sm text-gray-500 mb-5">
+              OTP sent to{" "}
+              <span className="font-medium text-gray-700">
+                {mobileNumber}
+              </span>
+            </p>
+          )}
 
 
-        {/* ================= ACTION LINKS ================= */}
+          {/* ================================================= */}
+          {/* OTP INPUTS */}
+          {/* ================================================= */}
 
-        <div className="flex justify-between mt-6">
+          <div className="flex justify-center gap-2 sm:gap-3 mb-4">
+
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(element) => {
+                  inputRefs.current[index] = element;
+                }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    e.target.value
+                  )
+                }
+                onKeyDown={(e) =>
+                  handleKeyDown(index, e)
+                }
+                className={`w-11 h-12 sm:w-12 sm:h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                  otpError
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
+              />
+            ))}
+
+          </div>
+
+
+          {/* ================================================= */}
+          {/* OTP ERROR */}
+          {/* ================================================= */}
+
+          {otpError && (
+            <p className="text-red-500 text-sm text-center mb-5">
+              {otpError}
+            </p>
+          )}
+
+
+          {/* ================================================= */}
+          {/* VERIFY BUTTON */}
+          {/* ================================================= */}
 
           <button
             type="button"
-            onClick={handleResendOTP}
-            className="text-green-600 hover:underline"
+            onClick={handleVerifyOTP}
+            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
           >
-            Resend OTP
+            Verify OTP
           </button>
 
-          <Link
-            to="/forgot-password"
-            className="text-blue-600 hover:underline"
-          >
-            ← Back
-          </Link>
+
+          {/* ================================================= */}
+          {/* ACTION LINKS */}
+          {/* ================================================= */}
+
+          <div className="flex justify-between mt-6">
+
+            {/* RESEND OTP */}
+
+            <button
+              type="button"
+              onClick={handleResendOTP}
+              className="text-green-600 hover:underline"
+            >
+              Resend OTP
+            </button>
+
+
+            {/* BACK */}
+
+            <Link
+              to={backUrl}
+              className="text-blue-600 hover:underline"
+            >
+              ← Back
+            </Link>
+
+          </div>
 
         </div>
 
-      </div>
+      </main>
+
+
+      {/* ===================================================== */}
+      {/* FOOTER */}
+      {/* ===================================================== */}
+
+      <Footer />
 
     </div>
   );

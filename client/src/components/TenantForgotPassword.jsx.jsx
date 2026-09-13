@@ -84,9 +84,9 @@ function ForgotPassword() {
     // OTP PAGE
     // =====================================================
 
-    navigate(
-      `/otp-verification?mobile=${enteredMobile}`
-    );
+  navigate(
+  `/otp-verification?mobile=${enteredMobile}&role=tenant`
+);
   };
 
   return (
