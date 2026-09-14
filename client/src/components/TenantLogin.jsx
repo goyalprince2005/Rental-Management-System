@@ -82,10 +82,9 @@ function TenantLogin() {
 
     // ================= LOGIN SUCCESS =================
 
-    // Store logged-in tenant ID for frontend mock flow.
     localStorage.setItem("tenantId", tenant.id.toString());
 
-    // Actual authentication will be connected with backend later.
+    // Navigate after successful login
     navigate("/tenant-dashboard");
   };
 
@@ -117,12 +116,18 @@ function TenantLogin() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label
+                htmlFor="tenant-mobile"
+                className="block mb-2 font-medium"
+              >
                 Mobile Number
               </label>
 
               <input
+                id="tenant-mobile"
                 type="tel"
+                name="mobile"
+                autoComplete="username"
                 value={mobileNumber}
                 onChange={(e) => {
                   setMobileNumber(e.target.value);
@@ -148,12 +153,18 @@ function TenantLogin() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label
+                htmlFor="tenant-password"
+                className="block mb-2 font-medium"
+              >
                 Password
               </label>
 
               <input
+                id="tenant-password"
                 type="password"
+                name="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
