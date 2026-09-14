@@ -1,4 +1,25 @@
 @import "tailwindcss";
+
+/* ========================================================= */
+
+
+/* ================= GLOBAL PAGE SETTINGS ================== */
+
+
+/* ========================================================= */
+
+html {
+    margin: 0;
+    /* Keep scrollbar space reserved.
+     Prevents horizontal layout movement when
+     the sidebar opens and body scrolling is locked. */
+    scrollbar-gutter: stable;
+    /* Prevent unwanted overscroll movement */
+    overscroll-behavior: none;
+}
+
 body {
     margin: 0;
+    /* Prevent horizontal movement */
+    overflow-x: hidden;
 }

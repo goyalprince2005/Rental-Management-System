@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import {
   Home,
   User,
@@ -22,9 +23,17 @@ function TenantNavbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const profileRef = useRef(null);
+
+  // Used to remember the page position
+  // while the sidebar is open.
   const scrollPositionRef = useRef(0);
 
-  // ================= MOCK TENANT DATA =================
+  // Used to close the sidebar after navigation.
+  const navigationTimerRef = useRef(null);
+
+  // =========================================================
+  // MOCK TENANT DATA
+  // =========================================================
 
   const tenants = {
     "1": {
@@ -38,46 +47,142 @@ function TenantNavbar() {
     },
   };
 
-  // ================= GET LOGGED-IN TENANT =================
+  // =========================================================
+  // GET LOGGED-IN TENANT
+  // =========================================================
 
   const tenantId = localStorage.getItem("tenantId");
   const tenant = tenants[tenantId];
 
-  // ================= LOGOUT =================
+  // =========================================================
+  // LOGOUT
+  // =========================================================
 
   const handleLogout = () => {
+    clearNavigationTimer();
+
     localStorage.removeItem("tenantId");
+
     setIsOpen(false);
     setIsProfileOpen(false);
+
     navigate("/tenant-login");
   };
 
-  // ================= MY DETAILS =================
+  // =========================================================
+  // MY DETAILS
+  // =========================================================
 
   const handleMyDetails = () => {
     const currentTenantId = localStorage.getItem("tenantId");
 
-    if (currentTenantId) {
-      setIsOpen(false);
-      setIsProfileOpen(false);
-      navigate(`/tenant-details/${currentTenantId}?view=tenant`);
+    if (!currentTenantId) {
+      return;
+    }
+
+    /*
+      IMPORTANT:
+
+      Do NOT close the sidebar before navigation.
+
+      We navigate first while the sidebar + overlay
+      are still covering the background page.
+
+      This prevents the old page movement from being
+      visible to the user.
+    */
+
+    navigate(
+      `/tenant-details/${currentTenantId}?view=tenant`
+    );
+
+    closeSidebarAfterNavigation();
+    setIsProfileOpen(false);
+  };
+
+  // =========================================================
+  // CHANGE PASSWORD
+  // =========================================================
+
+  const handleChangePassword = () => {
+    /*
+      Navigate first.
+      Keep sidebar/overlay visible during the route change.
+    */
+
+    navigate("/tenant-change-password");
+
+    closeSidebarAfterNavigation();
+
+    setIsProfileOpen(false);
+  };
+
+  // =========================================================
+  // CLEAR NAVIGATION TIMER
+  // =========================================================
+
+  const clearNavigationTimer = () => {
+    if (navigationTimerRef.current) {
+      clearTimeout(navigationTimerRef.current);
+      navigationTimerRef.current = null;
     }
   };
 
-  // ================= CHANGE PASSWORD =================
+  // =========================================================
+  // SIDEBAR NAVIGATION
+  // =========================================================
 
-  const handleChangePassword = () => {
-    setIsProfileOpen(false);
-    navigate("/tenant-change-password");
+  const handleSidebarNavigation = (path) => {
+    /*
+      IMPORTANT:
+
+      Do NOT call setIsOpen(false) immediately.
+
+      First navigate while the sidebar and overlay are
+      still visible.
+
+      Therefore the user cannot see the background page
+      changing/moving underneath.
+    */
+
+    navigate(path);
+
+    closeSidebarAfterNavigation();
   };
 
-  // ================= SIDEBAR CLOSE =================
+  // =========================================================
+  // CLOSE SIDEBAR AFTER NAVIGATION
+  // =========================================================
+
+  const closeSidebarAfterNavigation = () => {
+    clearNavigationTimer();
+
+    /*
+      Wait for the route change to happen underneath
+      the overlay.
+
+      The user sees the sidebar closing instead of
+      seeing the background page jump.
+    */
+
+    navigationTimerRef.current = setTimeout(() => {
+      setIsOpen(false);
+      navigationTimerRef.current = null;
+    }, 300);
+  };
+
+  // =========================================================
+  // NORMAL SIDEBAR CLOSE
+  // =========================================================
 
   const closeSidebar = () => {
+    clearNavigationTimer();
     setIsOpen(false);
   };
 
-  // ================= PROFILE DROPDOWN CLOSE =================
+  // =========================================================
+  // PROFILE DROPDOWN CLOSE
+  // =========================================================
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -89,74 +194,140 @@ function TenantNavbar() {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
     };
   }, []);
 
-  // ================= LOCK BACKGROUND PAGE =================
+  // =========================================================
+  // LOCK BACKGROUND PAGE
+  // =========================================================
 
   useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
     if (isOpen) {
-      // Save current page position
+      /*
+        Save current scroll position only when
+        sidebar opens.
+      */
+
       scrollPositionRef.current = window.scrollY;
 
-      // Completely lock the background page
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollPositionRef.current}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
+      /*
+        Completely freeze the background page.
 
-      // Prevent overscroll from reaching the page
-      document.documentElement.style.overscrollBehavior = "none";
+        The page stays exactly where it was.
+      */
+
+      body.style.position = "fixed";
+      body.style.top = `-${scrollPositionRef.current}px`;
+      body.style.left = "0";
+      body.style.right = "0";
+      body.style.width = "100%";
+      body.style.overflow = "hidden";
+
+      /*
+        Prevent horizontal movement caused by
+        scrollbar disappearing.
+      */
+
+      html.style.overflow = "hidden";
+      html.style.overscrollBehavior = "none";
+
     } else {
-      // Restore normal page behavior
-      const savedScrollPosition = scrollPositionRef.current;
+      /*
+        Restore normal page.
+      */
 
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
+      const savedScrollPosition =
+        scrollPositionRef.current;
 
-      document.documentElement.style.overscrollBehavior = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
 
-      // Restore exact previous scroll position
-      window.scrollTo(0, savedScrollPosition);
+      html.style.overflow = "";
+      html.style.overscrollBehavior = "";
+
+      /*
+        IMPORTANT:
+
+        Restore the previous position only if the
+        sidebar was simply closed.
+
+        The new page is already rendered when we
+        close after navigation, so restoring the
+        old scroll position can cause a jump.
+
+        Therefore we only restore the position when
+        there was no route navigation timer running.
+      */
+
+      if (!navigationTimerRef.current) {
+        window.scrollTo(0, savedScrollPosition);
+      }
     }
 
     return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
 
-      document.documentElement.style.overscrollBehavior = "";
+      html.style.overflow = "";
+      html.style.overscrollBehavior = "none";
     };
   }, [isOpen]);
 
-  // ================= ACTIVE PAGE =================
+  // =========================================================
+  // CLEANUP TIMER
+  // =========================================================
+
+  useEffect(() => {
+    return () => {
+      clearNavigationTimer();
+    };
+  }, []);
+
+  // =========================================================
+  // ACTIVE PAGE
+  // =========================================================
 
   const isActive = (path) => {
     return location.pathname === path;
   };
 
   const isDetailsActive = () => {
-    return location.pathname.startsWith("/tenant-details");
+    return location.pathname.startsWith(
+      "/tenant-details"
+    );
   };
 
   const isChangePasswordActive = () => {
-    return location.pathname === "/tenant-change-password";
+    return (
+      location.pathname ===
+      "/tenant-change-password"
+    );
   };
 
-  // ================= TOP NAVIGATION =================
+  // =========================================================
+  // TOP NAVIGATION
+  // =========================================================
 
   const navigateFromNavbar = (path) => {
     navigate(path);
@@ -176,12 +347,26 @@ function TenantNavbar() {
 
           <div className="flex items-center gap-3">
 
-            {/* HAMBURGER BUTTON */}
+            {/* HAMBURGER */}
 
             <button
-              onClick={() => setIsOpen(true)}
+              type="button"
+              onClick={() => {
+                clearNavigationTimer();
+
+                /*
+                  Save position before opening.
+                */
+
+                scrollPositionRef.current =
+                  window.scrollY;
+
+                setIsOpen(true);
+                setIsProfileOpen(false);
+              }}
               className="p-2 rounded-lg hover:bg-green-50 transition"
               aria-label="Open tenant menu"
+              title="Open Menu"
             >
               <Menu
                 size={24}
@@ -189,31 +374,28 @@ function TenantNavbar() {
               />
             </button>
 
-
             {/* LOGO */}
 
             <button
-              onClick={() => navigate("/tenant-dashboard")}
+              type="button"
+              onClick={() =>
+                navigate("/tenant-dashboard")
+              }
               className="flex items-center gap-3"
             >
-
               <div className="p-2 bg-green-50 rounded-lg">
-
                 <Home
                   size={22}
                   className="text-green-600"
                 />
-
               </div>
 
               <span className="text-xl font-bold text-green-600">
                 Tenant Portal
               </span>
-
             </button>
 
           </div>
-
 
           {/* ================================================= */}
           {/* ================= TOP NAV LINKS ================= */}
@@ -221,10 +403,15 @@ function TenantNavbar() {
 
           <nav className="hidden lg:flex items-center gap-1">
 
-            {/* ================= DASHBOARD ================= */}
+            {/* DASHBOARD */}
 
             <button
-              onClick={() => navigateFromNavbar("/tenant-dashboard")}
+              type="button"
+              onClick={() =>
+                navigateFromNavbar(
+                  "/tenant-dashboard"
+                )
+              }
               className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                 isActive("/tenant-dashboard")
                   ? "bg-green-50 text-green-600"
@@ -234,11 +421,15 @@ function TenantNavbar() {
               Dashboard
             </button>
 
-
-            {/* ================= PAYMENTS ================= */}
+            {/* PAYMENTS */}
 
             <button
-              onClick={() => navigateFromNavbar("/tenant-payments")}
+              type="button"
+              onClick={() =>
+                navigateFromNavbar(
+                  "/tenant-payments"
+                )
+              }
               className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                 isActive("/tenant-payments")
                   ? "bg-green-50 text-green-600"
@@ -248,11 +439,15 @@ function TenantNavbar() {
               Payments
             </button>
 
-
-            {/* ================= DOCUMENTS ================= */}
+            {/* DOCUMENTS */}
 
             <button
-              onClick={() => navigateFromNavbar("/tenant-documents")}
+              type="button"
+              onClick={() =>
+                navigateFromNavbar(
+                  "/tenant-documents"
+                )
+              }
               className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                 isActive("/tenant-documents")
                   ? "bg-green-50 text-green-600"
@@ -262,11 +457,15 @@ function TenantNavbar() {
               Documents
             </button>
 
-
-            {/* ================= NOTICES ================= */}
+            {/* NOTICES */}
 
             <button
-              onClick={() => navigateFromNavbar("/tenant-notices")}
+              type="button"
+              onClick={() =>
+                navigateFromNavbar(
+                  "/tenant-notices"
+                )
+              }
               className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                 isActive("/tenant-notices")
                   ? "bg-green-50 text-green-600"
@@ -276,11 +475,15 @@ function TenantNavbar() {
               Notices
             </button>
 
-
-            {/* ================= MAINTENANCE ================= */}
+            {/* MAINTENANCE */}
 
             <button
-              onClick={() => navigateFromNavbar("/tenant-maintenance")}
+              type="button"
+              onClick={() =>
+                navigateFromNavbar(
+                  "/tenant-maintenance"
+                )
+              }
               className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                 isActive("/tenant-maintenance")
                   ? "bg-green-50 text-green-600"
@@ -291,7 +494,6 @@ function TenantNavbar() {
             </button>
 
           </nav>
-
 
           {/* ================================================= */}
           {/* ================= PROFILE ======================== */}
@@ -305,7 +507,12 @@ function TenantNavbar() {
             >
 
               <button
-                onClick={() => setIsProfileOpen((prev) => !prev)}
+                type="button"
+                onClick={() =>
+                  setIsProfileOpen(
+                    (prev) => !prev
+                  )
+                }
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
                   isProfileOpen
                     ? "bg-green-50 text-green-600"
@@ -326,7 +533,9 @@ function TenantNavbar() {
                 <div className="hidden md:block text-left">
 
                   <p className="text-sm font-semibold text-gray-800">
-                    {tenant ? tenant.name : "Tenant"}
+                    {tenant
+                      ? tenant.name
+                      : "Tenant"}
                   </p>
 
                   <p className="text-xs text-gray-500">
@@ -338,17 +547,17 @@ function TenantNavbar() {
                 <ChevronDown
                   size={17}
                   className={`hidden sm:block transition-transform ${
-                    isProfileOpen ? "rotate-180" : ""
+                    isProfileOpen
+                      ? "rotate-180"
+                      : ""
                   }`}
                 />
 
               </button>
 
-
-              {/* ================= PROFILE MENU ================= */}
+              {/* PROFILE MENU */}
 
               {isProfileOpen && (
-
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
 
                   {/* PROFILE HEADER */}
@@ -369,7 +578,9 @@ function TenantNavbar() {
                       <div className="min-w-0">
 
                         <p className="font-semibold text-gray-800 truncate">
-                          {tenant ? tenant.name : "Tenant"}
+                          {tenant
+                            ? tenant.name
+                            : "Tenant"}
                         </p>
 
                         <p className="text-xs text-gray-500">
@@ -382,10 +593,10 @@ function TenantNavbar() {
 
                   </div>
 
-
                   {/* MY DETAILS */}
 
                   <button
+                    type="button"
                     onClick={handleMyDetails}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
                       isDetailsActive()
@@ -393,68 +604,57 @@ function TenantNavbar() {
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-
                     <User size={18} />
 
                     <span className="text-sm font-medium">
                       My Details
                     </span>
-
                   </button>
-
 
                   {/* CHANGE PASSWORD */}
 
                   <button
-                    onClick={handleChangePassword}
+                    type="button"
+                    onClick={
+                      handleChangePassword
+                    }
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
                       isChangePasswordActive()
                         ? "bg-green-50 text-green-600"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-
                     <Settings size={18} />
 
                     <span className="text-sm font-medium">
                       Change Password
                     </span>
-
                   </button>
 
-
-                  {/* DIVIDER */}
-
                   <div className="border-t" />
-
 
                   {/* LOGOUT */}
 
                   <button
+                    type="button"
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
                   >
-
                     <LogOut size={18} />
 
                     <span className="text-sm font-medium">
                       Logout
                     </span>
-
                   </button>
 
                 </div>
-
               )}
 
             </div>
-
           </div>
 
         </div>
-
       </header>
-
 
       {/* ===================================================== */}
       {/* ================= BACKGROUND OVERLAY ================= */}
@@ -467,15 +667,15 @@ function TenantNavbar() {
             : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}
+        aria-hidden="true"
       />
-
 
       {/* ===================================================== */}
       {/* ================= TENANT SIDEBAR ===================== */}
       {/* ===================================================== */}
 
       <aside
-        className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overscroll-contain ${
+        className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen
             ? "translate-x-0"
             : "-translate-x-full"
@@ -511,21 +711,21 @@ function TenantNavbar() {
 
           </div>
 
-
           {/* CLOSE BUTTON */}
 
           <button
+            type="button"
             onClick={closeSidebar}
             className="p-2 rounded-lg hover:bg-gray-100 transition"
             aria-label="Close tenant menu"
           >
-
-            <X size={22} />
-
+            <X
+              size={22}
+              className="text-gray-700"
+            />
           </button>
 
         </div>
-
 
         {/* ================= SIDEBAR MENU ================= */}
 
@@ -534,29 +734,29 @@ function TenantNavbar() {
           {/* ================= DASHBOARD ================= */}
 
           <button
-            onClick={() => {
-              closeSidebar();
-              navigate("/tenant-dashboard");
-            }}
+            type="button"
+            onClick={() =>
+              handleSidebarNavigation(
+                "/tenant-dashboard"
+              )
+            }
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isActive("/tenant-dashboard")
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <Home size={22} />
 
             <span className="text-base font-medium">
               Dashboard
             </span>
-
           </button>
-
 
           {/* ================= MY DETAILS ================= */}
 
           <button
+            type="button"
             onClick={handleMyDetails}
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isDetailsActive()
@@ -564,130 +764,120 @@ function TenantNavbar() {
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <User size={22} />
 
             <span className="text-base font-medium">
               My Details
             </span>
-
           </button>
-
 
           {/* ================= PAYMENTS ================= */}
 
           <button
-            onClick={() => {
-              closeSidebar();
-              navigate("/tenant-payments");
-            }}
+            type="button"
+            onClick={() =>
+              handleSidebarNavigation(
+                "/tenant-payments"
+              )
+            }
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isActive("/tenant-payments")
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <CreditCard size={22} />
 
             <span className="text-base font-medium">
               Payments
             </span>
-
           </button>
-
 
           {/* ================= DOCUMENTS ================= */}
 
           <button
-            onClick={() => {
-              closeSidebar();
-              navigate("/tenant-documents");
-            }}
+            type="button"
+            onClick={() =>
+              handleSidebarNavigation(
+                "/tenant-documents"
+              )
+            }
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isActive("/tenant-documents")
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <FileText size={22} />
 
             <span className="text-base font-medium">
               Documents
             </span>
-
           </button>
-
 
           {/* ================= NOTICES ================= */}
 
           <button
-            onClick={() => {
-              closeSidebar();
-              navigate("/tenant-notices");
-            }}
+            type="button"
+            onClick={() =>
+              handleSidebarNavigation(
+                "/tenant-notices"
+              )
+            }
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isActive("/tenant-notices")
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <Bell size={22} />
 
             <span className="text-base font-medium">
               Notices
             </span>
-
           </button>
-
 
           {/* ================= MAINTENANCE ================= */}
 
           <button
-            onClick={() => {
-              closeSidebar();
-              navigate("/tenant-maintenance");
-            }}
+            type="button"
+            onClick={() =>
+              handleSidebarNavigation(
+                "/tenant-maintenance"
+              )
+            }
             className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
               isActive("/tenant-maintenance")
                 ? "bg-green-50 text-green-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-
             <Wrench size={22} />
 
             <span className="text-base font-medium">
               Maintenance & Complaints
             </span>
-
           </button>
-
 
           {/* ================= DIVIDER ================= */}
 
           <div className="border-t my-4" />
 
-
-          {/* ================= SIDEBAR LOGOUT ================= */}
+          {/* ================= LOGOUT ================= */}
 
           <button
+            type="button"
             onClick={handleLogout}
             className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
           >
-
             <LogOut size={22} />
 
             <span className="text-base font-medium">
               Logout
             </span>
-
           </button>
 
         </div>
-
       </aside>
     </>
   );
