@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   User,
   Shield,
   Bell,
   Home,
   Save,
+  LockKeyhole,
 } from "lucide-react";
+
 import Navbar from "./Navbar";
 
 function Settings() {
@@ -15,39 +18,73 @@ function Settings() {
   const [settings, setSettings] = useState({
     ownerName: "Prince Goyal",
     email: "owner@example.com",
-    phone: "+91 9876543210",
+    phone: "+91 9876543200",
+
     emailNotifications: true,
     paymentNotifications: true,
     rentReminders: true,
+
     defaultRentDueDay: "5",
   });
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  // =========================================================
+  // HANDLE INPUT CHANGE
+  // =========================================================
 
-    setSettings({
-      ...settings,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  const handleChange = (e) => {
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
+
+    setSettings((prev) => ({
+      ...prev,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
+    }));
   };
+
+  // =========================================================
+  // SAVE SETTINGS
+  // =========================================================
 
   const handleSave = (e) => {
     e.preventDefault();
 
-    console.log("Settings saved:", settings);
+    console.log(
+      "Settings saved:",
+      settings
+    );
 
-    alert("Settings saved successfully!");
+    alert(
+      "Settings saved successfully!"
+    );
+  };
+
+  // =========================================================
+  // OWNER CHANGE PASSWORD
+  // =========================================================
+
+  const handleChangePassword = () => {
+    navigate("/owner-forgot-password");
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* ================= COMMON NAVBAR ================= */}
+      {/* ===================================================== */}
+      {/* COMMON NAVBAR */}
+      {/* ===================================================== */}
 
       <Navbar />
 
-
-      {/* ================= MAIN CONTENT ================= */}
+      {/* ===================================================== */}
+      {/* MAIN CONTENT */}
+      {/* ===================================================== */}
 
       <main className="p-4 md:p-6 max-w-5xl mx-auto">
 
@@ -65,11 +102,14 @@ function Settings() {
 
         </div>
 
+        <form
+          onSubmit={handleSave}
+          className="space-y-6"
+        >
 
-        <form onSubmit={handleSave} className="space-y-6">
-
-
-          {/* ================= PROFILE SETTINGS ================= */}
+          {/* ================================================= */}
+          {/* PROFILE SETTINGS */}
+          {/* ================================================= */}
 
           <section className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
@@ -98,10 +138,9 @@ function Settings() {
 
             </div>
 
-
             <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
 
-              {/* Name */}
+              {/* OWNER NAME */}
 
               <div>
 
@@ -119,8 +158,7 @@ function Settings() {
 
               </div>
 
-
-              {/* Email */}
+              {/* EMAIL */}
 
               <div>
 
@@ -138,8 +176,7 @@ function Settings() {
 
               </div>
 
-
-              {/* Phone */}
+              {/* PHONE */}
 
               <div>
 
@@ -161,8 +198,9 @@ function Settings() {
 
           </section>
 
-
-          {/* ================= SECURITY ================= */}
+          {/* ================================================= */}
+          {/* SECURITY */}
+          {/* ================================================= */}
 
           <section className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
@@ -191,23 +229,29 @@ function Settings() {
 
             </div>
 
-
             <div className="p-5">
 
               <button
                 type="button"
-                onClick={() => navigate("/forgot-password")}
-                className="border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition"
+                onClick={handleChangePassword}
+                className="flex items-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition"
               >
-                Change Password
+
+                <LockKeyhole size={18} />
+
+                <span>
+                  Change Password
+                </span>
+
               </button>
 
             </div>
 
           </section>
 
-
-          {/* ================= NOTIFICATIONS ================= */}
+          {/* ================================================= */}
+          {/* NOTIFICATIONS */}
+          {/* ================================================= */}
 
           <section className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
@@ -236,10 +280,7 @@ function Settings() {
 
             </div>
 
-
             <div className="p-5 space-y-4">
-
-              {/* Email Notifications */}
 
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
@@ -265,9 +306,6 @@ function Settings() {
 
               </label>
 
-
-              {/* Payment Notifications */}
-
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
                 <div>
@@ -291,9 +329,6 @@ function Settings() {
                 />
 
               </label>
-
-
-              {/* Rent Reminders */}
 
               <label className="flex items-center justify-between gap-4 cursor-pointer">
 
@@ -323,8 +358,9 @@ function Settings() {
 
           </section>
 
-
-          {/* ================= RENTAL PREFERENCES ================= */}
+          {/* ================================================= */}
+          {/* RENTAL PREFERENCES */}
+          {/* ================================================= */}
 
           <section className="bg-white rounded-xl shadow-sm border overflow-hidden">
 
@@ -352,7 +388,6 @@ function Settings() {
               </div>
 
             </div>
-
 
             <div className="p-5">
 
@@ -393,8 +428,9 @@ function Settings() {
 
           </section>
 
-
-          {/* ================= SAVE BUTTON ================= */}
+          {/* ================================================= */}
+          {/* SAVE BUTTON */}
+          {/* ================================================= */}
 
           <div className="flex justify-end">
 

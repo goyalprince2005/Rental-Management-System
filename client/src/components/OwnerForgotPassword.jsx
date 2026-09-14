@@ -37,7 +37,10 @@ function OwnerForgotPassword() {
     // =======================================================
 
     if (!enteredMobile) {
-      setMobileError("Please enter your mobile number");
+      setMobileError(
+        "Please enter your mobile number"
+      );
+
       return;
     }
 
@@ -49,6 +52,7 @@ function OwnerForgotPassword() {
       setMobileError(
         "Please enter a valid 10-digit mobile number"
       );
+
       return;
     }
 
@@ -57,18 +61,20 @@ function OwnerForgotPassword() {
     // =======================================================
 
     const owner = owners.find(
-      (owner) => owner.mobileNumber === enteredMobile
+      (owner) =>
+        owner.mobileNumber === enteredMobile
     );
 
     if (!owner) {
       setMobileError(
-        "Please enter correct registered mobile number"
+        "Please enter correct registered owner mobile number"
       );
+
       return;
     }
 
     // =======================================================
-    // STORE OWNER ID FOR MOCK FLOW
+    // STORE OWNER ID
     // =======================================================
 
     localStorage.setItem(
@@ -77,7 +83,16 @@ function OwnerForgotPassword() {
     );
 
     // =======================================================
-    // OTP PAGE
+    // STORE OWNER MOBILE
+    // =======================================================
+
+    localStorage.setItem(
+      "ownerMobile",
+      enteredMobile
+    );
+
+    // =======================================================
+    // GO TO OTP VERIFICATION
     // =======================================================
 
     navigate(
@@ -100,7 +115,7 @@ function OwnerForgotPassword() {
           {/* HEADING */}
           {/* ================================================= */}
 
-          <h1 className="text-3xl font-bold text-center">
+          <h1 className="text-3xl font-bold text-center text-gray-900">
             Owner Forgot Password
           </h1>
 
@@ -108,7 +123,6 @@ function OwnerForgotPassword() {
             Enter your registered mobile number to receive
             an OTP.
           </p>
-
 
           {/* ================================================= */}
           {/* FORM */}
@@ -125,7 +139,7 @@ function OwnerForgotPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2 font-medium text-gray-800">
                 Mobile Number
               </label>
 
@@ -137,9 +151,9 @@ function OwnerForgotPassword() {
                   setMobileError("");
                 }}
                 placeholder="Enter registered mobile number"
-                maxLength="10"
+                maxLength={10}
                 inputMode="numeric"
-                className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   mobileError
                     ? "border-red-500"
                     : "border-gray-300"
@@ -156,9 +170,8 @@ function OwnerForgotPassword() {
 
             </div>
 
-
             {/* ================================================= */}
-            {/* SEND OTP BUTTON */}
+            {/* SEND OTP */}
             {/* ================================================= */}
 
             <button
@@ -169,7 +182,6 @@ function OwnerForgotPassword() {
             </button>
 
           </form>
-
 
           {/* ================================================= */}
           {/* BACK TO OWNER LOGIN */}
@@ -189,7 +201,6 @@ function OwnerForgotPassword() {
         </div>
 
       </main>
-
 
       {/* ===================================================== */}
       {/* FOOTER */}

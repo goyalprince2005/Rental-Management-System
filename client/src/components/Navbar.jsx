@@ -17,7 +17,7 @@ import {
   UserCircle,
 } from "lucide-react";
 
-function OwnerNavbar() {
+function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -98,6 +98,7 @@ function OwnerNavbar() {
   const handleLogout = () => {
     setMenuOpen(false);
     setProfileOpen(false);
+
     navigate("/");
   };
 
@@ -107,6 +108,7 @@ function OwnerNavbar() {
 
   const handleSettings = () => {
     setProfileOpen(false);
+
     navigate("/settings");
   };
 
@@ -124,7 +126,10 @@ function OwnerNavbar() {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
 
     return () => {
       document.removeEventListener(
@@ -135,7 +140,7 @@ function OwnerNavbar() {
   }, []);
 
   // =========================================================
-  // LOCK BACKGROUND SCROLL WHEN MENU IS OPEN
+  // LOCK BACKGROUND SCROLL WHEN SIDEBAR IS OPEN
   // =========================================================
 
   useEffect(() => {
@@ -195,7 +200,9 @@ function OwnerNavbar() {
       {/* ===================================================== */}
 
       <nav className="sticky top-0 z-40 w-full bg-white border-b shadow-sm">
+
         <div className="w-full px-3 sm:px-4 lg:px-5">
+
           <div className="h-16 flex items-center justify-between gap-2">
 
             {/* ================================================= */}
@@ -231,17 +238,22 @@ function OwnerNavbar() {
                 }
                 className="flex items-center gap-2 shrink-0"
               >
+
                 <div className="p-2 bg-blue-50 rounded-lg">
+
                   <Home
                     size={21}
                     className="text-blue-600"
                   />
+
                 </div>
 
                 <span className="hidden sm:block text-lg font-bold text-blue-600 whitespace-nowrap">
                   Rental Management
                 </span>
+
               </button>
+
             </div>
 
             {/* ================================================= */}
@@ -251,6 +263,7 @@ function OwnerNavbar() {
             <div className="hidden xl:flex flex-1 items-center justify-center gap-1 min-w-0 mx-3">
 
               {navItems.map((item) => {
+
                 const Icon = item.icon;
                 const active = isActive(item.path);
 
@@ -267,14 +280,18 @@ function OwnerNavbar() {
                         : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
                     }`}
                   >
+
                     <Icon size={17} />
 
                     <span>
                       {item.name}
                     </span>
+
                   </button>
                 );
+
               })}
+
             </div>
 
             {/* ================================================= */}
@@ -285,6 +302,7 @@ function OwnerNavbar() {
               ref={profileRef}
               className="relative shrink-0"
             >
+
               <button
                 type="button"
                 onClick={() =>
@@ -299,6 +317,7 @@ function OwnerNavbar() {
                 title="Owner Settings"
                 aria-label="Open owner settings"
               >
+
                 <UserCircle
                   size={28}
                   className={
@@ -312,6 +331,7 @@ function OwnerNavbar() {
                 <span className="hidden sm:block text-sm font-medium text-gray-700">
                   Owner
                 </span>
+
               </button>
 
               {/* ================================================= */}
@@ -319,21 +339,26 @@ function OwnerNavbar() {
               {/* ================================================= */}
 
               {profileOpen && (
+
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border overflow-hidden z-50">
 
                   {/* PROFILE HEADER */}
 
                   <div className="p-4 border-b bg-gray-50">
+
                     <div className="flex items-center gap-3">
 
                       <div className="p-2 bg-blue-50 rounded-full">
+
                         <UserCircle
                           size={24}
                           className="text-blue-600"
                         />
+
                       </div>
 
                       <div>
+
                         <p className="font-semibold text-gray-800">
                           Owner
                         </p>
@@ -341,9 +366,11 @@ function OwnerNavbar() {
                         <p className="text-xs text-gray-500">
                           Owner Account
                         </p>
+
                       </div>
 
                     </div>
+
                   </div>
 
                   {/* SETTINGS */}
@@ -357,11 +384,13 @@ function OwnerNavbar() {
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
+
                     <Settings size={18} />
 
                     <span className="text-sm font-medium">
                       Settings
                     </span>
+
                   </button>
 
                   <div className="border-t" />
@@ -373,17 +402,25 @@ function OwnerNavbar() {
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
                   >
+
                     <LogOut size={18} />
 
                     <span className="text-sm font-medium">
                       Logout
                     </span>
+
                   </button>
+
                 </div>
+
               )}
+
             </div>
+
           </div>
+
         </div>
+
       </nav>
 
       {/* ===================================================== */}
@@ -412,22 +449,23 @@ function OwnerNavbar() {
         }`}
       >
 
-        {/* ================================================= */}
         {/* SIDEBAR HEADER */}
-        {/* ================================================= */}
 
         <div className="h-20 px-5 border-b flex items-center justify-between">
 
           <div className="flex items-center gap-3 min-w-0">
 
             <div className="p-2 bg-blue-50 rounded-lg shrink-0">
+
               <Home
                 size={22}
                 className="text-blue-600"
               />
+
             </div>
 
             <div className="min-w-0">
+
               <h2 className="text-lg font-bold text-blue-600 leading-tight whitespace-nowrap">
                 Rental Management
               </h2>
@@ -435,10 +473,10 @@ function OwnerNavbar() {
               <p className="text-xs text-gray-500 mt-0.5">
                 Owner Panel
               </p>
-            </div>
-          </div>
 
-          {/* CLOSE BUTTON */}
+            </div>
+
+          </div>
 
           <button
             type="button"
@@ -446,22 +484,24 @@ function OwnerNavbar() {
             className="p-2 rounded-lg hover:bg-gray-100 transition shrink-0"
             aria-label="Close owner menu"
           >
+
             <X
               size={22}
               className="text-gray-700"
             />
+
           </button>
+
         </div>
 
-        {/* ================================================= */}
         {/* SIDEBAR MENU */}
-        {/* ================================================= */}
 
         <div className="h-[calc(100vh-5rem)] overflow-y-auto overscroll-contain overflow-x-hidden px-3 py-4">
 
           <nav className="space-y-1">
 
             {navItems.map((item) => {
+
               const Icon = item.icon;
               const active = isActive(item.path);
 
@@ -478,6 +518,7 @@ function OwnerNavbar() {
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
+
                   <Icon
                     size={20}
                     className="shrink-0"
@@ -486,13 +527,13 @@ function OwnerNavbar() {
                   <span className="text-[15px] font-medium">
                     {item.name}
                   </span>
+
                 </button>
               );
+
             })}
 
-            {/* ================================================= */}
             {/* SETTINGS */}
-            {/* ================================================= */}
 
             <button
               type="button"
@@ -505,6 +546,7 @@ function OwnerNavbar() {
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
+
               <Settings
                 size={20}
                 className="shrink-0"
@@ -513,23 +555,19 @@ function OwnerNavbar() {
               <span className="text-[15px] font-medium">
                 Settings
               </span>
-            </button>
 
-            {/* ================================================= */}
-            {/* DIVIDER */}
-            {/* ================================================= */}
+            </button>
 
             <div className="border-t my-4" />
 
-            {/* ================================================= */}
             {/* LOGOUT */}
-            {/* ================================================= */}
 
             <button
               type="button"
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
             >
+
               <LogOut
                 size={20}
                 className="shrink-0"
@@ -538,14 +576,16 @@ function OwnerNavbar() {
               <span className="text-[15px] font-medium">
                 Logout
               </span>
+
             </button>
 
           </nav>
 
         </div>
+
       </aside>
     </>
   );
 }
 
-export default OwnerNavbar;
+export default Navbar;
