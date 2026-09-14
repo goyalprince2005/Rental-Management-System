@@ -17,7 +17,7 @@ import {
   UserCircle,
 } from "lucide-react";
 
-function Navbar() {
+function OwnerNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -143,20 +143,15 @@ function Navbar() {
     const body = document.body;
 
     if (menuOpen) {
-      // Prevent the page behind the sidebar from scrolling.
       html.style.overflow = "hidden";
       body.style.overflow = "hidden";
 
-      // Prevent pull/overscroll movement.
       html.style.overscrollBehavior = "none";
       body.style.overscrollBehavior = "none";
 
-      // Prevent horizontal overflow.
       html.style.overflowX = "hidden";
       body.style.overflowX = "hidden";
 
-      // Keep scrollbar space stable so the page does not
-      // shift left/right when the scrollbar disappears.
       html.style.scrollbarGutter = "stable";
     } else {
       html.style.overflow = "";
@@ -544,11 +539,13 @@ function Navbar() {
                 Logout
               </span>
             </button>
+
           </nav>
+
         </div>
       </aside>
     </>
   );
 }
 
-export default Navbar;
+export default OwnerNavbar;

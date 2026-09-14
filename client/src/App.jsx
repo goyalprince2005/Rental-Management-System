@@ -49,7 +49,7 @@ function App() {
     <Routes>
 
       {/* ===================================================== */}
-      {/* ================= GENERAL ROUTES ==================== */}
+      {/* GENERAL */}
       {/* ===================================================== */}
 
       <Route
@@ -57,9 +57,8 @@ function App() {
         element={<Home />}
       />
 
-
       {/* ===================================================== */}
-      {/* ================= AUTHENTICATION ==================== */}
+      {/* AUTHENTICATION */}
       {/* ===================================================== */}
 
       {/* OWNER LOGIN */}
@@ -90,33 +89,30 @@ function App() {
         element={<OwnerForgotPassword />}
       />
 
-      {/* OTP VERIFICATION */}
+      {/* SHARED OTP PAGE
+          Used by both owner and tenant */}
 
       <Route
         path="/otp-verification"
         element={<OTPVerification />}
       />
 
-      {/* RESET PASSWORD */}
+      {/* SHARED RESET PASSWORD PAGE
+          Used by both owner and tenant */}
 
       <Route
         path="/reset-password"
         element={<ResetPassword />}
       />
 
-
       {/* ===================================================== */}
-      {/* ================= OWNER PORTAL ====================== */}
+      {/* OWNER PORTAL */}
       {/* ===================================================== */}
-
-      {/* DASHBOARD */}
 
       <Route
         path="/owner-dashboard"
         element={<Dashboard />}
       />
-
-      {/* PROPERTIES */}
 
       <Route
         path="/properties"
@@ -127,8 +123,6 @@ function App() {
         path="/property-details"
         element={<PropertyDetails />}
       />
-
-      {/* ROOMS */}
 
       <Route
         path="/rooms"
@@ -145,8 +139,6 @@ function App() {
         element={<EditRoom />}
       />
 
-      {/* TENANTS */}
-
       <Route
         path="/tenants"
         element={<Tenants />}
@@ -162,8 +154,6 @@ function App() {
         element={<EditTenant />}
       />
 
-      {/* RENT & PAYMENTS */}
-
       <Route
         path="/rent-bills"
         element={<RentBills />}
@@ -174,68 +164,49 @@ function App() {
         element={<Payments />}
       />
 
-      {/* DOCUMENTS */}
-
       <Route
         path="/documents"
         element={<Documents />}
       />
-
-      {/* REPORTS */}
 
       <Route
         path="/reports"
         element={<Reports />}
       />
 
-      {/* SETTINGS */}
-
       <Route
         path="/settings"
         element={<Settings />}
       />
 
-
       {/* ===================================================== */}
-      {/* ================= TENANT PORTAL ===================== */}
+      {/* TENANT PORTAL */}
       {/* ===================================================== */}
-
-      {/* TENANT DASHBOARD */}
 
       <Route
         path="/tenant-dashboard"
         element={<TenantDashboard />}
       />
 
-      {/* TENANT PAYMENTS */}
-
       <Route
         path="/tenant-payments"
         element={<TenantPayments />}
       />
-
-      {/* TENANT DOCUMENTS */}
 
       <Route
         path="/tenant-documents"
         element={<TenantDocuments />}
       />
 
-      {/* TENANT NOTICES */}
-
       <Route
         path="/tenant-notices"
         element={<TenantNotices />}
       />
 
-      {/* TENANT MAINTENANCE */}
-
       <Route
         path="/tenant-maintenance"
         element={<TenantMaintenance />}
       />
-
-      {/* TENANT CHANGE PASSWORD */}
 
       <Route
         path="/tenant-change-password"
