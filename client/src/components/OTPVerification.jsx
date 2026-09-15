@@ -104,9 +104,9 @@ function OTPVerification() {
 
     setOtpError("");
 
-    // =====================================================
+    // =======================================================
     // MOBILE CHECK
-    // =====================================================
+    // =======================================================
 
     if (!mobileNumber) {
       setOtpError(
@@ -115,9 +115,9 @@ function OTPVerification() {
       return;
     }
 
-    // =====================================================
+    // =======================================================
     // ROLE CHECK
-    // =====================================================
+    // =======================================================
 
     if (role !== "owner" && role !== "tenant") {
       setOtpError(
@@ -126,9 +126,9 @@ function OTPVerification() {
       return;
     }
 
-    // =====================================================
+    // =======================================================
     // OTP LENGTH CHECK
-    // =====================================================
+    // =======================================================
 
     if (enteredOTP.length !== 6) {
       setOtpError(
@@ -137,9 +137,9 @@ function OTPVerification() {
       return;
     }
 
-    // =====================================================
+    // =======================================================
     // OTP CHECK
-    // =====================================================
+    // =======================================================
 
     if (enteredOTP !== MOCK_OTP) {
       setOtpError(
@@ -148,12 +148,29 @@ function OTPVerification() {
       return;
     }
 
-    // =====================================================
-    // SUCCESS
-    // =====================================================
+    // =======================================================
+    // OTP VERIFIED SUCCESSFULLY
+    // =======================================================
+
+    const verificationData = {
+      mobileNumber: mobileNumber,
+      role: role,
+      verified: true,
+    };
+
+    localStorage.setItem(
+      "passwordResetVerification",
+      JSON.stringify(verificationData)
+    );
+
+    // =======================================================
+    // GO TO SHARED RESET PASSWORD PAGE
+    // =======================================================
 
     navigate(
-      `/reset-password?mobile=${mobileNumber}&role=${role}`
+      `/reset-password?mobile=${encodeURIComponent(
+        mobileNumber
+      )}&role=${role}`
     );
   };
 
@@ -172,6 +189,11 @@ function OTPVerification() {
     ]);
 
     setOtpError("");
+
+    // Remove previous verification
+    localStorage.removeItem(
+      "passwordResetVerification"
+    );
 
     alert(
       "OTP has been resent. Demo OTP: 123456"
@@ -217,7 +239,6 @@ function OTPVerification() {
             mobile number.
           </p>
 
-
           {/* ================================================= */}
           {/* MOBILE NUMBER */}
           {/* ================================================= */}
@@ -233,7 +254,6 @@ function OTPVerification() {
 
             </p>
           )}
-
 
           {/* ================================================= */}
           {/* OTP INPUTS */}
@@ -258,7 +278,10 @@ function OTPVerification() {
                   )
                 }
                 onKeyDown={(e) =>
-                  handleKeyDown(index, e)
+                  handleKeyDown(
+                    index,
+                    e
+                  )
                 }
                 className={`w-11 h-12 sm:w-12 sm:h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 ${focusColor} ${
                   otpError
@@ -270,7 +293,6 @@ function OTPVerification() {
 
           </div>
 
-
           {/* ================================================= */}
           {/* OTP ERROR */}
           {/* ================================================= */}
@@ -280,7 +302,6 @@ function OTPVerification() {
               {otpError}
             </p>
           )}
-
 
           {/* ================================================= */}
           {/* VERIFY BUTTON */}
@@ -294,14 +315,13 @@ function OTPVerification() {
             Verify OTP
           </button>
 
-
           {/* ================================================= */}
           {/* ACTION LINKS */}
           {/* ================================================= */}
 
           <div className="flex justify-between mt-6">
 
-            {/* RESEND OTP */}
+            {/* ================= RESEND OTP ================= */}
 
             <button
               type="button"
@@ -311,12 +331,11 @@ function OTPVerification() {
               Resend OTP
             </button>
 
-
-            {/* BACK */}
+            {/* ================= BACK ================= */}
 
             <Link
               to={backUrl}
-              className="text-blue-600 hover:underline"
+              className={`${accentColor} hover:underline`}
             >
               ← Back
             </Link>
@@ -326,7 +345,6 @@ function OTPVerification() {
         </div>
 
       </main>
-
 
       {/* ===================================================== */}
       {/* FOOTER */}
