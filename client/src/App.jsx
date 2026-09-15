@@ -15,7 +15,8 @@ import OwnerResetPassword from "./components/OwnerResetPassword";
 
 // =========================================================
 // OWNER PORTAL
-// =========================================================
+// =====
+// ====================================================
 
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";

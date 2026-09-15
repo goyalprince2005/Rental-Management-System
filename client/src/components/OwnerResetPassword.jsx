@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Link,
   useNavigate,
@@ -7,128 +7,217 @@ import {
 
 import Footer from "./Footer";
 
-function OwnerResetPassword() {
+function OTPVerification() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   // =========================================================
-  // GET MOBILE NUMBER
+  // GET DATA FROM URL
   // =========================================================
 
   const mobileNumber = searchParams.get("mobile");
+  const role = searchParams.get("role");
 
   // =========================================================
-  // PASSWORD STATE
+  // OTP STATE
   // =========================================================
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
 
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] =
-    useState("");
+  const [otpError, setOtpError] = useState("");
+
+  const inputRefs = useRef([]);
 
   // =========================================================
-  // PASSWORD VALIDATION
+  // MOCK OTP
   // =========================================================
 
-  const validatePassword = (password) => {
-    if (password.length < 8) {
-      return "Password must be at least 8 characters long.";
+  const MOCK_OTP = "123456";
+
+  // =========================================================
+  // ROLE THEME
+  // =========================================================
+
+  const isOwner = role === "owner";
+
+  const buttonColor = isOwner
+    ? "bg-blue-600 hover:bg-blue-700"
+    : "bg-green-600 hover:bg-green-700";
+
+  const focusColor = isOwner
+    ? "focus:ring-blue-500"
+    : "focus:ring-green-500";
+
+  const accentColor = isOwner
+    ? "text-blue-600"
+    : "text-green-600";
+
+  // =========================================================
+  // OTP INPUT
+  // =========================================================
+
+  const handleChange = (index, value) => {
+    if (!/^\d?$/.test(value)) {
+      return;
     }
 
-    if (!/[A-Z]/.test(password)) {
-      return "Password must contain at least one uppercase letter.";
-    }
+    const updatedOtp = [...otp];
 
-    if (!/[a-z]/.test(password)) {
-      return "Password must contain at least one lowercase letter.";
-    }
+    updatedOtp[index] = value;
 
-    if (!/[0-9]/.test(password)) {
-      return "Password must contain at least one number.";
-    }
+    setOtp(updatedOtp);
+    setOtpError("");
 
-    if (!/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(password)) {
-      return "Password must contain at least one special character.";
+    // Move to next input
+    if (value && index < otp.length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
-
-    return "";
   };
 
   // =========================================================
-  // RESET OWNER PASSWORD
+  // BACKSPACE
   // =========================================================
 
-  const handleResetPassword = (e) => {
-    e.preventDefault();
+  const handleKeyDown = (index, e) => {
+    if (
+      e.key === "Backspace" &&
+      !otp[index] &&
+      index > 0
+    ) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
 
-    setPasswordError("");
-    setConfirmPasswordError("");
+  // =========================================================
+  // VERIFY OTP
+  // =========================================================
+
+  const handleVerifyOTP = () => {
+    const enteredOTP = otp.join("");
+
+    setOtpError("");
 
     // =======================================================
     // MOBILE CHECK
     // =======================================================
 
     if (!mobileNumber) {
-      setPasswordError(
-        "Password reset session is invalid. Please request OTP again."
+      setOtpError(
+        "Mobile number is missing. Please request OTP again."
       );
       return;
     }
 
     // =======================================================
-    // NEW PASSWORD CHECK
+    // ROLE CHECK
     // =======================================================
 
-    if (!newPassword) {
-      setPasswordError("Please enter a new password.");
-      return;
-    }
-
-    const validationError = validatePassword(newPassword);
-
-    if (validationError) {
-      setPasswordError(validationError);
-      return;
-    }
-
-    // =======================================================
-    // CONFIRM PASSWORD CHECK
-    // =======================================================
-
-    if (!confirmPassword) {
-      setConfirmPasswordError(
-        "Please confirm your password."
-      );
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setConfirmPasswordError(
-        "Passwords do not match."
+    if (role !== "owner" && role !== "tenant") {
+      setOtpError(
+        "Invalid password recovery request. Please try again."
       );
       return;
     }
 
     // =======================================================
-    // SUCCESS
+    // OTP LENGTH CHECK
     // =======================================================
 
-    alert("Owner password reset successfully.");
+    if (enteredOTP.length !== 6) {
+      setOtpError(
+        "Please enter the complete 6-digit OTP."
+      );
+      return;
+    }
 
     // =======================================================
-    // GO TO OWNER LOGIN
+    // OTP CHECK
     // =======================================================
 
-    navigate("/owner-login");
+    if (enteredOTP !== MOCK_OTP) {
+      setOtpError(
+        "Incorrect OTP. Please try again."
+      );
+      return;
+    }
+
+    // =======================================================
+    // OTP VERIFIED SUCCESSFULLY
+    // =======================================================
+
+    const verificationData = {
+      mobileNumber,
+      role,
+      verified: true,
+    };
+
+    localStorage.setItem(
+      "passwordResetVerification",
+      JSON.stringify(verificationData)
+    );
+
+    // =======================================================
+    // GO TO CORRECT RESET PASSWORD PAGE
+    // =======================================================
+
+    if (role === "owner") {
+      navigate(
+        `/owner-reset-password?mobile=${encodeURIComponent(
+          mobileNumber
+        )}&role=owner`
+      );
+    } else {
+      navigate(
+        `/reset-password?mobile=${encodeURIComponent(
+          mobileNumber
+        )}&role=tenant`
+      );
+    }
+  };
+
+  // =========================================================
+  // RESEND OTP
+  // =========================================================
+
+  const handleResendOTP = () => {
+    setOtp([
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+
+    setOtpError("");
+
+    // Remove previous verification
+    localStorage.removeItem(
+      "passwordResetVerification"
+    );
+
+    alert(
+      "OTP has been resent. Demo OTP: 123456"
+    );
+
+    inputRefs.current[0]?.focus();
   };
 
   // =========================================================
   // BACK URL
   // =========================================================
 
-  const backUrl = "/owner-forgot-password";
+  const backUrl =
+    role === "owner"
+      ? "/owner-forgot-password"
+      : "/forgot-password";
 
   // =========================================================
   // PAGE
@@ -138,7 +227,7 @@ function OwnerResetPassword() {
     <div className="min-h-screen bg-gray-100 flex flex-col">
 
       {/* ===================================================== */}
-      {/* MAIN CONTENT */}
+      {/* OTP CONTENT */}
       {/* ===================================================== */}
 
       <main className="flex-1 flex items-center justify-center p-4">
@@ -150,11 +239,12 @@ function OwnerResetPassword() {
           {/* ================================================= */}
 
           <h1 className="text-3xl font-bold text-center text-gray-800">
-            Owner Reset Password
+            Verify OTP
           </h1>
 
           <p className="text-center text-gray-500 mt-2 mb-6">
-            Create a new password for your owner account.
+            Enter the 6-digit OTP sent to your registered
+            mobile number.
           </p>
 
           {/* ================================================= */}
@@ -163,149 +253,92 @@ function OwnerResetPassword() {
 
           {mobileNumber && (
             <p className="text-center text-sm text-gray-500 mb-5">
-
-              Resetting password for{" "}
-
+              OTP sent to{" "}
               <span className="font-medium text-gray-700">
                 {mobileNumber}
               </span>
-
             </p>
           )}
 
           {/* ================================================= */}
-          {/* FORM */}
+          {/* OTP INPUTS */}
           {/* ================================================= */}
 
-          <form
-            onSubmit={handleResetPassword}
-            className="space-y-5"
+          <div className="flex justify-center gap-2 sm:gap-3 mb-4">
+
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={(element) => {
+                  inputRefs.current[index] = element;
+                }}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    e.target.value
+                  )
+                }
+                onKeyDown={(e) =>
+                  handleKeyDown(
+                    index,
+                    e
+                  )
+                }
+                className={`w-11 h-12 sm:w-12 sm:h-12 border rounded-lg text-center text-xl focus:outline-none focus:ring-2 ${focusColor} ${
+                  otpError
+                    ? "border-red-500"
+                    : "border-gray-300"
+                }`}
+              />
+            ))}
+
+          </div>
+
+          {/* ================================================= */}
+          {/* OTP ERROR */}
+          {/* ================================================= */}
+
+          {otpError && (
+            <p className="text-red-500 text-sm text-center mb-5">
+              {otpError}
+            </p>
+          )}
+
+          {/* ================================================= */}
+          {/* VERIFY BUTTON */}
+          {/* ================================================= */}
+
+          <button
+            type="button"
+            onClick={handleVerifyOTP}
+            className={`w-full text-white py-3 rounded-lg transition ${buttonColor}`}
           >
+            Verify OTP
+          </button>
 
-            {/* ================================================= */}
-            {/* NEW PASSWORD */}
-            {/* ================================================= */}
+          {/* ================================================= */}
+          {/* ACTION LINKS */}
+          {/* ================================================= */}
 
-            <div>
-
-              <label className="block mb-2 font-medium text-gray-700">
-                New Password
-              </label>
-
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value);
-                  setPasswordError("");
-                }}
-                placeholder="Enter new password"
-                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  passwordError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-              />
-
-              {passwordError && (
-                <p className="text-red-500 text-sm mt-2">
-                  {passwordError}
-                </p>
-              )}
-
-            </div>
-
-            {/* ================================================= */}
-            {/* PASSWORD REQUIREMENTS */}
-            {/* ================================================= */}
-
-            <div className="bg-blue-50 rounded-lg p-4">
-
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Password must contain:
-              </p>
-
-              <ul className="text-sm text-gray-600 space-y-1">
-
-                <li>• At least 8 characters</li>
-
-                <li>
-                  • At least one uppercase letter (A-Z)
-                </li>
-
-                <li>
-                  • At least one lowercase letter (a-z)
-                </li>
-
-                <li>
-                  • At least one number (0-9)
-                </li>
-
-                <li>
-                  • At least one special character
-                </li>
-
-              </ul>
-
-            </div>
-
-            {/* ================================================= */}
-            {/* CONFIRM PASSWORD */}
-            {/* ================================================= */}
-
-            <div>
-
-              <label className="block mb-2 font-medium text-gray-700">
-                Confirm Password
-              </label>
-
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setConfirmPasswordError("");
-                }}
-                placeholder="Confirm new password"
-                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  confirmPasswordError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-              />
-
-              {confirmPasswordError && (
-                <p className="text-red-500 text-sm mt-2">
-                  {confirmPasswordError}
-                </p>
-              )}
-
-            </div>
-
-            {/* ================================================= */}
-            {/* RESET BUTTON */}
-            {/* ================================================= */}
+          <div className="flex justify-between mt-6">
 
             <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+              type="button"
+              onClick={handleResendOTP}
+              className={`${accentColor} hover:underline`}
             >
-              Reset Owner Password
+              Resend OTP
             </button>
-
-          </form>
-
-          {/* ================================================= */}
-          {/* BACK LINK */}
-          {/* ================================================= */}
-
-          <div className="mt-6 text-center">
 
             <Link
               to={backUrl}
-              className="text-blue-600 hover:underline"
+              className={`${accentColor} hover:underline`}
             >
-              ← Back to Owner Forgot Password
+              ← Back
             </Link>
 
           </div>
@@ -324,4 +357,4 @@ function OwnerResetPassword() {
   );
 }
 
-export default OwnerResetPassword;
+export default OTPVerification;
