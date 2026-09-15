@@ -10,7 +10,7 @@ import TenantLogin from "./components/TenantLogin";
 import TenantForgotPassword from "./components/TenantForgotPassword";
 import OwnerForgotPassword from "./components/OwnerForgotPassword";
 import OTPVerification from "./components/OTPVerification";
-import ResetPassword from "./components/ResetPassword";
+import ResetPassword from "./components/TenantResetPassword";
 
 // =========================================================
 // OWNER PORTAL
@@ -102,7 +102,7 @@ function App() {
 
       <Route
         path="/reset-password"
-        element={<ResetPassword />}
+        element={<TenantResetPassword />}
       />
 
       {/* ===================================================== */}
