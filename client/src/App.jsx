@@ -10,7 +10,8 @@ import TenantLogin from "./components/TenantLogin";
 import TenantForgotPassword from "./components/TenantForgotPassword";
 import OwnerForgotPassword from "./components/OwnerForgotPassword";
 import OTPVerification from "./components/OTPVerification";
-import ResetPassword from "./components/TenantResetPassword";
+import TenantResetPassword from "./components/TenantResetPassword";
+import OwnerResetPassword from "./components/OwnerResetPassword";
 
 // =========================================================
 // OWNER PORTAL
@@ -61,58 +62,68 @@ function App() {
       {/* AUTHENTICATION */}
       {/* ===================================================== */}
 
-      {/* OWNER LOGIN */}
+      {/* ================= OWNER LOGIN ================= */}
 
       <Route
         path="/owner-login"
         element={<OwnerLogin />}
       />
 
-      {/* TENANT LOGIN */}
+      {/* ================= TENANT LOGIN ================= */}
 
       <Route
         path="/tenant-login"
         element={<TenantLogin />}
       />
 
-      {/* TENANT FORGOT PASSWORD */}
+      {/* ================= TENANT FORGOT PASSWORD ================= */}
 
       <Route
         path="/forgot-password"
         element={<TenantForgotPassword />}
       />
 
-      {/* OWNER FORGOT PASSWORD */}
+      {/* ================= OWNER FORGOT PASSWORD ================= */}
 
       <Route
         path="/owner-forgot-password"
         element={<OwnerForgotPassword />}
       />
 
-      {/* SHARED OTP PAGE
-          Used by both owner and tenant */}
+      {/* ================= SHARED OTP VERIFICATION =================
+          Used by both Owner and Tenant */}
 
       <Route
         path="/otp-verification"
         element={<OTPVerification />}
       />
 
-      {/* SHARED RESET PASSWORD PAGE
-          Used by both owner and tenant */}
+      {/* ================= TENANT RESET PASSWORD ================= */}
 
       <Route
-        path="/reset-password"
+        path="/tenant-reset-password"
         element={<TenantResetPassword />}
+      />
+
+      {/* ================= OWNER RESET PASSWORD ================= */}
+
+      <Route
+        path="/owner-reset-password"
+        element={<OwnerResetPassword />}
       />
 
       {/* ===================================================== */}
       {/* OWNER PORTAL */}
       {/* ===================================================== */}
 
+      {/* ================= OWNER DASHBOARD ================= */}
+
       <Route
         path="/owner-dashboard"
         element={<Dashboard />}
       />
+
+      {/* ================= PROPERTIES ================= */}
 
       <Route
         path="/properties"
@@ -123,6 +134,8 @@ function App() {
         path="/property-details"
         element={<PropertyDetails />}
       />
+
+      {/* ================= ROOMS ================= */}
 
       <Route
         path="/rooms"
@@ -139,6 +152,8 @@ function App() {
         element={<EditRoom />}
       />
 
+      {/* ================= TENANTS ================= */}
+
       <Route
         path="/tenants"
         element={<Tenants />}
@@ -154,6 +169,8 @@ function App() {
         element={<EditTenant />}
       />
 
+      {/* ================= RENT & PAYMENTS ================= */}
+
       <Route
         path="/rent-bills"
         element={<RentBills />}
@@ -164,15 +181,21 @@ function App() {
         element={<Payments />}
       />
 
+      {/* ================= DOCUMENTS ================= */}
+
       <Route
         path="/documents"
         element={<Documents />}
       />
 
+      {/* ================= REPORTS ================= */}
+
       <Route
         path="/reports"
         element={<Reports />}
       />
+
+      {/* ================= SETTINGS ================= */}
 
       <Route
         path="/settings"
@@ -183,30 +206,42 @@ function App() {
       {/* TENANT PORTAL */}
       {/* ===================================================== */}
 
+      {/* ================= TENANT DASHBOARD ================= */}
+
       <Route
         path="/tenant-dashboard"
         element={<TenantDashboard />}
       />
+
+      {/* ================= TENANT PAYMENTS ================= */}
 
       <Route
         path="/tenant-payments"
         element={<TenantPayments />}
       />
 
+      {/* ================= TENANT DOCUMENTS ================= */}
+
       <Route
         path="/tenant-documents"
         element={<TenantDocuments />}
       />
+
+      {/* ================= TENANT NOTICES ================= */}
 
       <Route
         path="/tenant-notices"
         element={<TenantNotices />}
       />
 
+      {/* ================= TENANT MAINTENANCE ================= */}
+
       <Route
         path="/tenant-maintenance"
         element={<TenantMaintenance />}
       />
+
+      {/* ================= TENANT CHANGE PASSWORD ================= */}
 
       <Route
         path="/tenant-change-password"

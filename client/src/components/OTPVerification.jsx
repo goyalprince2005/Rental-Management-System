@@ -164,14 +164,19 @@ function OTPVerification() {
     );
 
     // =======================================================
-    // GO TO SHARED RESET PASSWORD PAGE
+    // GO TO CORRECT RESET PASSWORD PAGE
     // =======================================================
 
-    navigate(
-      `/reset-password?mobile=${encodeURIComponent(
-        mobileNumber
-      )}&role=${role}`
-    );
+    const resetPasswordUrl =
+      role === "owner"
+        ? `/owner-reset-password?mobile=${encodeURIComponent(
+            mobileNumber
+          )}&role=owner`
+        : `/tenant-reset-password?mobile=${encodeURIComponent(
+            mobileNumber
+          )}&role=tenant`;
+
+    navigate(resetPasswordUrl);
   };
 
   // =========================================================
@@ -245,13 +250,11 @@ function OTPVerification() {
 
           {mobileNumber && (
             <p className="text-center text-sm text-gray-500 mb-5">
-
               OTP sent to{" "}
 
               <span className="font-medium text-gray-700">
                 {mobileNumber}
               </span>
-
             </p>
           )}
 
@@ -321,7 +324,7 @@ function OTPVerification() {
 
           <div className="flex justify-between mt-6">
 
-            {/* ================= RESEND OTP ================= */}
+            {/* RESEND OTP */}
 
             <button
               type="button"
@@ -331,7 +334,7 @@ function OTPVerification() {
               Resend OTP
             </button>
 
-            {/* ================= BACK ================= */}
+            {/* BACK */}
 
             <Link
               to={backUrl}
