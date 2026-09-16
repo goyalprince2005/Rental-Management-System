@@ -7,7 +7,7 @@ import {
 
 import Footer from "./Footer";
 
-function ResetPassword() {
+function TenantResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -30,22 +30,24 @@ function ResetPassword() {
     useState("");
 
   // =========================================================
-  // ROLE THEME
+  // TENANT SESSION VALIDATION
   // =========================================================
 
-  const isOwner = role === "owner";
+  const getVerificationData = () => {
+    try {
+      const storedData = localStorage.getItem(
+        "passwordResetVerification"
+      );
 
-  const focusColor = isOwner
-    ? "focus:ring-blue-500"
-    : "focus:ring-green-500";
+      if (!storedData) {
+        return null;
+      }
 
-  const buttonColor = isOwner
-    ? "bg-blue-600 hover:bg-blue-700"
-    : "bg-green-600 hover:bg-green-700";
-
-  const accentColor = isOwner
-    ? "text-blue-600"
-    : "text-green-600";
+      return JSON.parse(storedData);
+    } catch {
+      return null;
+    }
+  };
 
   // =========================================================
   // PASSWORD VALIDATION
@@ -68,7 +70,11 @@ function ResetPassword() {
       return "Password must contain at least one number.";
     }
 
-    if (!/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(password)) {
+    if (
+      !/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(
+        password
+      )
+    ) {
       return "Password must contain at least one special character.";
     }
 
@@ -76,7 +82,7 @@ function ResetPassword() {
   };
 
   // =========================================================
-  // RESET PASSWORD
+  // RESET TENANT PASSWORD
   // =========================================================
 
   const handleResetPassword = (e) => {
@@ -100,9 +106,27 @@ function ResetPassword() {
     // ROLE CHECK
     // =======================================================
 
-    if (role !== "owner" && role !== "tenant") {
+    if (role !== "tenant") {
       setPasswordError(
-        "Invalid password reset request. Please try again."
+        "Invalid tenant password reset request. Please try again."
+      );
+      return;
+    }
+
+    // =======================================================
+    // OTP VERIFICATION CHECK
+    // =======================================================
+
+    const verificationData = getVerificationData();
+
+    if (
+      !verificationData ||
+      verificationData.verified !== true ||
+      verificationData.role !== "tenant" ||
+      verificationData.mobileNumber !== mobileNumber
+    ) {
+      setPasswordError(
+        "OTP verification is required. Please request OTP again."
       );
       return;
     }
@@ -116,7 +140,8 @@ function ResetPassword() {
       return;
     }
 
-    const validationError = validatePassword(newPassword);
+    const validationError =
+      validatePassword(newPassword);
 
     if (validationError) {
       setPasswordError(validationError);
@@ -142,30 +167,36 @@ function ResetPassword() {
     }
 
     // =======================================================
-    // SUCCESS
+    // PASSWORD RESET SUCCESS
     // =======================================================
 
-    alert("Password reset successfully.");
+    localStorage.setItem(
+  `tenantPassword_${mobileNumber}`,
+  newPassword
+);
+
+    alert("Tenant password reset successfully.");
 
     // =======================================================
-    // GO TO CORRECT LOGIN PAGE
+    // REMOVE OTP VERIFICATION SESSION
     // =======================================================
 
-    navigate(
-      role === "owner"
-        ? "/owner-login"
-        : "/tenant-login"
+    localStorage.removeItem(
+      "passwordResetVerification"
     );
+
+    // =======================================================
+    // GO TO TENANT LOGIN
+    // =======================================================
+
+    navigate("/tenant-login");
   };
 
   // =========================================================
   // BACK URL
   // =========================================================
 
-  const backUrl =
-    role === "owner"
-      ? "/owner-forgot-password"
-      : "/forgot-password";
+  const backUrl = "/forgot-password";
 
   // =========================================================
   // PAGE
@@ -186,12 +217,12 @@ function ResetPassword() {
           {/* HEADING */}
           {/* ================================================= */}
 
-          <h1 className="text-3xl font-bold text-center">
-            Reset Password
+          <h1 className="text-3xl font-bold text-center text-gray-800">
+            Tenant Reset Password
           </h1>
 
           <p className="text-center text-gray-500 mt-2 mb-6">
-            Create a new password for your account.
+            Create a new password for your tenant account.
           </p>
 
           {/* ================================================= */}
@@ -201,6 +232,7 @@ function ResetPassword() {
           {mobileNumber && (
             <p className="text-center text-sm text-gray-500 mb-5">
               Resetting password for{" "}
+
               <span className="font-medium text-gray-700">
                 {mobileNumber}
               </span>
@@ -222,7 +254,7 @@ function ResetPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2 font-medium text-gray-700">
                 New Password
               </label>
 
@@ -234,7 +266,7 @@ function ResetPassword() {
                   setPasswordError("");
                 }}
                 placeholder="Enter new password"
-                className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${focusColor} ${
+                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   passwordError
                     ? "border-red-500"
                     : "border-gray-300"
@@ -253,15 +285,17 @@ function ResetPassword() {
             {/* PASSWORD REQUIREMENTS */}
             {/* ================================================= */}
 
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-green-50 rounded-lg p-4">
 
               <p className="text-sm font-medium text-gray-700 mb-2">
                 Password must contain:
               </p>
 
-              <ul className="text-sm text-gray-500 space-y-1">
+              <ul className="text-sm text-gray-600 space-y-1">
 
-                <li>• At least 8 characters</li>
+                <li>
+                  • At least 8 characters
+                </li>
 
                 <li>
                   • At least one uppercase letter (A-Z)
@@ -289,7 +323,7 @@ function ResetPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label className="block mb-2 font-medium text-gray-700">
                 Confirm Password
               </label>
 
@@ -300,8 +334,8 @@ function ResetPassword() {
                   setConfirmPassword(e.target.value);
                   setConfirmPasswordError("");
                 }}
-                placeholder="Confirm password"
-                className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 ${focusColor} ${
+                placeholder="Confirm new password"
+                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   confirmPasswordError
                     ? "border-red-500"
                     : "border-gray-300"
@@ -322,9 +356,9 @@ function ResetPassword() {
 
             <button
               type="submit"
-              className={`w-full text-white py-3 rounded-lg transition ${buttonColor}`}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
             >
-              Reset Password
+              Reset Tenant Password
             </button>
 
           </form>
@@ -337,9 +371,9 @@ function ResetPassword() {
 
             <Link
               to={backUrl}
-              className={`${accentColor} hover:underline`}
+              className="text-green-600 hover:underline"
             >
-              ← Back
+              ← Back to Forgot Password
             </Link>
 
           </div>
@@ -358,4 +392,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default TenantResetPassword;
