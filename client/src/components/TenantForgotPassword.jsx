@@ -19,13 +19,11 @@ function ForgotPassword() {
       mobileNumber: "9876543210",
       name: "Rahul Sharma",
     },
-
     {
       id: 2,
       mobileNumber: "9876543211",
       name: "Aman Kumar",
     },
-
     {
       id: 3,
       mobileNumber: "9876543212",
@@ -45,18 +43,18 @@ function ForgotPassword() {
     // Clear previous error
     setMobileError("");
 
-    // =====================================================
+    // =======================================================
     // EMPTY VALIDATION
-    // =====================================================
+    // =======================================================
 
     if (!enteredMobile) {
       setMobileError("Please enter your mobile number");
       return;
     }
 
-    // =====================================================
+    // =======================================================
     // MOBILE NUMBER FORMAT
-    // =====================================================
+    // =======================================================
 
     if (!/^\d{10}$/.test(enteredMobile)) {
       setMobileError(
@@ -65,9 +63,9 @@ function ForgotPassword() {
       return;
     }
 
-    // =====================================================
-    // REGISTERED MOBILE CHECK
-    // =====================================================
+    // =======================================================
+    // REGISTERED TENANT CHECK
+    // =======================================================
 
     const tenant = tenants.find(
       (tenant) => tenant.mobileNumber === enteredMobile
@@ -80,20 +78,40 @@ function ForgotPassword() {
       return;
     }
 
-    // =====================================================
-    // OTP PAGE
-    // =====================================================
+    // =======================================================
+    // STORE TENANT INFORMATION
+    // =======================================================
 
-  navigate(
-  `/otp-verification?mobile=${enteredMobile}&role=tenant`
-);
+    localStorage.setItem(
+      "tenantId",
+      tenant.id.toString()
+    );
+
+    localStorage.setItem(
+      "tenantMobile",
+      enteredMobile
+    );
+
+    // =======================================================
+    // GO TO SHARED OTP VERIFICATION
+    // =======================================================
+
+    navigate(
+      `/otp-verification?mobile=${encodeURIComponent(
+        enteredMobile
+      )}&role=tenant`
+    );
   };
+
+  // =========================================================
+  // PAGE
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
 
       {/* ===================================================== */}
-      {/* FORGOT PASSWORD CONTENT */}
+      {/* MAIN CONTENT */}
       {/* ===================================================== */}
 
       <main className="flex-1 flex items-center justify-center p-4">
@@ -111,7 +129,6 @@ function ForgotPassword() {
           <p className="text-center text-gray-500 mt-2 mb-6">
             Enter your registered mobile number to receive an OTP.
           </p>
-
 
           {/* ================================================= */}
           {/* FORM */}
@@ -136,11 +153,18 @@ function ForgotPassword() {
                 type="tel"
                 value={mobileNumber}
                 onChange={(e) => {
-                  setMobileNumber(e.target.value);
+                  const value = e.target.value;
+
+                  // Allow only numbers
+                  if (!/^\d*$/.test(value)) {
+                    return;
+                  }
+
+                  setMobileNumber(value);
                   setMobileError("");
                 }}
                 placeholder="Enter registered mobile number"
-                maxLength="10"
+                maxLength={10}
                 inputMode="numeric"
                 className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   mobileError
@@ -149,6 +173,8 @@ function ForgotPassword() {
                 }`}
               />
 
+              {/* ERROR */}
+
               {mobileError && (
                 <p className="text-red-500 text-sm mt-2">
                   {mobileError}
@@ -156,7 +182,6 @@ function ForgotPassword() {
               )}
 
             </div>
-
 
             {/* ================================================= */}
             {/* SEND OTP BUTTON */}
@@ -171,7 +196,6 @@ function ForgotPassword() {
 
           </form>
 
-
           {/* ================================================= */}
           {/* BACK TO TENANT LOGIN */}
           {/* ================================================= */}
@@ -180,7 +204,7 @@ function ForgotPassword() {
 
             <Link
               to="/tenant-login"
-              className="text-blue-600 hover:underline"
+              className="text-green-600 hover:underline"
             >
               ← Back to Tenant Login
             </Link>
@@ -190,7 +214,6 @@ function ForgotPassword() {
         </div>
 
       </main>
-
 
       {/* ===================================================== */}
       {/* FOOTER */}

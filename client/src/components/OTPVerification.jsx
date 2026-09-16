@@ -36,7 +36,7 @@ function OTPVerification() {
   const inputRefs = useRef([]);
 
   // =========================================================
-  // MOCK OTP
+  // DEMO OTP
   // =========================================================
 
   const MOCK_OTP = "123456";
@@ -64,6 +64,7 @@ function OTPVerification() {
   // =========================================================
 
   const handleChange = (index, value) => {
+    // Allow only one digit
     if (!/^\d?$/.test(value)) {
       return;
     }
@@ -149,12 +150,12 @@ function OTPVerification() {
     }
 
     // =======================================================
-    // OTP VERIFIED SUCCESSFULLY
+    // OTP VERIFIED
     // =======================================================
 
     const verificationData = {
-      mobileNumber: mobileNumber,
-      role: role,
+      mobileNumber,
+      role,
       verified: true,
     };
 
@@ -167,16 +168,19 @@ function OTPVerification() {
     // GO TO CORRECT RESET PASSWORD PAGE
     // =======================================================
 
-    const resetPasswordUrl =
-      role === "owner"
-        ? `/owner-reset-password?mobile=${encodeURIComponent(
-            mobileNumber
-          )}&role=owner`
-        : `/tenant-reset-password?mobile=${encodeURIComponent(
-            mobileNumber
-          )}&role=tenant`;
-
-    navigate(resetPasswordUrl);
+    if (role === "owner") {
+      navigate(
+        `/owner-reset-password?mobile=${encodeURIComponent(
+          mobileNumber
+        )}&role=owner`
+      );
+    } else {
+      navigate(
+        `/tenant-reset-password?mobile=${encodeURIComponent(
+          mobileNumber
+        )}&role=tenant`
+      );
+    }
   };
 
   // =========================================================
@@ -235,7 +239,7 @@ function OTPVerification() {
           {/* HEADING */}
           {/* ================================================= */}
 
-          <h1 className="text-3xl font-bold text-center">
+          <h1 className="text-3xl font-bold text-center text-gray-800">
             Verify OTP
           </h1>
 
