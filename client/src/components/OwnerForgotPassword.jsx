@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import Footer from "./Footer";
 
 function OwnerForgotPassword() {
@@ -29,7 +30,6 @@ function OwnerForgotPassword() {
 
     const enteredMobile = mobileNumber.trim();
 
-    // Clear previous error
     setMobileError("");
 
     // =======================================================
@@ -37,10 +37,7 @@ function OwnerForgotPassword() {
     // =======================================================
 
     if (!enteredMobile) {
-      setMobileError(
-        "Please enter your mobile number"
-      );
-
+      setMobileError("Please enter your mobile number");
       return;
     }
 
@@ -52,7 +49,6 @@ function OwnerForgotPassword() {
       setMobileError(
         "Please enter a valid 10-digit mobile number"
       );
-
       return;
     }
 
@@ -61,20 +57,18 @@ function OwnerForgotPassword() {
     // =======================================================
 
     const owner = owners.find(
-      (owner) =>
-        owner.mobileNumber === enteredMobile
+      (owner) => owner.mobileNumber === enteredMobile
     );
 
     if (!owner) {
       setMobileError(
         "Please enter correct registered owner mobile number"
       );
-
       return;
     }
 
     // =======================================================
-    // STORE OWNER ID
+    // STORE OWNER INFORMATION
     // =======================================================
 
     localStorage.setItem(
@@ -82,23 +76,33 @@ function OwnerForgotPassword() {
       owner.id.toString()
     );
 
-    // =======================================================
-    // STORE OWNER MOBILE
-    // =======================================================
-
     localStorage.setItem(
       "ownerMobile",
       enteredMobile
     );
 
     // =======================================================
-    // GO TO OTP VERIFICATION
+    // REMOVE PREVIOUS OTP VERIFICATION
+    // =======================================================
+
+    localStorage.removeItem(
+      "passwordResetVerification"
+    );
+
+    // =======================================================
+    // GO TO SHARED OTP VERIFICATION
     // =======================================================
 
     navigate(
-      `/otp-verification?mobile=${enteredMobile}&role=owner`
+      `/otp-verification?mobile=${encodeURIComponent(
+        enteredMobile
+      )}&role=owner`
     );
   };
+
+  // =========================================================
+  // PAGE
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
@@ -147,7 +151,14 @@ function OwnerForgotPassword() {
                 type="tel"
                 value={mobileNumber}
                 onChange={(e) => {
-                  setMobileNumber(e.target.value);
+                  const value = e.target.value;
+
+                  // Allow numbers only
+                  if (!/^\d*$/.test(value)) {
+                    return;
+                  }
+
+                  setMobileNumber(value);
                   setMobileError("");
                 }}
                 placeholder="Enter registered mobile number"
