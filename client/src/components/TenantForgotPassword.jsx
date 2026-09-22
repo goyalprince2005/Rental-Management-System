@@ -81,6 +81,9 @@ function TenantForgotPassword() {
     localStorage.setItem("tenantId", tenant.id.toString());
     localStorage.setItem("tenantMobile", enteredMobile);
 
+    // Remove previous password reset verification
+    localStorage.removeItem("passwordResetVerification");
+
     // =======================================================
     // GO TO SHARED OTP VERIFICATION
     // =======================================================
