@@ -23,9 +23,12 @@ function OwnerResetPassword() {
   // =========================================================
 
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
-  const [passwordError, setPasswordError] = useState("");
+  const [passwordError, setPasswordError] =
+    useState("");
+
   const [confirmPasswordError, setConfirmPasswordError] =
     useState("");
 
@@ -273,40 +276,6 @@ function OwnerResetPassword() {
                   {passwordError}
                 </p>
               )}
-
-            </div>
-
-            {/* ================================================= */}
-            {/* PASSWORD REQUIREMENTS */}
-            {/* ================================================= */}
-
-            <div className="bg-blue-50 rounded-lg p-4">
-
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Password must contain:
-              </p>
-
-              <ul className="text-sm text-gray-600 space-y-1">
-
-                <li>• At least 8 characters</li>
-
-                <li>
-                  • At least one uppercase letter (A-Z)
-                </li>
-
-                <li>
-                  • At least one lowercase letter (a-z)
-                </li>
-
-                <li>
-                  • At least one number (0-9)
-                </li>
-
-                <li>
-                  • At least one special character
-                </li>
-
-              </ul>
 
             </div>
 
