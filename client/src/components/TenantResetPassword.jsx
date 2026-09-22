@@ -23,9 +23,12 @@ function TenantResetPassword() {
   // =========================================================
 
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
-  const [passwordError, setPasswordError] = useState("");
+  const [passwordError, setPasswordError] =
+    useState("");
+
   const [confirmPasswordError, setConfirmPasswordError] =
     useState("");
 
@@ -167,13 +170,17 @@ function TenantResetPassword() {
     }
 
     // =======================================================
-    // PASSWORD RESET SUCCESS
+    // SAVE TENANT PASSWORD
     // =======================================================
 
     localStorage.setItem(
-  `tenantPassword_${mobileNumber}`,
-  newPassword
-);
+      `tenantPassword_${mobileNumber}`,
+      newPassword
+    );
+
+    // =======================================================
+    // PASSWORD RESET SUCCESS
+    // =======================================================
 
     alert("Tenant password reset successfully.");
 
@@ -278,42 +285,6 @@ function TenantResetPassword() {
                   {passwordError}
                 </p>
               )}
-
-            </div>
-
-            {/* ================================================= */}
-            {/* PASSWORD REQUIREMENTS */}
-            {/* ================================================= */}
-
-            <div className="bg-green-50 rounded-lg p-4">
-
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Password must contain:
-              </p>
-
-              <ul className="text-sm text-gray-600 space-y-1">
-
-                <li>
-                  • At least 8 characters
-                </li>
-
-                <li>
-                  • At least one uppercase letter (A-Z)
-                </li>
-
-                <li>
-                  • At least one lowercase letter (a-z)
-                </li>
-
-                <li>
-                  • At least one number (0-9)
-                </li>
-
-                <li>
-                  • At least one special character
-                </li>
-
-              </ul>
 
             </div>
 
