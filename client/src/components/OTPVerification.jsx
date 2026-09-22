@@ -218,7 +218,7 @@ function OTPVerification() {
   const backUrl =
     role === "owner"
       ? "/owner-forgot-password"
-      : "/forgot-password";
+      : "/tenant-forgot-password";
 
   // =========================================================
   // PAGE
