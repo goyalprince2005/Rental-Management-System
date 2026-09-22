@@ -203,7 +203,7 @@ function TenantResetPassword() {
   // BACK URL
   // =========================================================
 
-  const backUrl = "/forgot-password";
+  const backUrl = "/tenant-forgot-password";
 
   // =========================================================
   // PAGE

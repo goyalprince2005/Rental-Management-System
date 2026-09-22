@@ -74,11 +74,17 @@ function TenantLogin() {
     }
 
     // ================= PASSWORD CHECK =================
+  const storedPassword = localStorage.getItem(
+  `tenantPassword_${tenant.mobileNumber}`
+);
 
-    if (tenant.password !== password) {
-      setPasswordError("Incorrect password");
-      return;
-    }
+const currentPassword = storedPassword || tenant.password;
+
+if (currentPassword !== password) {
+  setPasswordError("Incorrect password");
+  return;
+}
+   
 
     // ================= LOGIN SUCCESS =================
 
