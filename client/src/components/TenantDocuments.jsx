@@ -299,11 +299,11 @@ function TenantDocuments() {
 
                 <div className="flex items-center gap-4">
 
-                  <div className="p-3 bg-blue-50 rounded-xl">
+                  <div className="p-3 bg-green-50 rounded-xl">
 
                     <FileText
                       size={24}
-                      className="text-blue-600"
+                      className="text-green-600"
                     />
 
                   </div>
