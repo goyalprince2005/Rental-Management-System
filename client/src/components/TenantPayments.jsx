@@ -72,36 +72,39 @@ const tenants = {
 
 
 /*
- * =========================================================
+ * =======================================================
  * RECENT PAYMENTS
- * =========================================================
+ * =======================================================
  *
- * This is currently mock data.
- * Later this will come from the backend/database.
+ * Mock payment history for the logged-in tenant.
+ * The amount and payment date use the tenant's own
+ * rent and rent due day.
+ *
+ * Later this information will come from the backend/database.
  */
 
 const recentPayments = [
   {
     id: 1,
     month: "August 2026",
-    amount: 5000,
-    date: "10 Aug 2026",
+    amount: Number(tenant.rent),
+    date: `August ${tenant.rentDueDay}, 2026`,
     status: "Paid",
   },
 
   {
     id: 2,
     month: "July 2026",
-    amount: 5000,
-    date: "10 Jul 2026",
+    amount: Number(tenant.rent),
+    date: `July ${tenant.rentDueDay}, 2026`,
     status: "Paid",
   },
 
   {
     id: 3,
     month: "June 2026",
-    amount: 5000,
-    date: "10 Jun 2026",
+    amount: Number(tenant.rent),
+    date: `June ${tenant.rentDueDay}, 2026`,
     status: "Paid",
   },
 ];
