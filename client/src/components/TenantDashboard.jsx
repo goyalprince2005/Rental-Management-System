@@ -197,31 +197,31 @@ function TenantDashboard() {
 
   // ================= RECENT PAYMENTS =================
 
-  const recentPayments = [
-    {
-      id: 1,
-      month: "August 2026",
-      amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-      date: "August 10, 2026",
-      status: "Paid",
-    },
+const recentPayments = [
+  {
+    id: 1,
+    month: "August 2026",
+    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
+    date: `August ${tenant.rentDueDay}, 2026`,
+    status: "Paid",
+  },
 
-    {
-      id: 2,
-      month: "July 2026",
-      amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-      date: "July 10, 2026",
-      status: "Paid",
-    },
+  {
+    id: 2,
+    month: "July 2026",
+    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
+    date: `July ${tenant.rentDueDay}, 2026`,
+    status: "Paid",
+  },
 
-    {
-      id: 3,
-      month: "June 2026",
-      amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-      date: "June 10, 2026",
-      status: "Paid",
-    },
-  ];
+  {
+    id: 3,
+    month: "June 2026",
+    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
+    date: `June ${tenant.rentDueDay}, 2026`,
+    status: "Paid",
+  },
+];
 
   // ================= STATUS HELPERS =================
 
