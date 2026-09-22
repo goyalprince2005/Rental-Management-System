@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   UserCircle,
+  Lock,
 } from "lucide-react";
 
 function Navbar() {
@@ -110,6 +111,28 @@ function Navbar() {
     setProfileOpen(false);
 
     navigate("/settings");
+  };
+
+  // =========================================================
+  // MY DETAILS
+  // =========================================================
+
+  const handleMyDetails = () => {
+    setProfileOpen(false);
+
+    // Owner details page will be added later.
+    // For now, Settings acts as the owner account/details page.
+    navigate("/settings");
+  };
+
+  // =========================================================
+  // CHANGE PASSWORD
+  // =========================================================
+
+  const handleChangePassword = () => {
+    setProfileOpen(false);
+
+    navigate("/owner-change-password");
   };
 
   // =========================================================
@@ -309,20 +332,18 @@ function Navbar() {
                   setProfileOpen((prev) => !prev)
                 }
                 className={`flex items-center gap-2 p-2 rounded-lg transition ${
-                  profileOpen ||
-                  isActive("/settings")
+                  profileOpen
                     ? "bg-blue-50 text-blue-600"
                     : "hover:bg-gray-100"
                 }`}
-                title="Owner Settings"
-                aria-label="Open owner settings"
+                title="Owner Account"
+                aria-label="Open owner account"
               >
 
                 <UserCircle
                   size={28}
                   className={
-                    profileOpen ||
-                    isActive("/settings")
+                    profileOpen
                       ? "text-blue-600"
                       : "text-gray-600"
                   }
@@ -373,11 +394,11 @@ function Navbar() {
 
                   </div>
 
-                  {/* SETTINGS */}
+                  {/* MY DETAILS */}
 
                   <button
                     type="button"
-                    onClick={handleSettings}
+                    onClick={handleMyDetails}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
                       isActive("/settings")
                         ? "bg-blue-50 text-blue-600"
@@ -385,10 +406,30 @@ function Navbar() {
                     }`}
                   >
 
-                    <Settings size={18} />
+                    <UserCircle size={18} />
 
                     <span className="text-sm font-medium">
-                      Settings
+                      My Details
+                    </span>
+
+                  </button>
+
+                  {/* CHANGE PASSWORD */}
+
+                  <button
+                    type="button"
+                    onClick={handleChangePassword}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
+                      isActive("/owner-change-password")
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+
+                    <Lock size={18} />
+
+                    <span className="text-sm font-medium">
+                      Change Password
                     </span>
 
                   </button>
