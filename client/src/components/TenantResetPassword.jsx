@@ -203,7 +203,7 @@ function TenantResetPassword() {
   // BACK URL
   // =========================================================
 
-  const backUrl = "/tenant-forgot-password";
+  const backUrl = "/forgot-password";
 
   // =========================================================
   // PAGE
@@ -261,11 +261,15 @@ function TenantResetPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium text-gray-700">
+              <label
+                htmlFor="tenant-new-password"
+                className="block mb-2 font-medium text-gray-700"
+              >
                 New Password
               </label>
 
               <input
+                id="tenant-new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => {
@@ -273,6 +277,7 @@ function TenantResetPassword() {
                   setPasswordError("");
                 }}
                 placeholder="Enter new password"
+                autoComplete="new-password"
                 className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   passwordError
                     ? "border-red-500"
@@ -294,11 +299,15 @@ function TenantResetPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium text-gray-700">
+              <label
+                htmlFor="tenant-confirm-password"
+                className="block mb-2 font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
 
               <input
+                id="tenant-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => {
@@ -306,6 +315,7 @@ function TenantResetPassword() {
                   setConfirmPasswordError("");
                 }}
                 placeholder="Confirm new password"
+                autoComplete="new-password"
                 className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   confirmPasswordError
                     ? "border-red-500"
