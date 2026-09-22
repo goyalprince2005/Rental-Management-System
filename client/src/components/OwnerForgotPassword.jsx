@@ -143,11 +143,15 @@ function OwnerForgotPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium text-gray-800">
+              <label
+                htmlFor="owner-forgot-mobile"
+                className="block mb-2 font-medium text-gray-800"
+              >
                 Mobile Number
               </label>
 
               <input
+                id="owner-forgot-mobile"
                 type="tel"
                 value={mobileNumber}
                 onChange={(e) => {
@@ -164,6 +168,7 @@ function OwnerForgotPassword() {
                 placeholder="Enter registered mobile number"
                 maxLength={10}
                 inputMode="numeric"
+                autoComplete="tel"
                 className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   mobileError
                     ? "border-red-500"
