@@ -170,13 +170,19 @@ function OwnerResetPassword() {
     }
 
     // =======================================================
+    // SAVE OWNER PASSWORD
+    // =======================================================
+
+    localStorage.setItem(
+      `ownerPassword_${mobileNumber}`,
+      newPassword
+    );
+
+    // =======================================================
     // PASSWORD RESET SUCCESS
     // =======================================================
 
-localStorage.setItem(
-  `ownerPassword_${mobileNumber}`,
-  newPassword
-);
+    alert("Owner password reset successfully.");
 
     // =======================================================
     // REMOVE OTP VERIFICATION SESSION
@@ -255,11 +261,15 @@ localStorage.setItem(
 
             <div>
 
-              <label className="block mb-2 font-medium text-gray-700">
+              <label
+                htmlFor="owner-new-password"
+                className="block mb-2 font-medium text-gray-700"
+              >
                 New Password
               </label>
 
               <input
+                id="owner-new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => {
@@ -267,6 +277,7 @@ localStorage.setItem(
                   setPasswordError("");
                 }}
                 placeholder="Enter new password"
+                autoComplete="new-password"
                 className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   passwordError
                     ? "border-red-500"
@@ -288,11 +299,15 @@ localStorage.setItem(
 
             <div>
 
-              <label className="block mb-2 font-medium text-gray-700">
+              <label
+                htmlFor="owner-confirm-password"
+                className="block mb-2 font-medium text-gray-700"
+              >
                 Confirm Password
               </label>
 
               <input
+                id="owner-confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => {
@@ -300,6 +315,7 @@ localStorage.setItem(
                   setConfirmPasswordError("");
                 }}
                 placeholder="Confirm new password"
+                autoComplete="new-password"
                 className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   confirmPasswordError
                     ? "border-red-500"
