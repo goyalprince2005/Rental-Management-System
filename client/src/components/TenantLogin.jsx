@@ -41,7 +41,8 @@ function TenantLogin() {
 
     const enteredMobile = mobileNumber.trim();
 
-    // Clear previous errors
+    // ================= CLEAR PREVIOUS ERRORS =================
+
     setMobileError("");
     setPasswordError("");
 
@@ -74,24 +75,32 @@ function TenantLogin() {
     }
 
     // ================= PASSWORD CHECK =================
-  const storedPassword = localStorage.getItem(
-  `tenantPassword_${tenant.mobileNumber}`
-);
 
-const currentPassword = storedPassword || tenant.password;
+    const storedPassword = localStorage.getItem(
+      `tenantPassword_${tenant.mobileNumber}`
+    );
 
-if (currentPassword !== password) {
-  setPasswordError("Incorrect password");
-  return;
-}
-   
+    const validPassword = storedPassword || tenant.password;
+
+    if (validPassword !== password) {
+      setPasswordError("Incorrect password");
+      return;
+    }
 
     // ================= LOGIN SUCCESS =================
 
-    localStorage.setItem("tenantId", tenant.id.toString());
-    localStorage.setItem("tenantMobile", tenant.mobileNumber);
+    localStorage.setItem(
+      "tenantId",
+      tenant.id.toString()
+    );
 
-    // Navigate after successful login
+    localStorage.setItem(
+      "tenantMobile",
+      tenant.mobileNumber
+    );
+
+    // ================= NAVIGATE =================
+
     navigate("/tenant-dashboard");
   };
 
@@ -111,6 +120,7 @@ if (currentPassword !== password) {
           <p className="text-center text-gray-500 mt-2 mb-6">
             Login to view your room details and payments.
           </p>
+
 
           {/* ================= LOGIN FORM ================= */}
 
@@ -156,6 +166,7 @@ if (currentPassword !== password) {
 
             </div>
 
+
             {/* ================= PASSWORD ================= */}
 
             <div>
@@ -193,6 +204,7 @@ if (currentPassword !== password) {
 
             </div>
 
+
             {/* ================= LOGIN BUTTON ================= */}
 
             <button
@@ -203,6 +215,7 @@ if (currentPassword !== password) {
             </button>
 
           </form>
+
 
           {/* ================= LINKS ================= */}
 
@@ -227,6 +240,7 @@ if (currentPassword !== password) {
         </div>
 
       </main>
+
 
       {/* ================= FOOTER ================= */}
 
