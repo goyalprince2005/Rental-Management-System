@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import Footer from "./Footer";
 
 function OwnerLogin() {
@@ -9,6 +10,13 @@ function OwnerLogin() {
   const [password, setPassword] = useState("");
 
   // =========================================================
+  // MOCK OWNER ACCOUNT
+  // =========================================================
+
+  const OWNER_MOBILE = "9876543200";
+  const DEFAULT_OWNER_PASSWORD = "Owner@123";
+
+  // =========================================================
   // LOGIN
   // =========================================================
 
@@ -16,25 +24,70 @@ function OwnerLogin() {
     e.preventDefault();
 
     const enteredMobile = mobileNumber.trim();
-    const enteredPassword = password.trim();
+    const enteredPassword = password;
 
-    // ================= BASIC VALIDATION =================
+    // =======================================================
+    // BASIC VALIDATION
+    // =======================================================
 
     if (!enteredMobile || !enteredPassword) {
-      alert("Please enter your mobile number and password.");
+      alert(
+        "Please enter your mobile number and password."
+      );
       return;
     }
 
-    // ================= MOBILE VALIDATION =================
+    // =======================================================
+    // MOBILE VALIDATION
+    // =======================================================
 
     if (!/^\d{10}$/.test(enteredMobile)) {
-      alert("Mobile number must contain exactly 10 digits.");
+      alert(
+        "Mobile number must contain exactly 10 digits."
+      );
       return;
     }
 
-    // =====================================================
-    // BACKEND AUTHENTICATION WILL BE ADDED LATER
-    // =====================================================
+    // =======================================================
+    // OWNER MOBILE CHECK
+    // =======================================================
+
+    if (enteredMobile !== OWNER_MOBILE) {
+      alert(
+        "Owner account was not found. Please check your mobile number."
+      );
+      return;
+    }
+
+    // =======================================================
+    // GET CURRENT OWNER PASSWORD
+    // =======================================================
+
+    const storedPassword = localStorage.getItem(
+      `ownerPassword_${OWNER_MOBILE}`
+    );
+
+    const currentPassword =
+      storedPassword || DEFAULT_OWNER_PASSWORD;
+
+    // =======================================================
+    // PASSWORD CHECK
+    // =======================================================
+
+    if (enteredPassword !== currentPassword) {
+      alert("Incorrect password. Please try again.");
+      return;
+    }
+
+    // =======================================================
+    // OWNER LOGIN SUCCESS
+    // =======================================================
+
+    localStorage.setItem("ownerId", "1");
+    localStorage.setItem(
+      "ownerMobile",
+      OWNER_MOBILE
+    );
 
     navigate("/owner-dashboard");
   };
@@ -61,7 +114,6 @@ function OwnerLogin() {
           <p className="text-center text-gray-500 mt-2 mb-6">
             Login to manage your rental properties.
           </p>
-
 
           {/* ================================================= */}
           {/* LOGIN FORM */}
@@ -96,7 +148,6 @@ function OwnerLogin() {
 
             </div>
 
-
             {/* ================================================= */}
             {/* PASSWORD */}
             {/* ================================================= */}
@@ -119,7 +170,6 @@ function OwnerLogin() {
 
             </div>
 
-
             {/* ================================================= */}
             {/* LOGIN BUTTON */}
             {/* ================================================= */}
@@ -132,7 +182,6 @@ function OwnerLogin() {
             </button>
 
           </form>
-
 
           {/* ================================================= */}
           {/* LINKS */}
@@ -149,7 +198,6 @@ function OwnerLogin() {
               ← Back to Home
             </Link>
 
-
             {/* FORGOT PASSWORD */}
 
             <Link
@@ -164,7 +212,6 @@ function OwnerLogin() {
         </div>
 
       </main>
-
 
       {/* ===================================================== */}
       {/* FOOTER */}

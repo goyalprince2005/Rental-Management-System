@@ -173,7 +173,10 @@ function OwnerResetPassword() {
     // PASSWORD RESET SUCCESS
     // =======================================================
 
-    alert("Owner password reset successfully.");
+localStorage.setItem(
+  `ownerPassword_${mobileNumber}`,
+  newPassword
+);
 
     // =======================================================
     // REMOVE OTP VERIFICATION SESSION
