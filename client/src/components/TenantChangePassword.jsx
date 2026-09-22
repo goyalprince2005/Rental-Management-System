@@ -24,16 +24,22 @@ function TenantChangePassword() {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ================= MOCK TENANT PASSWORDS =================
+  // ================= MOCK TENANT DATA =================
 
   const tenants = {
     "1": {
+      name: "Rahul Sharma",
+      mobileNumber: "9876543210",
       password: "Rahul@123",
     },
     "2": {
+      name: "Aman Kumar",
+      mobileNumber: "9876543211",
       password: "Aman@123",
     },
     "3": {
+      name: "Neha Sharma",
+      mobileNumber: "9876543212",
       password: "Neha@123",
     },
   };
@@ -117,12 +123,25 @@ function TenantChangePassword() {
 
     const tenantId = localStorage.getItem("tenantId");
 
+    // ================= TENANT SESSION =================
+
     if (!tenantId || !tenants[tenantId]) {
       setErrors({
         general: "Tenant session not found. Please login again.",
       });
       return;
     }
+
+    const tenant = tenants[tenantId];
+
+    // ================= CURRENT STORED PASSWORD =================
+
+    const storedPassword = localStorage.getItem(
+      `tenantPassword_${tenant.mobileNumber}`
+    );
+
+    const currentStoredPassword =
+      storedPassword || tenant.password;
 
     const newErrors = {};
 
@@ -131,9 +150,7 @@ function TenantChangePassword() {
     if (!currentPassword.trim()) {
       newErrors.currentPassword =
         "Please enter your current password.";
-    } else if (
-      currentPassword !== tenants[tenantId].password
-    ) {
+    } else if (currentPassword !== currentStoredPassword) {
       newErrors.currentPassword =
         "Incorrect current password.";
     }
@@ -175,12 +192,21 @@ function TenantChangePassword() {
       ];
     }
 
+    // ================= VALIDATION RESULT =================
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // ================= MOCK SUCCESS =================
+    // ================= SAVE NEW PASSWORD =================
+
+    localStorage.setItem(
+      `tenantPassword_${tenant.mobileNumber}`,
+      newPassword
+    );
+
+    // ================= SUCCESS =================
 
     setSuccessMessage(
       "Password changed successfully. Please login again."
@@ -190,8 +216,12 @@ function TenantChangePassword() {
     setNewPassword("");
     setConfirmPassword("");
 
+    // ================= LOGOUT =================
+
     setTimeout(() => {
       localStorage.removeItem("tenantId");
+      localStorage.removeItem("tenantMobile");
+
       navigate("/tenant-login");
     }, 1500);
   };
@@ -215,8 +245,12 @@ function TenantChangePassword() {
           <input
             type={showPassword ? "text" : "password"}
             value={value}
-            onChange={onChange || ((event) => setValue(event.target.value))}
+            onChange={
+              onChange ||
+              ((event) => setValue(event.target.value))
+            }
             placeholder={placeholder}
+            autoComplete="new-password"
             className={`w-full px-4 py-3 pr-12 border rounded-lg outline-none transition ${
               error
                 ? "border-red-400 focus:ring-2 focus:ring-red-100"
@@ -226,7 +260,9 @@ function TenantChangePassword() {
 
           <button
             type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
+            onClick={() =>
+              setShowPassword((previous) => !previous)
+            }
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             aria-label="Toggle password visibility"
           >
@@ -359,6 +395,7 @@ function TenantChangePassword() {
                 setShowPassword: setShowCurrentPassword,
                 placeholder: "Enter current password",
                 error: errors.currentPassword,
+                autoComplete: "current-password",
               })}
 
             </div>
@@ -380,6 +417,7 @@ function TenantChangePassword() {
                 placeholder: "Enter new password",
                 error: errors.newPassword,
                 onChange: handleNewPasswordChange,
+                autoComplete: "new-password",
               })}
 
             </div>
@@ -401,6 +439,7 @@ function TenantChangePassword() {
                 placeholder: "Confirm new password",
                 error: errors.confirmPassword,
                 onChange: handleConfirmPasswordChange,
+                autoComplete: "new-password",
               })}
 
             </div>
