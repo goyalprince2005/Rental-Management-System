@@ -16,15 +16,23 @@ function OwnerChangePassword() {
   const navigate = useNavigate();
 
   // =========================================================
+  // OWNER MOCK ACCOUNT
+  // =========================================================
+
+  const OWNER_MOBILE = "9876543200";
+  const DEFAULT_OWNER_PASSWORD = "Owner@123";
+
+  // =========================================================
   // PASSWORD STATE
   // =========================================================
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
   // =========================================================
-  // PASSWORD VISIBILITY
+  // VISIBILITY STATE
   // =========================================================
 
   const [showCurrentPassword, setShowCurrentPassword] =
@@ -40,174 +48,232 @@ function OwnerChangePassword() {
   // ERROR / SUCCESS STATE
   // =========================================================
 
-  const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
+  const [errors, setErrors] = useState({
+    currentPassword: "",
+    newPassword: [],
+    confirmPassword: "",
+    general: "",
+  });
 
-  // =========================================================
-  // MOCK OWNER DATA
-  // =========================================================
-  // Frontend/demo only.
-  // Real password verification will be handled by
-  // the backend and database later.
-
-  const owners = {
-    "1": {
-      password: "Owner@123",
-    },
-  };
+  const [successMessage, setSuccessMessage] =
+    useState("");
 
   // =========================================================
   // PASSWORD VALIDATION
   // =========================================================
 
   const validatePassword = (password) => {
-    const passwordErrors = [];
+    const validationErrors = [];
 
     if (password.length < 8) {
-      passwordErrors.push(
-        "Password must contain at least 8 characters."
+      validationErrors.push(
+        "Password must be at least 8 characters long."
       );
     }
 
     if (!/[A-Z]/.test(password)) {
-      passwordErrors.push(
-        "Password must contain at least one uppercase character."
+      validationErrors.push(
+        "Password must contain at least one uppercase letter."
       );
     }
 
     if (!/[a-z]/.test(password)) {
-      passwordErrors.push(
-        "Password must contain at least one lowercase character."
+      validationErrors.push(
+        "Password must contain at least one lowercase letter."
       );
     }
 
     if (!/[0-9]/.test(password)) {
-      passwordErrors.push(
+      validationErrors.push(
         "Password must contain at least one number."
       );
     }
 
     if (
-      !/[!@#$%^&*(),.?":{}|<>_\-\\[\]/;'`~+=]/.test(
+      !/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(
         password
       )
     ) {
-      passwordErrors.push(
+      validationErrors.push(
         "Password must contain at least one special character."
       );
     }
 
-    return passwordErrors;
+    return validationErrors;
   };
 
   // =========================================================
-  // HANDLE NEW PASSWORD
+  // NEW PASSWORD CHANGE
   // =========================================================
 
-  const handleNewPasswordChange = (event) => {
-    const value = event.target.value;
-
+  const handleNewPasswordChange = (value) => {
     setNewPassword(value);
 
-    setErrors((previousErrors) => ({
-      ...previousErrors,
-      newPassword: value
-        ? validatePassword(value)
-        : [],
+    const validationErrors =
+      validatePassword(value);
+
+    setErrors((prev) => ({
+      ...prev,
+      newPassword:
+        value.length > 0 ? validationErrors : [],
     }));
+
+    if (
+      confirmPassword &&
+      value !== confirmPassword
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword:
+          "Passwords do not match.",
+      }));
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: "",
+      }));
+    }
   };
 
   // =========================================================
-  // HANDLE CONFIRM PASSWORD
+  // CONFIRM PASSWORD CHANGE
   // =========================================================
 
-  const handleConfirmPasswordChange = (event) => {
-    const value = event.target.value;
-
+  const handleConfirmPasswordChange = (value) => {
     setConfirmPassword(value);
 
-    setErrors((previousErrors) => ({
-      ...previousErrors,
+    setErrors((prev) => ({
+      ...prev,
       confirmPassword:
-        value && value !== newPassword
+        value && newPassword !== value
           ? "Passwords do not match."
           : "",
     }));
   };
 
   // =========================================================
-  // HANDLE SUBMIT
+  // CHANGE PASSWORD
   // =========================================================
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleChangePassword = (e) => {
+    e.preventDefault();
 
-    setErrors({});
+    // =======================================================
+    // CLEAR PREVIOUS MESSAGES
+    // =======================================================
+
+    setErrors({
+      currentPassword: "",
+      newPassword: [],
+      confirmPassword: "",
+      general: "",
+    });
+
     setSuccessMessage("");
 
     // =======================================================
-    // GET OWNER SESSION
+    // OWNER SESSION CHECK
     // =======================================================
 
     const ownerId =
-      localStorage.getItem("ownerId") || "1";
+      localStorage.getItem("ownerId");
 
-    // =======================================================
-    // CHECK OWNER
-    // =======================================================
-
-    if (!owners[ownerId]) {
-      setErrors({
+    if (!ownerId) {
+      setErrors((prev) => ({
+        ...prev,
         general:
           "Owner session not found. Please login again.",
-      });
-
+      }));
       return;
     }
 
-    const newErrors = {};
-
     // =======================================================
-    // CURRENT PASSWORD
+    // CURRENT PASSWORD CHECK
     // =======================================================
 
-    if (!currentPassword.trim()) {
-      newErrors.currentPassword =
-        "Please enter your current password.";
-    } else if (
-      currentPassword !== owners[ownerId].password
-    ) {
-      newErrors.currentPassword =
-        "Incorrect current password.";
+    if (!currentPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        currentPassword:
+          "Please enter your current password.",
+      }));
+      return;
     }
 
     // =======================================================
-    // NEW PASSWORD
+    // GET CURRENT STORED PASSWORD
+    // =======================================================
+
+    const storedPassword =
+      localStorage.getItem(
+        `ownerPassword_${OWNER_MOBILE}`
+      );
+
+    const currentStoredPassword =
+      storedPassword || DEFAULT_OWNER_PASSWORD;
+
+    // =======================================================
+    // VERIFY CURRENT PASSWORD
+    // =======================================================
+
+    if (
+      currentPassword !==
+      currentStoredPassword
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        currentPassword:
+          "Current password is incorrect.",
+      }));
+      return;
+    }
+
+    // =======================================================
+    // NEW PASSWORD CHECK
     // =======================================================
 
     if (!newPassword) {
-      newErrors.newPassword = [
-        "Please enter a new password.",
-      ];
-    } else {
-      const passwordErrors =
-        validatePassword(newPassword);
+      setErrors((prev) => ({
+        ...prev,
+        newPassword: [
+          "Please enter a new password.",
+        ],
+      }));
+      return;
+    }
 
-      if (passwordErrors.length > 0) {
-        newErrors.newPassword = passwordErrors;
-      }
+    const passwordValidationErrors =
+      validatePassword(newPassword);
+
+    if (passwordValidationErrors.length > 0) {
+      setErrors((prev) => ({
+        ...prev,
+        newPassword:
+          passwordValidationErrors,
+      }));
+      return;
     }
 
     // =======================================================
-    // CONFIRM PASSWORD
+    // CONFIRM PASSWORD CHECK
     // =======================================================
 
     if (!confirmPassword) {
-      newErrors.confirmPassword =
-        "Please confirm your new password.";
-    } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword =
-        "Passwords do not match.";
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword:
+          "Please confirm your new password.",
+      }));
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword:
+          "Passwords do not match.",
+      }));
+      return;
     }
 
     // =======================================================
@@ -215,31 +281,32 @@ function OwnerChangePassword() {
     // =======================================================
 
     if (
-      currentPassword &&
-      newPassword &&
       currentPassword === newPassword
     ) {
-      newErrors.newPassword = [
-        ...(newErrors.newPassword || []),
-        "New password must be different from current password.",
-      ];
-    }
-
-    // =======================================================
-    // SHOW ERRORS
-    // =======================================================
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      setErrors((prev) => ({
+        ...prev,
+        newPassword: [
+          "New password must be different from your current password.",
+        ],
+      }));
       return;
     }
 
     // =======================================================
-    // MOCK SUCCESS
+    // SAVE NEW OWNER PASSWORD
+    // =======================================================
+
+    localStorage.setItem(
+      `ownerPassword_${OWNER_MOBILE}`,
+      newPassword
+    );
+
+    // =======================================================
+    // SUCCESS
     // =======================================================
 
     setSuccessMessage(
-      "Password changed successfully. Please login again."
+      "Password changed successfully."
     );
 
     setCurrentPassword("");
@@ -252,6 +319,8 @@ function OwnerChangePassword() {
 
     setTimeout(() => {
       localStorage.removeItem("ownerId");
+      localStorage.removeItem("ownerMobile");
+
       navigate("/owner-login");
     }, 1500);
   };
@@ -261,18 +330,27 @@ function OwnerChangePassword() {
   // =========================================================
 
   const renderPasswordInput = ({
+    label,
     value,
     setValue,
     showPassword,
     setShowPassword,
     placeholder,
     error,
-    onChange,
+    isNewPassword = false,
   }) => {
     return (
       <div>
+        <label className="block mb-2 font-medium text-gray-700">
+          {label}
+        </label>
 
         <div className="relative">
+
+          <Lock
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
 
           <input
             type={
@@ -281,16 +359,29 @@ function OwnerChangePassword() {
                 : "password"
             }
             value={value}
-            onChange={
-              onChange ||
-              ((event) =>
-                setValue(event.target.value))
-            }
+            onChange={(e) => {
+              if (isNewPassword) {
+                handleNewPasswordChange(
+                  e.target.value
+                );
+              } else {
+                setValue(e.target.value);
+
+                if (label === "Confirm New Password") {
+                  handleConfirmPasswordChange(
+                    e.target.value
+                  );
+                }
+              }
+            }}
             placeholder={placeholder}
-            className={`w-full px-4 py-3 pr-12 border rounded-lg outline-none transition ${
-              error
-                ? "border-red-400 focus:ring-2 focus:ring-red-100"
-                : "border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className={`w-full border rounded-lg pl-10 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              error &&
+              (Array.isArray(error)
+                ? error.length > 0
+                : true)
+                ? "border-red-500"
+                : "border-gray-300"
             }`}
           />
 
@@ -298,16 +389,20 @@ function OwnerChangePassword() {
             type="button"
             onClick={() =>
               setShowPassword(
-                (previous) => !previous
+                (prev) => !prev
               )
             }
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            aria-label="Toggle password visibility"
+            aria-label={
+              showPassword
+                ? `Hide ${label}`
+                : `Show ${label}`
+            }
           >
             {showPassword ? (
-              <EyeOff size={20} />
+              <EyeOff size={18} />
             ) : (
-              <Eye size={20} />
+              <Eye size={18} />
             )}
           </button>
 
@@ -318,24 +413,27 @@ function OwnerChangePassword() {
         {/* ================================================= */}
 
         {Array.isArray(error) ? (
-          error.map((message, index) => (
-            <p
-              key={index}
-              className="flex items-center gap-1 text-sm text-red-600 mt-2"
-            >
-              <AlertCircle size={14} />
-              {message}
-            </p>
-          ))
+          error.length > 0 && (
+            <div className="mt-2 space-y-1">
+              {error.map(
+                (message, index) => (
+                  <p
+                    key={index}
+                    className="text-red-500 text-sm"
+                  >
+                    {message}
+                  </p>
+                )
+              )}
+            </div>
+          )
         ) : (
           error && (
-            <p className="flex items-center gap-1 text-sm text-red-600 mt-2">
-              <AlertCircle size={14} />
+            <p className="text-red-500 text-sm mt-2">
               {error}
             </p>
           )
         )}
-
       </div>
     );
   };
@@ -348,7 +446,7 @@ function OwnerChangePassword() {
     <div className="min-h-screen bg-gray-100">
 
       {/* ===================================================== */}
-      {/* OWNER NAVBAR */}
+      {/* NAVBAR */}
       {/* ===================================================== */}
 
       <Navbar />
@@ -357,92 +455,114 @@ function OwnerChangePassword() {
       {/* MAIN CONTENT */}
       {/* ===================================================== */}
 
-      <main className="max-w-3xl mx-auto p-4 md:p-6">
+      <main className="flex justify-center px-4 py-8">
 
-        {/* ================================================= */}
-        {/* PAGE HEADING */}
-        {/* ================================================= */}
+        <div className="w-full max-w-lg">
 
-        <div className="mb-6">
+          {/* ================================================= */}
+          {/* PAGE HEADER */}
+          {/* ================================================= */}
 
-          <div className="flex items-center gap-3">
+          <div className="mb-6">
 
-            <div className="p-3 bg-blue-50 rounded-xl">
+            <button
+              type="button"
+              onClick={() =>
+                navigate("/owner-dashboard")
+              }
+              className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4"
+            >
+              <ArrowLeft size={18} />
 
-              <Lock
-                size={28}
-                className="text-blue-600"
-              />
+              <span>
+                Back to Dashboard
+              </span>
+            </button>
+
+            <div className="flex items-center gap-3">
+
+              <div className="p-3 bg-blue-50 rounded-xl">
+
+                <Lock
+                  size={26}
+                  className="text-blue-600"
+                />
+
+              </div>
+
+              <div>
+
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Change Password
+                </h1>
+
+                <p className="text-sm text-gray-500">
+                  Update your owner account password.
+                </p>
+
+              </div>
 
             </div>
 
-            <div>
-
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-                Change Password
-              </h1>
-
-              <p className="text-gray-500 mt-1">
-                Update your owner account password.
-              </p>
-
-            </div>
-
           </div>
 
-        </div>
+          {/* ================================================= */}
+          {/* PASSWORD CARD */}
+          {/* ================================================= */}
 
-        {/* ================================================= */}
-        {/* SUCCESS MESSAGE */}
-        {/* ================================================= */}
-
-        {successMessage && (
-          <div className="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-xl">
-
-            <CheckCircle size={20} />
-
-            <p className="text-sm font-medium">
-              {successMessage}
-            </p>
-
-          </div>
-        )}
-
-        {/* ================================================= */}
-        {/* GENERAL ERROR */}
-        {/* ================================================= */}
-
-        {errors.general && (
-          <div className="mb-6 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-xl">
-
-            <AlertCircle size={20} />
-
-            <p className="text-sm font-medium">
-              {errors.general}
-            </p>
-
-          </div>
-        )}
-
-        {/* ================================================= */}
-        {/* PASSWORD FORM */}
-        {/* ================================================= */}
-
-        <div className="bg-white rounded-xl shadow-sm border p-5 md:p-7">
-
-          <form onSubmit={handleSubmit}>
+          <div className="bg-white rounded-xl shadow-sm border p-6">
 
             {/* ================================================= */}
-            {/* CURRENT PASSWORD */}
+            {/* SUCCESS MESSAGE */}
             {/* ================================================= */}
 
-            <div className="mb-5">
+            {successMessage && (
+              <div className="mb-5 flex items-start gap-3 bg-green-50 border border-green-200 rounded-lg p-4">
 
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Current Password
-              </label>
+                <CheckCircle
+                  size={20}
+                  className="text-green-600 mt-0.5 shrink-0"
+                />
+
+                <p className="text-sm text-green-700">
+                  {successMessage}
+                </p>
+
+              </div>
+            )}
+
+            {/* ================================================= */}
+            {/* GENERAL ERROR */}
+            {/* ================================================= */}
+
+            {errors.general && (
+              <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4">
+
+                <AlertCircle
+                  size={20}
+                  className="text-red-600 mt-0.5 shrink-0"
+                />
+
+                <p className="text-sm text-red-700">
+                  {errors.general}
+                </p>
+
+              </div>
+            )}
+
+            {/* ================================================= */}
+            {/* FORM */}
+            {/* ================================================= */}
+
+            <form
+              onSubmit={handleChangePassword}
+              className="space-y-5"
+            >
+
+              {/* CURRENT PASSWORD */}
 
               {renderPasswordInput({
+                label: "Current Password",
                 value: currentPassword,
                 setValue: setCurrentPassword,
                 showPassword:
@@ -455,19 +575,10 @@ function OwnerChangePassword() {
                   errors.currentPassword,
               })}
 
-            </div>
-
-            {/* ================================================= */}
-            {/* NEW PASSWORD */}
-            {/* ================================================= */}
-
-            <div className="mb-5">
-
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                New Password
-              </label>
+              {/* NEW PASSWORD */}
 
               {renderPasswordInput({
+                label: "New Password",
                 value: newPassword,
                 setValue: setNewPassword,
                 showPassword:
@@ -478,25 +589,16 @@ function OwnerChangePassword() {
                   "Enter new password",
                 error:
                   errors.newPassword,
-                onChange:
-                  handleNewPasswordChange,
+                isNewPassword: true,
               })}
 
-            </div>
-
-            {/* ================================================= */}
-            {/* CONFIRM PASSWORD */}
-            {/* ================================================= */}
-
-            <div className="mb-6">
-
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm New Password
-              </label>
+              {/* CONFIRM PASSWORD */}
 
               {renderPasswordInput({
+                label: "Confirm New Password",
                 value: confirmPassword,
-                setValue: setConfirmPassword,
+                setValue:
+                  setConfirmPassword,
                 showPassword:
                   showConfirmPassword,
                 setShowPassword:
@@ -505,46 +607,36 @@ function OwnerChangePassword() {
                   "Confirm new password",
                 error:
                   errors.confirmPassword,
-                onChange:
-                  handleConfirmPasswordChange,
               })}
 
-            </div>
+              {/* ================================================= */}
+              {/* ACTION BUTTONS */}
+              {/* ================================================= */}
 
-            {/* ================================================= */}
-            {/* ACTION BUTTONS */}
-            {/* ================================================= */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
 
-            <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium"
+                >
+                  Change Password
+                </button>
 
-              {/* CHANGE PASSWORD */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate("/owner-dashboard")
+                  }
+                  className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition font-medium"
+                >
+                  Cancel
+                </button>
 
-              <button
-                type="submit"
-                className="flex-1 bg-blue-600 text-white px-5 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-              >
-                Change Password
-              </button>
+              </div>
 
-              {/* CANCEL */}
+            </form>
 
-              <button
-                type="button"
-                onClick={() =>
-                  navigate("/owner-dashboard")
-                }
-                className="flex items-center justify-center gap-2 px-5 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-              >
-
-                <ArrowLeft size={18} />
-
-                Cancel
-
-              </button>
-
-            </div>
-
-          </form>
+          </div>
 
         </div>
 
