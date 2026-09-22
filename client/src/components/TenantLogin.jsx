@@ -83,6 +83,7 @@ function TenantLogin() {
     // ================= LOGIN SUCCESS =================
 
     localStorage.setItem("tenantId", tenant.id.toString());
+    localStorage.setItem("tenantMobile", tenant.mobileNumber);
 
     // Navigate after successful login
     navigate("/tenant-dashboard");
