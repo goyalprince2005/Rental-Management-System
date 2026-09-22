@@ -13,11 +13,9 @@ import OTPVerification from "./components/OTPVerification";
 import TenantResetPassword from "./components/TenantResetPassword";
 import OwnerResetPassword from "./components/OwnerResetPassword";
 
-
 // =========================================================
 // OWNER PORTAL
-// =====
-// ====================================================
+// =========================================================
 
 import Dashboard from "./components/Dashboard";
 import Properties from "./components/Properties";
@@ -205,6 +203,13 @@ function App() {
         element={<Settings />}
       />
 
+      {/* ================= OWNER CHANGE PASSWORD ================= */}
+
+      <Route
+        path="/owner-change-password"
+        element={<OwnerChangePassword />}
+      />
+
       {/* ===================================================== */}
       {/* TENANT PORTAL */}
       {/* ===================================================== */}
@@ -249,10 +254,6 @@ function App() {
       <Route
         path="/tenant-change-password"
         element={<TenantChangePassword />}
-      />
-      <Route
-        path="/owner-change-password"
-        element={<OwnerChangePassword />}
       />
 
     </Routes>
