@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Footer from "./Footer";
 
-function ForgotPassword() {
+function TenantForgotPassword() {
   const navigate = useNavigate();
 
   const [mobileNumber, setMobileNumber] = useState("");
@@ -57,9 +57,7 @@ function ForgotPassword() {
     // =======================================================
 
     if (!/^\d{10}$/.test(enteredMobile)) {
-      setMobileError(
-        "Please enter a valid 10-digit mobile number"
-      );
+      setMobileError("Please enter a valid 10-digit mobile number");
       return;
     }
 
@@ -72,9 +70,7 @@ function ForgotPassword() {
     );
 
     if (!tenant) {
-      setMobileError(
-        "Please enter correct registered mobile number"
-      );
+      setMobileError("Please enter correct registered mobile number");
       return;
     }
 
@@ -82,15 +78,8 @@ function ForgotPassword() {
     // STORE TENANT INFORMATION
     // =======================================================
 
-    localStorage.setItem(
-      "tenantId",
-      tenant.id.toString()
-    );
-
-    localStorage.setItem(
-      "tenantMobile",
-      enteredMobile
-    );
+    localStorage.setItem("tenantId", tenant.id.toString());
+    localStorage.setItem("tenantMobile", enteredMobile);
 
     // =======================================================
     // GO TO SHARED OTP VERIFICATION
@@ -145,11 +134,15 @@ function ForgotPassword() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label
+                htmlFor="tenant-forgot-mobile"
+                className="block mb-2 font-medium"
+              >
                 Mobile Number
               </label>
 
               <input
+                id="tenant-forgot-mobile"
                 type="tel"
                 value={mobileNumber}
                 onChange={(e) => {
@@ -166,6 +159,7 @@ function ForgotPassword() {
                 placeholder="Enter registered mobile number"
                 maxLength={10}
                 inputMode="numeric"
+                autoComplete="tel"
                 className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                   mobileError
                     ? "border-red-500"
@@ -225,4 +219,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default TenantForgotPassword;
