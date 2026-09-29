@@ -337,10 +337,13 @@ function OwnerChangePassword() {
     setShowPassword,
     placeholder,
     error,
+    autoComplete = "new-password",
     isNewPassword = false,
+    isConfirmPassword = false,
   }) => {
     return (
       <div>
+
         <label className="block mb-2 font-medium text-gray-700">
           {label}
         </label>
@@ -360,21 +363,22 @@ function OwnerChangePassword() {
             }
             value={value}
             onChange={(e) => {
+
               if (isNewPassword) {
                 handleNewPasswordChange(
                   e.target.value
                 );
+              } else if (isConfirmPassword) {
+                handleConfirmPasswordChange(
+                  e.target.value
+                );
               } else {
                 setValue(e.target.value);
-
-                if (label === "Confirm New Password") {
-                  handleConfirmPasswordChange(
-                    e.target.value
-                  );
-                }
               }
+
             }}
             placeholder={placeholder}
+            autoComplete={autoComplete}
             className={`w-full border rounded-lg pl-10 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               error &&
               (Array.isArray(error)
@@ -434,6 +438,7 @@ function OwnerChangePassword() {
             </p>
           )
         )}
+
       </div>
     );
   };
@@ -573,6 +578,8 @@ function OwnerChangePassword() {
                   "Enter current password",
                 error:
                   errors.currentPassword,
+                autoComplete:
+                  "current-password",
               })}
 
               {/* NEW PASSWORD */}
@@ -589,6 +596,8 @@ function OwnerChangePassword() {
                   "Enter new password",
                 error:
                   errors.newPassword,
+                autoComplete:
+                  "new-password",
                 isNewPassword: true,
               })}
 
@@ -607,6 +616,9 @@ function OwnerChangePassword() {
                   "Confirm new password",
                 error:
                   errors.confirmPassword,
+                autoComplete:
+                  "new-password",
+                isConfirmPassword: true,
               })}
 
               {/* ================================================= */}
