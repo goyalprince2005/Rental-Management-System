@@ -70,46 +70,6 @@ const tenants = {
   },
 };
 
-
-/*
- * =======================================================
- * RECENT PAYMENTS
- * =======================================================
- *
- * Mock payment history for the logged-in tenant.
- * The amount and payment date use the tenant's own
- * rent and rent due day.
- *
- * Later this information will come from the backend/database.
- */
-
-const recentPayments = [
-  {
-    id: 1,
-    month: "August 2026",
-    amount: Number(tenant.rent),
-    date: `August ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
-
-  {
-    id: 2,
-    month: "July 2026",
-    amount: Number(tenant.rent),
-    date: `July ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
-
-  {
-    id: 3,
-    month: "June 2026",
-    amount: Number(tenant.rent),
-    date: `June ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
-];
-
-
 /*
  * =========================================================
  * PAYMENT SETTINGS
@@ -120,10 +80,14 @@ const LATE_PENALTY_PER_DAY = 50;
 
 const UPI_ID = "rentalowner@upi";
 
+/*
+ * =========================================================
+ * TENANT PAYMENTS COMPONENT
+ * =========================================================
+ */
 
 function TenantPayments() {
   const navigate = useNavigate();
-
 
   /*
    * =======================================================
@@ -137,6 +101,48 @@ function TenantPayments() {
 
   const tenant = tenants[tenantId] || tenants[1];
 
+  /*
+   * =======================================================
+   * RECENT PAYMENTS
+   * =======================================================
+   *
+   * Mock payment history for the logged-in tenant.
+   *
+   * IMPORTANT:
+   * This must be inside the component because it uses
+   * the tenant variable defined above.
+   *
+   * The amount and payment date use the tenant's own
+   * rent and rent due day.
+   *
+   * Later this information will come from the backend/database.
+   */
+
+  const recentPayments = [
+    {
+      id: 1,
+      month: "August 2026",
+      amount: Number(tenant.rent),
+      date: `August ${tenant.rentDueDay}, 2026`,
+      status: "Paid",
+    },
+
+    {
+      id: 2,
+      month: "July 2026",
+      amount: Number(tenant.rent),
+      date: `July ${tenant.rentDueDay}, 2026`,
+      status: "Paid",
+    },
+
+    {
+      id: 3,
+      month: "June 2026",
+      amount: Number(tenant.rent),
+      date: `June ${tenant.rentDueDay}, 2026`,
+      status: "Paid",
+    },
+  ];
 
   /*
    * =======================================================
@@ -151,7 +157,6 @@ function TenantPayments() {
    */
 
   const [currentDate, setCurrentDate] = useState(new Date());
-
 
   /*
    * =======================================================
@@ -173,7 +178,6 @@ function TenantPayments() {
     return () => clearInterval(timer);
   }, []);
 
-
   /*
    * =======================================================
    * PAYMENT INFORMATION CALCULATION
@@ -193,7 +197,6 @@ function TenantPayments() {
 
     const dueDay = Number(tenant.rentDueDay);
 
-
     /*
      * If due day is not configured.
      */
@@ -204,12 +207,11 @@ function TenantPayments() {
         statusLabel: "Due date not configured",
         daysLate: 0,
         penalty: 0,
-        total: tenant.rent,
+        total: Number(tenant.rent),
         dueDate: null,
         dueDateText: "Not configured",
       };
     }
-
 
     /*
      * =====================================================
@@ -229,7 +231,6 @@ function TenantPayments() {
       0
     ).getDate();
 
-
     /*
      * Actual due day for current month.
      */
@@ -238,7 +239,6 @@ function TenantPayments() {
       dueDay,
       lastDayOfMonth
     );
-
 
     /*
      * Current month's due date.
@@ -249,7 +249,6 @@ function TenantPayments() {
       month,
       actualDueDay
     );
-
 
     /*
      * Create date containing only year/month/day.
@@ -264,7 +263,6 @@ function TenantPayments() {
       todayDate
     );
 
-
     /*
      * Difference between today and due date.
      */
@@ -273,12 +271,10 @@ function TenantPayments() {
       todayOnly.getTime() -
       dueDate.getTime();
 
-
     const differenceInDays = Math.floor(
       differenceInMilliseconds /
         (1000 * 60 * 60 * 24)
     );
-
 
     /*
      * Default payment state.
@@ -291,7 +287,6 @@ function TenantPayments() {
     let daysLate = 0;
 
     let penalty = 0;
-
 
     /*
      * =====================================================
@@ -312,15 +307,11 @@ function TenantPayments() {
       status = "Upcoming";
 
       statusLabel = "Rent Upcoming";
-    }
-
-    else if (differenceInDays === 0) {
+    } else if (differenceInDays === 0) {
       status = "Due Today";
 
       statusLabel = "Rent Due Today";
-    }
-
-    else {
+    } else {
       status = "Overdue";
 
       statusLabel = "Rent Overdue";
@@ -332,7 +323,6 @@ function TenantPayments() {
         LATE_PENALTY_PER_DAY;
     }
 
-
     /*
      * =====================================================
      * TOTAL PAYABLE
@@ -342,7 +332,6 @@ function TenantPayments() {
     const total =
       Number(tenant.rent) +
       penalty;
-
 
     /*
      * Format due date for UI.
@@ -358,7 +347,6 @@ function TenantPayments() {
         }
       );
 
-
     return {
       status,
       statusLabel,
@@ -368,9 +356,7 @@ function TenantPayments() {
       dueDate,
       dueDateText,
     };
-
   }, [currentDate, tenant]);
-
 
   /*
    * =======================================================
@@ -388,7 +374,6 @@ function TenantPayments() {
     paymentInfo.status === "Due Today" ||
     paymentInfo.status === "Overdue";
 
-
   /*
    * =======================================================
    * UPI PAYMENT URL
@@ -402,7 +387,6 @@ function TenantPayments() {
   const upiPaymentUrl = showQRCode
     ? `upi://pay?pa=${UPI_ID}&pn=Rental%20Management&am=${paymentInfo.total}&cu=INR`
     : "";
-
 
   /*
    * =======================================================
@@ -420,7 +404,6 @@ function TenantPayments() {
     }
   };
 
-
   /*
    * =======================================================
    * STATUS STYLES
@@ -428,7 +411,6 @@ function TenantPayments() {
    */
 
   const getStatusStyles = () => {
-
     if (paymentInfo.status === "Overdue") {
       return {
         container:
@@ -444,7 +426,6 @@ function TenantPayments() {
           "bg-red-100 text-red-700",
       };
     }
-
 
     if (paymentInfo.status === "Due Today") {
       return {
@@ -462,7 +443,6 @@ function TenantPayments() {
       };
     }
 
-
     return {
       container:
         "bg-blue-50 border-blue-200",
@@ -478,10 +458,14 @@ function TenantPayments() {
     };
   };
 
-
   const statusStyles =
     getStatusStyles();
 
+  /*
+   * =======================================================
+   * PAGE UI
+   * =======================================================
+   */
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -491,7 +475,6 @@ function TenantPayments() {
       ================================================= */}
 
       <TenantNavbar />
-
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -510,7 +493,6 @@ function TenantPayments() {
           Back to Dashboard
         </button>
 
-
         {/* =================================================
             PAGE HEADER
         ================================================= */}
@@ -526,7 +508,6 @@ function TenantPayments() {
           </p>
 
         </div>
-
 
         {/* =================================================
             TENANT INFORMATION
@@ -548,7 +529,6 @@ function TenantPayments() {
 
             </div>
 
-
             <div className="flex items-center gap-2 text-sm text-gray-600">
 
               <span className="font-medium">
@@ -568,7 +548,6 @@ function TenantPayments() {
           </div>
 
         </div>
-
 
         {/* =================================================
             RENT STATUS
@@ -596,7 +575,6 @@ function TenantPayments() {
 
               </div>
 
-
               <div>
 
                 <p
@@ -604,7 +582,6 @@ function TenantPayments() {
                 >
                   {paymentInfo.statusLabel}
                 </p>
-
 
                 <p className="text-gray-600 mt-1">
 
@@ -616,20 +593,17 @@ function TenantPayments() {
 
                 </p>
 
-
                 {paymentInfo.status === "Upcoming" && (
                   <p className="text-gray-500 text-sm mt-1">
                     Your rent will be payable on your scheduled due date.
                   </p>
                 )}
 
-
                 {paymentInfo.status === "Due Today" && (
                   <p className="text-yellow-700 text-sm mt-1">
                     Your rent is due today. The payment QR code is now available.
                   </p>
                 )}
-
 
                 {paymentInfo.status === "Overdue" && (
                   <p className="text-red-700 text-sm mt-1">
@@ -646,7 +620,6 @@ function TenantPayments() {
 
             </div>
 
-
             <div>
 
               <span
@@ -660,7 +633,6 @@ function TenantPayments() {
           </div>
 
         </div>
-
 
         {/* =================================================
             PAYMENT CALCULATION
@@ -686,7 +658,6 @@ function TenantPayments() {
 
             </div>
 
-
             <p className="text-2xl font-bold text-gray-900">
 
               ₹
@@ -695,7 +666,6 @@ function TenantPayments() {
             </p>
 
           </div>
-
 
           {/* LATE PENALTY */}
 
@@ -715,14 +685,12 @@ function TenantPayments() {
 
             </div>
 
-
             <p className="text-2xl font-bold text-gray-900">
 
               ₹
               {paymentInfo.penalty.toLocaleString("en-IN")}
 
             </p>
-
 
             {paymentInfo.daysLate > 0 && (
               <p className="text-sm text-red-600 mt-2">
@@ -737,7 +705,6 @@ function TenantPayments() {
             )}
 
           </div>
-
 
           {/* TOTAL */}
 
@@ -757,7 +724,6 @@ function TenantPayments() {
 
             </div>
 
-
             <p className="text-2xl font-bold text-gray-900">
 
               ₹
@@ -768,7 +734,6 @@ function TenantPayments() {
           </div>
 
         </div>
-
 
         {/* =================================================
             PAYMENT REQUIRED
@@ -800,7 +765,6 @@ function TenantPayments() {
 
               </div>
 
-
               <button
                 onClick={handlePayNow}
                 className="flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
@@ -816,7 +780,6 @@ function TenantPayments() {
 
           </div>
         )}
-
 
         {/* =================================================
             QR PAYMENT SECTION
@@ -840,16 +803,13 @@ function TenantPayments() {
 
               </div>
 
-
               <h2 className="text-2xl font-bold text-gray-900">
                 Scan & Pay
               </h2>
 
-
               <p className="text-gray-600 mt-2">
                 Scan this QR code using your UPI app to pay your current rent.
               </p>
-
 
               {/* QR CODE */}
 
@@ -868,7 +828,6 @@ function TenantPayments() {
 
               </div>
 
-
               {/* AMOUNT */}
 
               <div className="mt-6">
@@ -885,7 +844,6 @@ function TenantPayments() {
                 </p>
 
               </div>
-
 
               {/* PAYMENT BREAKDOWN */}
 
@@ -906,7 +864,6 @@ function TenantPayments() {
 
                 </div>
 
-
                 <div className="flex justify-between py-2">
 
                   <span className="text-gray-600">
@@ -921,7 +878,6 @@ function TenantPayments() {
                   </span>
 
                 </div>
-
 
                 <div className="border-t border-gray-200 mt-2 pt-3 flex justify-between">
 
@@ -940,13 +896,11 @@ function TenantPayments() {
 
               </div>
 
-
               {/* UPI ID */}
 
               <p className="text-sm text-gray-500 mt-5">
                 UPI ID: {UPI_ID}
               </p>
-
 
               <div className="flex justify-center items-center gap-2 text-green-600 text-sm mt-4">
 
@@ -960,7 +914,6 @@ function TenantPayments() {
 
           </div>
         )}
-
 
         {/* =================================================
             UPCOMING PAYMENT
@@ -976,11 +929,9 @@ function TenantPayments() {
                 className="mx-auto text-blue-500 mb-4"
               />
 
-
               <h2 className="text-xl font-semibold text-gray-900">
                 Payment Not Due Yet
               </h2>
-
 
               <p className="text-gray-600 mt-2">
 
@@ -994,7 +945,6 @@ function TenantPayments() {
 
               </p>
 
-
               <p className="text-gray-500 text-sm mt-2">
                 The payment QR code will automatically become available when your rent is due.
               </p>
@@ -1003,7 +953,6 @@ function TenantPayments() {
 
           </div>
         )}
-
 
         {/* =================================================
             RECENT PAYMENTS
@@ -1022,7 +971,6 @@ function TenantPayments() {
             </p>
 
           </div>
-
 
           <div className="divide-y divide-gray-100">
 
@@ -1045,7 +993,6 @@ function TenantPayments() {
 
                 </div>
 
-
                 <div className="flex items-center gap-5">
 
                   <p className="font-semibold text-gray-900">
@@ -1054,7 +1001,6 @@ function TenantPayments() {
                     {payment.amount.toLocaleString("en-IN")}
 
                   </p>
-
 
                   <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
 

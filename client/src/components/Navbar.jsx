@@ -75,6 +75,38 @@ function Navbar() {
   ];
 
   // =========================================================
+  // SIDEBAR NOTIFICATIONS
+  // =========================================================
+  // These values are based on information already present
+  // in the current frontend/dashboard mock data.
+  //
+  // Empty values mean there is currently no notification
+  // for that section.
+  // =========================================================
+
+  const sidebarNotifications = {
+    Dashboard: {
+      count: 3,
+      message: "3 items need your attention",
+    },
+
+    Rooms: {
+      count: 3,
+      message: "3 rooms are currently available",
+    },
+
+    "Rent & Bills": {
+      count: 5,
+      message: "5 tenants have pending rent",
+    },
+
+    Documents: {
+      count: 4,
+      message: "4 documents are expiring",
+    },
+  };
+
+  // =========================================================
   // ACTIVE PAGE
   // =========================================================
 
@@ -519,23 +551,47 @@ function Navbar() {
 
           </div>
 
-          <button
-            type="button"
-            onClick={closeMenu}
-            className="p-2 rounded-lg hover:bg-gray-100 transition shrink-0"
-            aria-label="Close owner menu"
-          >
+          {/* ================================================= */}
+          {/* CLOSE SIDEBAR BUTTON */}
+          {/* ================================================= */}
 
-            <X
-              size={22}
-              className="text-gray-700"
-            />
+          <div className="relative group shrink-0">
 
-          </button>
+            <button
+              type="button"
+              onClick={closeMenu}
+              className="p-2 rounded-lg hover:bg-gray-100 transition"
+              aria-label="Close owner menu"
+            >
+
+              <X
+                size={22}
+                className="text-gray-700"
+              />
+
+            </button>
+
+            {/* CLOSE SIDEBAR TOOLTIP */}
+
+            <div className="pointer-events-none absolute right-0 top-full mt-2 z-[70] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+
+              <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-lg">
+
+                Close sidebar
+
+                <span className="absolute -top-1 right-3 h-2 w-2 rotate-45 bg-gray-900" />
+
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
 
+        {/* ===================================================== */}
         {/* SIDEBAR MENU */}
+        {/* ===================================================== */}
 
         <div className="h-[calc(100vh-5rem)] overflow-y-auto overscroll-contain overflow-x-hidden px-3 py-4">
 
@@ -545,63 +601,127 @@ function Navbar() {
 
               const Icon = item.icon;
               const active = isActive(item.path);
+              const notification =
+                sidebarNotifications[item.name];
 
               return (
-                <button
-                  type="button"
+                <div
                   key={item.name}
-                  onClick={() =>
-                    handleNavigation(item.path)
-                  }
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
-                    active
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className="relative group"
                 >
 
-                  <Icon
-                    size={20}
-                    className="shrink-0"
-                  />
+                  {/* SIDEBAR NAVIGATION BUTTON */}
 
-                  <span className="text-[15px] font-medium">
-                    {item.name}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleNavigation(item.path)
+                    }
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
+                      active
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
 
-                </button>
+                    <Icon
+                      size={20}
+                      className="shrink-0"
+                    />
+
+                    <span className="text-[15px] font-medium flex-1">
+                      {item.name}
+                    </span>
+
+                    {/* NOTIFICATION CIRCLE */}
+
+                    {notification && (
+
+                      <span className="relative flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm">
+
+                        {notification.count}
+
+                      </span>
+
+                    )}
+
+                  </button>
+
+                  {/* ================================================= */}
+                  {/* HOVER NOTIFICATION TOOLTIP */}
+                  {/* ================================================= */}
+
+                  {notification && (
+
+                    <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 z-[70] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+
+                      <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-xl">
+
+                        {notification.message}
+
+                        <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[5px] border-r-[6px] border-y-transparent border-r-gray-900" />
+
+                      </div>
+
+                    </div>
+
+                  )}
+
+                </div>
               );
 
             })}
 
+            {/* ================================================= */}
             {/* SETTINGS */}
+            {/* ================================================= */}
 
-            <button
-              type="button"
-              onClick={() =>
-                handleNavigation("/settings")
-              }
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
-                isActive("/settings")
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
+            <div className="relative group">
 
-              <Settings
-                size={20}
-                className="shrink-0"
-              />
+              <button
+                type="button"
+                onClick={() =>
+                  handleNavigation("/settings")
+                }
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition ${
+                  isActive("/settings")
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
 
-              <span className="text-[15px] font-medium">
-                Settings
-              </span>
+                <Settings
+                  size={20}
+                  className="shrink-0"
+                />
 
-            </button>
+                <span className="text-[15px] font-medium flex-1">
+                  Settings
+                </span>
+
+              </button>
+
+              {/* SETTINGS TOOLTIP */}
+
+              <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 z-[70] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+
+                <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-xl">
+
+                  Open settings
+
+                  <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[5px] border-r-[6px] border-y-transparent border-r-gray-900" />
+
+                </div>
+
+              </div>
+
+            </div>
 
             <div className="border-t my-4" />
 
+            {/* ================================================= */}
             {/* LOGOUT */}
+            {/* ================================================= */}
 
             <button
               type="button"
