@@ -84,6 +84,7 @@ function OwnerLogin() {
     // =======================================================
 
     localStorage.setItem("ownerId", "1");
+
     localStorage.setItem(
       "ownerMobile",
       OWNER_MOBILE
@@ -130,18 +131,30 @@ function OwnerLogin() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label
+                htmlFor="owner-mobile"
+                className="block mb-2 font-medium"
+              >
                 Mobile Number
               </label>
 
               <input
+                id="owner-mobile"
                 type="tel"
+                name="mobile"
+                autoComplete="username"
                 value={mobileNumber}
-                onChange={(e) =>
-                  setMobileNumber(e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (!/^\d*$/.test(value)) {
+                    return;
+                  }
+
+                  setMobileNumber(value);
+                }}
                 placeholder="Enter your mobile number"
-                maxLength="10"
+                maxLength={10}
                 inputMode="numeric"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -154,12 +167,18 @@ function OwnerLogin() {
 
             <div>
 
-              <label className="block mb-2 font-medium">
+              <label
+                htmlFor="owner-password"
+                className="block mb-2 font-medium"
+              >
                 Password
               </label>
 
               <input
+                id="owner-password"
                 type="password"
+                name="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) =>
                   setPassword(e.target.value)
