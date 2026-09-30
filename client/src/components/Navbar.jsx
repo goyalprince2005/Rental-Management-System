@@ -25,6 +25,21 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  /*
+   * Stores the sidebar item currently being hovered.
+   */
+  const [hoveredSidebarItem, setHoveredSidebarItem] =
+    useState(null);
+
+  /*
+   * Position of the hover information card.
+   */
+  const [hoverCardPosition, setHoverCardPosition] =
+    useState({
+      top: 0,
+      left: 0,
+    });
+
   const profileRef = useRef(null);
 
   // =========================================================
@@ -75,34 +90,120 @@ function Navbar() {
   ];
 
   // =========================================================
-  // SIDEBAR NOTIFICATIONS
+  // SIDEBAR HOVER INFORMATION
   // =========================================================
-  // These values are based on information already present
-  // in the current frontend/dashboard mock data.
   //
-  // Empty values mean there is currently no notification
-  // for that section.
+  // These are informational descriptions for the existing
+  // owner-side sections.
+  //
+  // They are NOT notification badges.
+  // They do NOT represent pending actions.
+  // They do NOT use red notification counters.
   // =========================================================
 
-  const sidebarNotifications = {
+  const sidebarInfo = {
     Dashboard: {
-      count: 3,
-      message: "3 items need your attention",
+      title: "Dashboard",
+      items: [
+        "Properties overview",
+        "Rooms overview",
+        "Active tenants",
+        "Pending rent",
+        "Vacant rooms",
+        "Expiring documents",
+        "Recent tenants",
+        "Recent payments",
+      ],
+    },
+
+    Properties: {
+      title: "Properties",
+      items: [
+        "Property list",
+        "Property information",
+        "Add property",
+        "Edit property",
+        "View property details",
+        "Property rooms",
+      ],
     },
 
     Rooms: {
-      count: 3,
-      message: "3 rooms are currently available",
+      title: "Rooms",
+      items: [
+        "Room list",
+        "Room availability",
+        "Room details",
+        "Tenant assignment",
+        "Edit room",
+        "Room rent information",
+      ],
+    },
+
+    Tenants: {
+      title: "Tenants",
+      items: [
+        "Tenant list",
+        "Tenant details",
+        "Tenant property",
+        "Tenant room",
+        "Tenant rent information",
+        "Edit tenant",
+      ],
     },
 
     "Rent & Bills": {
-      count: 5,
-      message: "5 tenants have pending rent",
+      title: "Rent & Bills",
+      items: [
+        "Rent records",
+        "Bill information",
+        "Due amounts",
+        "Payment status",
+        "Tenant-wise rent details",
+      ],
+    },
+
+    Payments: {
+      title: "Payments",
+      items: [
+        "Payment records",
+        "Tenant payments",
+        "Payment amounts",
+        "Payment status",
+        "Payment history",
+      ],
     },
 
     Documents: {
-      count: 4,
-      message: "4 documents are expiring",
+      title: "Documents",
+      items: [
+        "Document records",
+        "Tenant documents",
+        "Property documents",
+        "Document information",
+        "Document status",
+      ],
+    },
+
+    Reports: {
+      title: "Reports",
+      items: [
+        "Rental reports",
+        "Payment reports",
+        "Tenant information",
+        "Property information",
+        "Room information",
+        "Report summaries",
+      ],
+    },
+
+    Settings: {
+      title: "Settings",
+      items: [
+        "Owner account settings",
+        "Account information",
+        "Application settings",
+      ],
     },
   };
 
@@ -121,6 +222,8 @@ function Navbar() {
   const handleNavigation = (path) => {
     setMenuOpen(false);
     setProfileOpen(false);
+    setHoveredSidebarItem(null);
+
     navigate(path);
   };
 
@@ -131,18 +234,9 @@ function Navbar() {
   const handleLogout = () => {
     setMenuOpen(false);
     setProfileOpen(false);
+    setHoveredSidebarItem(null);
 
     navigate("/");
-  };
-
-  // =========================================================
-  // SETTINGS
-  // =========================================================
-
-  const handleSettings = () => {
-    setProfileOpen(false);
-
-    navigate("/settings");
   };
 
   // =========================================================
@@ -152,8 +246,11 @@ function Navbar() {
   const handleMyDetails = () => {
     setProfileOpen(false);
 
-    // Owner details page will be added later.
-    // For now, Settings acts as the owner account/details page.
+    /*
+     * Owner details page will be added later.
+     * For now, Settings acts as the owner account/details page.
+     */
+
     navigate("/settings");
   };
 
@@ -165,6 +262,41 @@ function Navbar() {
     setProfileOpen(false);
 
     navigate("/owner-change-password");
+  };
+
+  // =========================================================
+  // SIDEBAR HOVER HANDLER
+  // =========================================================
+
+  const handleSidebarHover = (itemName, event) => {
+    const rect =
+      event.currentTarget.getBoundingClientRect();
+
+    const cardWidth = 260;
+
+    /*
+     * Keep the card inside the visible browser window.
+     */
+
+    const leftPosition = Math.min(
+      rect.right + 12,
+      window.innerWidth - cardWidth - 12
+    );
+
+    setHoveredSidebarItem(itemName);
+
+    setHoverCardPosition({
+      top: rect.top + rect.height / 2,
+      left: leftPosition,
+    });
+  };
+
+  // =========================================================
+  // CLOSE SIDEBAR HOVER CARD
+  // =========================================================
+
+  const handleSidebarLeave = () => {
+    setHoveredSidebarItem(null);
   };
 
   // =========================================================
@@ -224,6 +356,8 @@ function Navbar() {
       body.style.overflowX = "";
 
       html.style.scrollbarGutter = "";
+
+      setHoveredSidebarItem(null);
     }
 
     return () => {
@@ -246,7 +380,17 @@ function Navbar() {
 
   const closeMenu = () => {
     setMenuOpen(false);
+    setHoveredSidebarItem(null);
   };
+
+  // =========================================================
+  // CURRENT HOVER INFORMATION
+  // =========================================================
+
+  const currentHoverInfo =
+    hoveredSidebarItem
+      ? sidebarInfo[hoveredSidebarItem]
+      : null;
 
   return (
     <>
@@ -289,7 +433,9 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() =>
-                  handleNavigation("/owner-dashboard")
+                  handleNavigation(
+                    "/owner-dashboard"
+                  )
                 }
                 className="flex items-center gap-2 shrink-0"
               >
@@ -452,7 +598,9 @@ function Navbar() {
                     type="button"
                     onClick={handleChangePassword}
                     className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
-                      isActive("/owner-change-password")
+                      isActive(
+                        "/owner-change-password"
+                      )
                         ? "bg-blue-50 text-blue-600"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
@@ -520,6 +668,7 @@ function Navbar() {
             ? "translate-x-0"
             : "-translate-x-full"
         }`}
+        onMouseLeave={handleSidebarLeave}
       >
 
         {/* SIDEBAR HEADER */}
@@ -600,20 +749,32 @@ function Navbar() {
             {navItems.map((item) => {
 
               const Icon = item.icon;
-              const active = isActive(item.path);
-              const notification =
-                sidebarNotifications[item.name];
+
+              const active =
+                isActive(item.path);
 
               return (
                 <div
                   key={item.name}
-                  className="relative group"
+                  className="relative"
                 >
 
                   {/* SIDEBAR NAVIGATION BUTTON */}
 
                   <button
                     type="button"
+                    onMouseEnter={(event) =>
+                      handleSidebarHover(
+                        item.name,
+                        event
+                      )
+                    }
+                    onFocus={(event) =>
+                      handleSidebarHover(
+                        item.name,
+                        event
+                      )
+                    }
                     onClick={() =>
                       handleNavigation(item.path)
                     }
@@ -633,39 +794,7 @@ function Navbar() {
                       {item.name}
                     </span>
 
-                    {/* NOTIFICATION CIRCLE */}
-
-                    {notification && (
-
-                      <span className="relative flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm">
-
-                        {notification.count}
-
-                      </span>
-
-                    )}
-
                   </button>
-
-                  {/* ================================================= */}
-                  {/* HOVER NOTIFICATION TOOLTIP */}
-                  {/* ================================================= */}
-
-                  {notification && (
-
-                    <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 z-[70] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-
-                      <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-xl">
-
-                        {notification.message}
-
-                        <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[5px] border-r-[6px] border-y-transparent border-r-gray-900" />
-
-                      </div>
-
-                    </div>
-
-                  )}
 
                 </div>
               );
@@ -676,10 +805,22 @@ function Navbar() {
             {/* SETTINGS */}
             {/* ================================================= */}
 
-            <div className="relative group">
+            <div className="relative">
 
               <button
                 type="button"
+                onMouseEnter={(event) =>
+                  handleSidebarHover(
+                    "Settings",
+                    event
+                  )
+                }
+                onFocus={(event) =>
+                  handleSidebarHover(
+                    "Settings",
+                    event
+                  )
+                }
                 onClick={() =>
                   handleNavigation("/settings")
                 }
@@ -700,20 +841,6 @@ function Navbar() {
                 </span>
 
               </button>
-
-              {/* SETTINGS TOOLTIP */}
-
-              <div className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 z-[70] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-
-                <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-xl">
-
-                  Open settings
-
-                  <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[5px] border-r-[6px] border-y-transparent border-r-gray-900" />
-
-                </div>
-
-              </div>
 
             </div>
 
@@ -745,6 +872,73 @@ function Navbar() {
         </div>
 
       </aside>
+
+      {/* ===================================================== */}
+      {/* FIXED SIDEBAR INFORMATION CARD */}
+      {/* ===================================================== */}
+
+      {menuOpen && currentHoverInfo && (
+
+        <div
+          className="fixed z-[80] pointer-events-none"
+          style={{
+            top: `${hoverCardPosition.top}px`,
+            left: `${hoverCardPosition.left}px`,
+            transform: "translateY(-50%)",
+          }}
+        >
+
+          {/* ================================================= */}
+          {/* WHITE + BLUE INFORMATION CARD */}
+          {/* ================================================= */}
+
+          <div className="relative w-[260px] rounded-xl bg-white border border-blue-100 px-4 py-3 text-gray-700 shadow-xl">
+
+            {/* CARD TITLE */}
+
+            <p className="text-sm font-semibold text-blue-600 mb-2">
+              {currentHoverInfo.title}
+            </p>
+
+            {/* SMALL DIVIDER */}
+
+            <div className="h-px bg-blue-50 mb-2" />
+
+            {/* CARD INFORMATION */}
+
+            <div className="space-y-1.5">
+
+              {currentHoverInfo.items.map(
+                (text, index) => (
+
+                  <div
+                    key={index}
+                    className="flex items-start gap-2 text-xs text-gray-600"
+                  >
+
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+
+                    <span>
+                      {text}
+                    </span>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+            {/* TOOLTIP ARROW */}
+
+            <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white" />
+
+          </div>
+
+        </div>
+
+      )}
+
     </>
   );
 }
