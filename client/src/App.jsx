@@ -132,9 +132,9 @@ function App() {
       />
 
       <Route
-        path="/property-details"
-        element={<PropertyDetails />}
-      />
+  path="/property-details/:id"
+  element={<PropertyDetails />}
+/>
 
       {/* ================= ROOMS ================= */}
 

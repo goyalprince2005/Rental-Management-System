@@ -447,6 +447,14 @@ function Properties() {
   };
 
   // =========================================================
+  // VIEW PROPERTY DETAILS
+  // =========================================================
+
+  const handleViewProperty = (propertyId) => {
+    navigate(`/property-details/${propertyId}`);
+  };
+
+  // =========================================================
   // RENDER
   // =========================================================
 
@@ -496,6 +504,7 @@ function Properties() {
               Add Property
             </span>
           </button>
+
         </div>
 
         {/* =====================================================
@@ -507,6 +516,7 @@ function Properties() {
           {/* TOTAL PROPERTIES */}
 
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
+
             <div className="flex items-center justify-between gap-3">
 
               <div>
@@ -527,11 +537,13 @@ function Properties() {
               </div>
 
             </div>
+
           </div>
 
           {/* ACTIVE PROPERTIES */}
 
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
+
             <div className="flex items-center justify-between gap-3">
 
               <div>
@@ -552,11 +564,13 @@ function Properties() {
               </div>
 
             </div>
+
           </div>
 
           {/* TOTAL ROOMS */}
 
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
+
             <div className="flex items-center justify-between gap-3">
 
               <div>
@@ -577,11 +591,13 @@ function Properties() {
               </div>
 
             </div>
+
           </div>
 
           {/* AVAILABLE ROOMS */}
 
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
+
             <div className="flex items-center justify-between gap-3">
 
               <div>
@@ -602,6 +618,7 @@ function Properties() {
               </div>
 
             </div>
+
           </div>
 
         </div>
@@ -696,11 +713,13 @@ function Properties() {
                       </h3>
 
                       <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
+
                         <MapPin size={15} />
 
                         <span className="truncate">
                           {property.location}
                         </span>
+
                       </div>
 
                     </div>
@@ -750,6 +769,7 @@ function Properties() {
                     {/* FLOORS */}
 
                     <div className="bg-gray-50 rounded-lg p-3">
+
                       <p className="text-xs text-gray-500">
                         Floors
                       </p>
@@ -757,11 +777,13 @@ function Properties() {
                       <p className="text-xl font-bold mt-1 text-gray-800">
                         {property.floors}
                       </p>
+
                     </div>
 
                     {/* ROOMS */}
 
                     <div className="bg-gray-50 rounded-lg p-3">
+
                       <p className="text-xs text-gray-500">
                         Rooms
                       </p>
@@ -769,11 +791,13 @@ function Properties() {
                       <p className="text-xl font-bold mt-1 text-gray-800">
                         {property.rooms}
                       </p>
+
                     </div>
 
                     {/* AVAILABLE */}
 
                     <div className="bg-green-50 rounded-lg p-3">
+
                       <p className="text-xs text-gray-500">
                         Available
                       </p>
@@ -781,11 +805,13 @@ function Properties() {
                       <p className="text-xl font-bold text-green-600 mt-1">
                         {property.available}
                       </p>
+
                     </div>
 
                     {/* OCCUPIED */}
 
                     <div className="bg-blue-50 rounded-lg p-3">
+
                       <p className="text-xs text-gray-500">
                         Occupied
                       </p>
@@ -793,6 +819,7 @@ function Properties() {
                       <p className="text-xl font-bold text-blue-600 mt-1">
                         {property.occupied}
                       </p>
+
                     </div>
 
                   </div>
@@ -808,15 +835,17 @@ function Properties() {
                     <button
                       type="button"
                       onClick={() =>
-                        navigate("/property-details")
+                        handleViewProperty(property.id)
                       }
                       className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition"
                     >
+
                       <Eye size={18} />
 
                       <span>
                         View Details
                       </span>
+
                     </button>
 
                     {/* EDIT */}
@@ -828,11 +857,13 @@ function Properties() {
                       }
                       className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
                     >
+
                       <Pencil size={18} />
 
                       <span className="hidden sm:block">
                         Edit
                       </span>
+
                     </button>
 
                   </div>
@@ -875,8 +906,11 @@ function Properties() {
               onClick={handleClearSearch}
               className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
+
               <X size={17} />
+
               Clear Search
+
             </button>
 
           </div>
@@ -921,10 +955,12 @@ function Properties() {
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close add property form"
               >
+
                 <X
                   size={22}
                   className="text-gray-600"
                 />
+
               </button>
 
             </div>
@@ -1031,6 +1067,7 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="Active">
                       Active
                     </option>
@@ -1038,6 +1075,7 @@ function Properties() {
                     <option value="Inactive">
                       Inactive
                     </option>
+
                   </select>
 
                 </div>
@@ -1117,10 +1155,12 @@ function Properties() {
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close edit property form"
               >
+
                 <X
                   size={22}
                   className="text-gray-600"
                 />
+
               </button>
 
             </div>
@@ -1227,6 +1267,7 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
+
                     <option value="Active">
                       Active
                     </option>
@@ -1234,6 +1275,7 @@ function Properties() {
                     <option value="Inactive">
                       Inactive
                     </option>
+
                   </select>
 
                 </div>
