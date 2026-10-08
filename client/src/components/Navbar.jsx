@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -21,18 +27,37 @@ import {
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // =========================================================
+  // REFS
+  // =========================================================
+
   const profileRef = useRef(null);
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [hoveredSidebarItem, setHoveredSidebarItem] = useState(null);
+  // Ref used to measure the actual hover information card
+  const hoverCardRef = useRef(null);
 
-  const [hoverCardPosition, setHoverCardPosition] = useState({
-    top: 100,
-    left: 300,
-    width: 250,
-    visible: false,
-  });
+  // =========================================================
+  // STATE
+  // =========================================================
+
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const [profileOpen, setProfileOpen] =
+    useState(false);
+
+  const [hoveredSidebarItem, setHoveredSidebarItem] =
+    useState(null);
+
+  const [hoverCardPosition, setHoverCardPosition] =
+    useState({
+      top: 100,
+      left: 300,
+      width: 240,
+      anchorCenter: 100,
+      maxHeight: 500,
+      visible: false,
+    });
 
   // =========================================================
   // NAVIGATION ITEMS
@@ -44,36 +69,43 @@ function Navbar() {
       path: "/owner-dashboard",
       icon: Home,
     },
+
     {
       name: "Properties",
       path: "/properties",
       icon: Building2,
     },
+
     {
       name: "Rooms",
       path: "/rooms",
       icon: DoorOpen,
     },
+
     {
       name: "Tenants",
       path: "/tenants",
       icon: Users,
     },
+
     {
       name: "Rent & Bills",
       path: "/rent-bills",
       icon: Receipt,
     },
+
     {
       name: "Payments",
       path: "/payments",
       icon: CreditCard,
     },
+
     {
       name: "Documents",
       path: "/documents",
       icon: FileText,
     },
+
     {
       name: "Reports",
       path: "/reports",
@@ -195,7 +227,9 @@ function Navbar() {
   // ACTIVE ROUTE
   // =========================================================
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   // =========================================================
   // NAVIGATION
@@ -203,7 +237,9 @@ function Navbar() {
 
   const handleNavigation = (path) => {
     setMenuOpen(false);
+
     setProfileOpen(false);
+
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -220,6 +256,7 @@ function Navbar() {
 
   const closeMenu = () => {
     setMenuOpen(false);
+
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -234,7 +271,9 @@ function Navbar() {
 
   const handleLogout = () => {
     closeMenu();
+
     setProfileOpen(false);
+
     navigate("/");
   };
 
@@ -244,6 +283,7 @@ function Navbar() {
 
   const handleMyDetails = () => {
     setProfileOpen(false);
+
     navigate("/settings");
   };
 
@@ -253,35 +293,20 @@ function Navbar() {
 
   const handleChangePassword = () => {
     setProfileOpen(false);
+
     navigate("/owner-change-password");
   };
 
   // =========================================================
-  // HOVER INFORMATION CARD POSITIONING
+  // HOVER INFORMATION CARD
   // =========================================================
 
   const handleSidebarHover = (itemName, event) => {
-    const sidebar = event.currentTarget.closest("aside");
+    // -------------------------------------------------------
+    // DISABLE INFORMATION CARD ON SMALL SCREENS
+    // -------------------------------------------------------
 
-    if (!sidebar) return;
-
-    const sidebarRect = sidebar.getBoundingClientRect();
-    const itemRect = event.currentTarget.getBoundingClientRect();
-
-    const gap = 10;
-    const viewportPadding = 12;
-
-    // Compact notification card
-    const preferredWidth = 250;
-
-    // Always place card to the right of sidebar
-    const left = sidebarRect.right + gap;
-
-    const availableWidth =
-      window.innerWidth - left - viewportPadding;
-
-    // Hide card if there is not enough space
-    if (availableWidth < 220) {
+    if (window.innerWidth < 1024) {
       setHoveredSidebarItem(null);
 
       setHoverCardPosition((previous) => ({
@@ -292,29 +317,195 @@ function Navbar() {
       return;
     }
 
+    // -------------------------------------------------------
+    // GET SIDEBAR
+    // -------------------------------------------------------
+
+    const sidebar =
+      event.currentTarget.closest("aside");
+
+    if (!sidebar) {
+      return;
+    }
+
+    // -------------------------------------------------------
+    // GET POSITIONS
+    // -------------------------------------------------------
+
+    const sidebarRect =
+      sidebar.getBoundingClientRect();
+
+    const itemRect =
+      event.currentTarget.getBoundingClientRect();
+
+    // -------------------------------------------------------
+    // POSITION SETTINGS
+    // -------------------------------------------------------
+
+    const gap = 10;
+
+    const viewportPadding = 12;
+
+    const preferredWidth = 240;
+
+    // -------------------------------------------------------
+    // HORIZONTAL POSITION
+    // -------------------------------------------------------
+
+    const left =
+      sidebarRect.right + gap;
+
+    const availableWidth =
+      window.innerWidth -
+      left -
+      viewportPadding;
+
+    // -------------------------------------------------------
+    // NOT ENOUGH SPACE
+    // -------------------------------------------------------
+
+    if (availableWidth < 210) {
+      setHoveredSidebarItem(null);
+
+      setHoverCardPosition((previous) => ({
+        ...previous,
+        visible: false,
+      }));
+
+      return;
+    }
+
+    // -------------------------------------------------------
+    // FINAL WIDTH
+    // -------------------------------------------------------
+
     const width = Math.min(
       preferredWidth,
       availableWidth
     );
 
-    // Keep card inside viewport vertically
-    const top = Math.max(
-      viewportPadding,
-      Math.min(
-        itemRect.top + itemRect.height / 2,
-        window.innerHeight - viewportPadding
-      )
-    );
+    // -------------------------------------------------------
+    // CENTER OF HOVERED ITEM
+    // -------------------------------------------------------
+
+    const anchorCenter =
+      itemRect.top +
+      itemRect.height / 2;
+
+    // -------------------------------------------------------
+    // INITIAL CARD POSITION
+    // -------------------------------------------------------
+
+    /*
+      The first render starts near the hovered item.
+
+      After the card is rendered, useLayoutEffect measures
+      its actual height and calculates the final position.
+    */
 
     setHoveredSidebarItem(itemName);
 
     setHoverCardPosition({
-      top,
+      top: itemRect.top,
       left,
       width,
+      anchorCenter,
+      maxHeight:
+        window.innerHeight -
+        viewportPadding * 2,
       visible: true,
     });
   };
+
+  // =========================================================
+  // ACTUAL HOVER CARD POSITION CALCULATION
+  // =========================================================
+
+  useLayoutEffect(() => {
+    if (
+      !menuOpen ||
+      !hoveredSidebarItem ||
+      !hoverCardPosition.visible
+    ) {
+      return;
+    }
+
+    const card = hoverCardRef.current;
+
+    if (!card) {
+      return;
+    }
+
+    // -------------------------------------------------------
+    // GET ACTUAL CARD HEIGHT
+    // -------------------------------------------------------
+
+    const cardHeight =
+      card.getBoundingClientRect().height;
+
+    const viewportPadding = 12;
+
+    // -------------------------------------------------------
+    // CENTER CARD AROUND HOVERED ITEM
+    // -------------------------------------------------------
+
+    let top =
+      hoverCardPosition.anchorCenter -
+      cardHeight / 2;
+
+    // -------------------------------------------------------
+    // TOP BOUNDARY
+    // -------------------------------------------------------
+
+    if (top < viewportPadding) {
+      top = viewportPadding;
+    }
+
+    // -------------------------------------------------------
+    // BOTTOM BOUNDARY
+    // -------------------------------------------------------
+
+    const maxTop =
+      window.innerHeight -
+      cardHeight -
+      viewportPadding;
+
+    if (top > maxTop) {
+      top = Math.max(
+        viewportPadding,
+        maxTop
+      );
+    }
+
+    // -------------------------------------------------------
+    // FINAL SAFETY CHECK
+    // -------------------------------------------------------
+
+    top = Math.max(
+      viewportPadding,
+      top
+    );
+
+    // -------------------------------------------------------
+    // UPDATE POSITION
+    // -------------------------------------------------------
+
+    if (
+      Math.abs(
+        top - hoverCardPosition.top
+      ) > 1
+    ) {
+      setHoverCardPosition((previous) => ({
+        ...previous,
+        top,
+      }));
+    }
+  }, [
+    menuOpen,
+    hoveredSidebarItem,
+    hoverCardPosition.visible,
+    hoverCardPosition.anchorCenter,
+  ]);
 
   // =========================================================
   // SIDEBAR HOVER LEAVE
@@ -329,6 +520,10 @@ function Navbar() {
     }));
   };
 
+  // =========================================================
+  // CURRENT HOVER INFORMATION
+  // =========================================================
+
   const currentHoverInfo = hoveredSidebarItem
     ? sidebarInfo[hoveredSidebarItem]
     : null;
@@ -341,7 +536,9 @@ function Navbar() {
     const handleClickOutside = (event) => {
       if (
         profileRef.current &&
-        !profileRef.current.contains(event.target)
+        !profileRef.current.contains(
+          event.target
+        )
       ) {
         setProfileOpen(false);
       }
@@ -361,11 +558,13 @@ function Navbar() {
   }, []);
 
   // =========================================================
-  // PREVENT BACKGROUND SCROLL WHILE SIDEBAR IS OPEN
+  // PREVENT BACKGROUND SCROLL
   // =========================================================
 
   useEffect(() => {
-    if (!menuOpen) return undefined;
+    if (!menuOpen) {
+      return undefined;
+    }
 
     const previousHtmlOverflow =
       document.documentElement.style.overflow;
@@ -374,18 +573,21 @@ function Navbar() {
       document.body.style.overflow;
 
     const previousHtmlOverscroll =
-      document.documentElement.style.overscrollBehavior;
+      document.documentElement.style
+        .overscrollBehavior;
 
     const previousBodyOverscroll =
-      document.body.style.overscrollBehavior;
+      document.body.style
+        .overscrollBehavior;
 
     document.documentElement.style.overflow =
       "hidden";
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
 
-    document.documentElement.style.overscrollBehavior =
-      "none";
+    document.documentElement.style
+      .overscrollBehavior = "none";
 
     document.body.style.overscrollBehavior =
       "none";
@@ -397,10 +599,12 @@ function Navbar() {
       document.body.style.overflow =
         previousBodyOverflow;
 
-      document.documentElement.style.overscrollBehavior =
+      document.documentElement.style
+        .overscrollBehavior =
         previousHtmlOverscroll;
 
-      document.body.style.overscrollBehavior =
+      document.body.style
+        .overscrollBehavior =
         previousBodyOverscroll;
     };
   }, [menuOpen]);
@@ -410,7 +614,9 @@ function Navbar() {
   // =========================================================
 
   useEffect(() => {
-    if (!menuOpen) return undefined;
+    if (!menuOpen) {
+      return undefined;
+    }
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
@@ -487,7 +693,9 @@ function Navbar() {
 
           <div className="flex h-16 items-center justify-between gap-2">
 
-            {/* ================= LEFT SECTION ================= */}
+            {/* =================================================
+                LEFT SECTION
+            ================================================= */}
 
             <div className="flex min-w-0 shrink-0 items-center gap-2">
 
@@ -508,13 +716,14 @@ function Navbar() {
                 />
               </button>
 
-
               {/* LOGO */}
 
               <button
                 type="button"
                 onClick={() =>
-                  handleNavigation("/owner-dashboard")
+                  handleNavigation(
+                    "/owner-dashboard"
+                  )
                 }
                 className="flex shrink-0 items-center gap-2"
                 aria-label="Go to owner dashboard"
@@ -537,8 +746,9 @@ function Navbar() {
 
             </div>
 
-
-            {/* ================= DESKTOP NAVIGATION ================= */}
+            {/* =================================================
+                DESKTOP NAVIGATION
+            ================================================= */}
 
             <div className="mx-3 hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
 
@@ -546,14 +756,17 @@ function Navbar() {
 
                 const Icon = item.icon;
 
-                const active = isActive(item.path);
+                const active =
+                  isActive(item.path);
 
                 return (
                   <button
                     type="button"
                     key={item.name}
                     onClick={() =>
-                      handleNavigation(item.path)
+                      handleNavigation(
+                        item.path
+                      )
                     }
                     className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium transition ${
                       active
@@ -561,7 +774,9 @@ function Navbar() {
                         : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
                     }`}
                     aria-current={
-                      active ? "page" : undefined
+                      active
+                        ? "page"
+                        : undefined
                     }
                   >
 
@@ -573,13 +788,13 @@ function Navbar() {
 
                   </button>
                 );
-
               })}
 
             </div>
 
-
-            {/* ================= PROFILE MENU ================= */}
+            {/* =================================================
+                PROFILE MENU
+            ================================================= */}
 
             <div
               ref={profileRef}
@@ -617,11 +832,12 @@ function Navbar() {
 
               </button>
 
-
               {/* PROFILE DROPDOWN */}
 
               {profileOpen && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border bg-white shadow-xl">
+
+                  {/* PROFILE HEADER */}
 
                   <div className="border-b bg-gray-50 p-4">
 
@@ -652,7 +868,6 @@ function Navbar() {
 
                   </div>
 
-
                   {/* MY DETAILS */}
 
                   <button
@@ -669,12 +884,13 @@ function Navbar() {
 
                   </button>
 
-
                   {/* CHANGE PASSWORD */}
 
                   <button
                     type="button"
-                    onClick={handleChangePassword}
+                    onClick={
+                      handleChangePassword
+                    }
                     className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
                   >
 
@@ -686,9 +902,7 @@ function Navbar() {
 
                   </button>
 
-
                   <div className="border-t" />
-
 
                   {/* LOGOUT */}
 
@@ -717,7 +931,6 @@ function Navbar() {
 
       </nav>
 
-
       {/* =====================================================
           OVERLAY
       ===================================================== */}
@@ -731,9 +944,10 @@ function Navbar() {
         }`}
         onClick={closeMenu}
         aria-label="Close owner menu overlay"
-        tabIndex={menuOpen ? 0 : -1}
+        tabIndex={
+          menuOpen ? 0 : -1
+        }
       />
-
 
       {/* =====================================================
           SIDEBAR
@@ -749,7 +963,9 @@ function Navbar() {
         aria-hidden={!menuOpen}
       >
 
-        {/* ================= HEADER ================= */}
+        {/* =================================================
+            SIDEBAR HEADER
+        ================================================= */}
 
         <div className="flex h-20 items-center justify-between gap-2 border-b px-3 sm:px-4">
 
@@ -778,7 +994,6 @@ function Navbar() {
 
           </div>
 
-
           {/* CLOSE BUTTON */}
 
           <div className="group relative shrink-0">
@@ -797,6 +1012,8 @@ function Navbar() {
 
             </button>
 
+            {/* CLOSE TOOLTIP */}
+
             <div className="pointer-events-none absolute right-0 top-full z-[70] mt-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 
               <div className="relative whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs font-semibold text-white shadow-xl">
@@ -809,23 +1026,31 @@ function Navbar() {
 
         </div>
 
-
-        {/* ================= MENU ITEMS ================= */}
+        {/* =================================================
+            SIDEBAR MENU
+        ================================================= */}
 
         <div className="h-[calc(100vh-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4">
 
           <nav className="space-y-1">
 
+            {/* =================================================
+                MAIN MENU ITEMS
+            ================================================= */}
+
             {navItems.map((item) => {
 
               const Icon = item.icon;
 
-              const active = isActive(item.path);
+              const active =
+                isActive(item.path);
 
               return (
                 <div
                   key={item.name}
-                  onMouseLeave={handleSidebarLeave}
+                  onMouseLeave={
+                    handleSidebarLeave
+                  }
                 >
 
                   <button
@@ -842,9 +1067,13 @@ function Navbar() {
                         event
                       )
                     }
-                    onBlur={handleSidebarLeave}
+                    onBlur={
+                      handleSidebarLeave
+                    }
                     onClick={() =>
-                      handleNavigation(item.path)
+                      handleNavigation(
+                        item.path
+                      )
                     }
                     className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                       active
@@ -852,7 +1081,9 @@ function Navbar() {
                         : "text-gray-700 hover:bg-gray-100"
                     }`}
                     aria-current={
-                      active ? "page" : undefined
+                      active
+                        ? "page"
+                        : undefined
                     }
                   >
 
@@ -869,14 +1100,16 @@ function Navbar() {
 
                 </div>
               );
-
             })}
 
-
-            {/* SETTINGS */}
+            {/* =================================================
+                SETTINGS
+            ================================================= */}
 
             <div
-              onMouseLeave={handleSidebarLeave}
+              onMouseLeave={
+                handleSidebarLeave
+              }
             >
 
               <button
@@ -893,9 +1126,13 @@ function Navbar() {
                     event
                   )
                 }
-                onBlur={handleSidebarLeave}
+                onBlur={
+                  handleSidebarLeave
+                }
                 onClick={() =>
-                  handleNavigation("/settings")
+                  handleNavigation(
+                    "/settings"
+                  )
                 }
                 className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                   isActive("/settings")
@@ -922,11 +1159,15 @@ function Navbar() {
 
             </div>
 
+            {/* =================================================
+                DIVIDER
+            ================================================= */}
 
             <div className="my-4 border-t" />
 
-
-            {/* LOGOUT */}
+            {/* =================================================
+                LOGOUT
+            ================================================= */}
 
             <button
               type="button"
@@ -951,9 +1192,8 @@ function Navbar() {
 
       </aside>
 
-
       {/* =====================================================
-          HOVER INFORMATION CARD
+          HOVER INFORMATION / NOTIFICATION CARD
       ===================================================== */}
 
       {menuOpen &&
@@ -961,43 +1201,52 @@ function Navbar() {
         hoverCardPosition.visible && (
 
           <div
-  className="pointer-events-none fixed z-[70]"
-  style={{
-    top: `${hoverCardPosition.top}px`,
-    left: `${hoverCardPosition.left}px`,
-    width: `${hoverCardPosition.width}px`,
-    transform: "translateY(-50%)",
-  }}
-  aria-hidden="true"
->
+            ref={hoverCardRef}
+            className="pointer-events-none fixed z-[70]"
+            style={{
+              top: `${hoverCardPosition.top}px`,
+              left: `${hoverCardPosition.left}px`,
+              width: `${hoverCardPosition.width}px`,
+              maxHeight: `${hoverCardPosition.maxHeight}px`,
+            }}
+            aria-hidden="true"
+          >
 
-            <div className="relative w-full rounded-xl border border-blue-100 bg-white px-4 py-3 text-gray-700 shadow-xl">
+            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-gray-700 shadow-xl">
 
-              {/* TITLE */}
+              {/* =================================================
+                  SMALL TITLE
+              ================================================= */}
 
-              <p className="mb-2 text-sm font-bold text-blue-600">
+              <p className="mb-1.5 text-xs font-bold leading-4 text-blue-600">
                 {currentHoverInfo.title}
               </p>
 
+              {/* =================================================
+                  DIVIDER
+              ================================================= */}
 
-              {/* DIVIDER */}
+              <div className="mb-1.5 h-px bg-blue-100" />
 
-              <div className="mb-2 h-px bg-blue-100" />
+              {/* =================================================
+                  INFORMATION ITEMS
+              ================================================= */}
 
-
-              {/* INFORMATION ITEMS */}
-
-              <div className="space-y-1.5">
+              <div className="space-y-1">
 
                 {currentHoverInfo.items.map(
                   (text) => (
 
                     <div
                       key={text}
-                      className="flex items-start gap-2 text-xs leading-5 text-gray-700"
+                      className="flex items-start gap-1.5 text-[11px] leading-4 text-gray-600"
                     >
 
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                      {/* SMALL BLUE DOT */}
+
+                      <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-blue-500" />
+
+                      {/* SMALL TEXT */}
 
                       <span>
                         {text}
@@ -1010,10 +1259,11 @@ function Navbar() {
 
               </div>
 
+              {/* =================================================
+                  CARD ARROW
+              ================================================= */}
 
-              {/* ARROW */}
-
-              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white" />
+              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[6px] border-r-[6px] border-y-transparent border-r-white" />
 
             </div>
 
