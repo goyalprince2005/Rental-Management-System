@@ -33,7 +33,6 @@ function Navbar() {
   // =========================================================
 
   const profileRef = useRef(null);
-
   const hoverCardRef = useRef(null);
 
   // =========================================================
@@ -42,8 +41,7 @@ function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [profileOpen, setProfileOpen] =
-    useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const [hoveredSidebarItem, setHoveredSidebarItem] =
     useState(null);
@@ -236,9 +234,7 @@ function Navbar() {
 
   const handleNavigation = (path) => {
     setMenuOpen(false);
-
     setProfileOpen(false);
-
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -255,7 +251,6 @@ function Navbar() {
 
   const closeMenu = () => {
     setMenuOpen(false);
-
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -270,7 +265,6 @@ function Navbar() {
 
   const handleLogout = () => {
     closeMenu();
-
     setProfileOpen(false);
 
     navigate("/");
@@ -302,7 +296,7 @@ function Navbar() {
 
   const handleSidebarHover = (itemName, event) => {
     // ---------------------------------------------------------
-    // DISABLE HOVER INFORMATION ON SMALL SCREENS
+    // DISABLE HOVER CARD ON SMALL SCREENS
     // ---------------------------------------------------------
 
     if (window.innerWidth < 1024) {
@@ -328,7 +322,7 @@ function Navbar() {
     }
 
     // ---------------------------------------------------------
-    // GET ELEMENT POSITIONS
+    // GET POSITIONS
     // ---------------------------------------------------------
 
     const sidebarRect =
@@ -360,7 +354,7 @@ function Navbar() {
       viewportPadding;
 
     // ---------------------------------------------------------
-    // NOT ENOUGH SPACE
+    // NOT ENOUGH HORIZONTAL SPACE
     // ---------------------------------------------------------
 
     if (availableWidth < 220) {
@@ -375,7 +369,7 @@ function Navbar() {
     }
 
     // ---------------------------------------------------------
-    // FINAL CARD WIDTH
+    // FINAL WIDTH
     // ---------------------------------------------------------
 
     const width = Math.min(
@@ -384,7 +378,7 @@ function Navbar() {
     );
 
     // ---------------------------------------------------------
-    // CENTER OF HOVERED ITEM
+    // CENTER OF HOVERED SIDEBAR ITEM
     // ---------------------------------------------------------
 
     const anchorCenter =
@@ -392,7 +386,7 @@ function Navbar() {
       itemRect.height / 2;
 
     // ---------------------------------------------------------
-    // INITIAL POSITION
+    // SHOW CARD
     // ---------------------------------------------------------
 
     setHoveredSidebarItem(itemName);
@@ -429,7 +423,7 @@ function Navbar() {
     }
 
     // ---------------------------------------------------------
-    // GET ACTUAL CARD HEIGHT
+    // ACTUAL CARD HEIGHT
     // ---------------------------------------------------------
 
     const cardHeight =
@@ -517,14 +511,6 @@ function Navbar() {
   // =========================================================
 
   const handleSidebarScroll = () => {
-    /*
-      When the sidebar itself is scrolled, the hovered menu
-      item changes its screen position.
-
-      Hide the information card until the user hovers
-      another menu item.
-    */
-
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -542,7 +528,7 @@ function Navbar() {
     : null;
 
   // =========================================================
-  // CLOSE PROFILE MENU WHEN CLICKING OUTSIDE
+  // CLOSE PROFILE WHEN CLICKING OUTSIDE
   // =========================================================
 
   useEffect(() => {
@@ -751,8 +737,7 @@ function Navbar() {
 
                 </div>
 
-                <span className="hidden whitespace-nowrap text-lg font-bold text-blue-600 sm:block">
-                  Rental Management
+               <span className="hidden whitespace-nowrap text-[16px] font-semibold text-blue-800 sm:block">Rental Management
                 </span>
 
               </button>
@@ -901,9 +886,7 @@ function Navbar() {
 
                   <button
                     type="button"
-                    onClick={
-                      handleChangePassword
-                    }
+                    onClick={handleChangePassword}
                     className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
                   >
 
@@ -977,7 +960,7 @@ function Navbar() {
       >
 
         {/* =================================================
-            SIDEBAR HEADER - FIXED
+            SIDEBAR HEADER
         ================================================= */}
 
         <div className="flex h-20 shrink-0 items-center justify-between gap-2 border-b px-3 sm:px-4">
@@ -995,14 +978,13 @@ function Navbar() {
 
             <div className="min-w-0 flex-1">
 
-              <h2 className="break-words text-base font-bold leading-5 text-blue-600">
-                Rental Management
-              </h2>
+              <h2 className="break-words text-[15px] font-semibold leading-5 text-blue-800">
+  Rental Management
+</h2>
 
-              <p className="mt-1 text-xs text-gray-500">
-                Owner Panel
-              </p>
-
+<p className="mt-0.5 text-[11px] font-normal text-gray-500">
+  Owner Panel
+</p>
             </div>
 
           </div>
@@ -1040,7 +1022,7 @@ function Navbar() {
         </div>
 
         {/* =================================================
-            SCROLLABLE MENU AREA
+            SCROLLABLE MENU
         ================================================= */}
 
         <div
@@ -1050,9 +1032,7 @@ function Navbar() {
 
           <nav className="space-y-1">
 
-            {/* =================================================
-                MAIN MENU ITEMS
-            ================================================= */}
+            {/* MAIN MENU */}
 
             {navItems.map((item) => {
 
@@ -1118,9 +1098,7 @@ function Navbar() {
               );
             })}
 
-            {/* =================================================
-                SETTINGS
-            ================================================= */}
+            {/* SETTINGS */}
 
             <div
               onMouseLeave={
@@ -1175,8 +1153,6 @@ function Navbar() {
 
             </div>
 
-            {/* Extra bottom spacing inside scroll area */}
-
             <div className="h-4" />
 
           </nav>
@@ -1184,7 +1160,7 @@ function Navbar() {
         </div>
 
         {/* =================================================
-            LOGOUT - FIXED AT BOTTOM
+            LOGOUT - FIXED
         ================================================= */}
 
         <div className="shrink-0 border-t bg-white px-3 py-3 sm:px-4">
@@ -1230,13 +1206,13 @@ function Navbar() {
             aria-hidden="true"
           >
 
-            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3 text-gray-700 shadow-xl">
+            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-xl">
 
               {/* =================================================
                   INFORMATION TITLE
               ================================================= */}
 
-              <p className="mb-2 text-[13px] font-bold leading-5 text-blue-600">
+              <p className="mb-2.5 text-sm font-bold leading-5 text-blue-600">
                 {currentHoverInfo.title}
               </p>
 
@@ -1244,7 +1220,7 @@ function Navbar() {
                   DIVIDER
               ================================================= */}
 
-              <div className="mb-2 h-px bg-blue-100" />
+              <div className="mb-2.5 h-px bg-blue-100" />
 
               {/* =================================================
                   INFORMATION ITEMS
@@ -1257,7 +1233,7 @@ function Navbar() {
 
                     <div
                       key={text}
-                      className="flex items-start gap-2 text-xs leading-5 text-gray-600"
+                      className="flex items-start gap-2 text-[13px] leading-5 text-gray-600"
                     >
 
                       {/* BLUE DOT */}
