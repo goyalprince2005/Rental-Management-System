@@ -34,7 +34,6 @@ function Navbar() {
 
   const profileRef = useRef(null);
 
-  // Ref used to measure the actual hover information card
   const hoverCardRef = useRef(null);
 
   // =========================================================
@@ -53,7 +52,7 @@ function Navbar() {
     useState({
       top: 100,
       left: 300,
-      width: 240,
+      width: 250,
       anchorCenter: 100,
       maxHeight: 500,
       visible: false,
@@ -298,13 +297,13 @@ function Navbar() {
   };
 
   // =========================================================
-  // HOVER INFORMATION CARD
+  // HOVER INFORMATION CARD POSITIONING
   // =========================================================
 
   const handleSidebarHover = (itemName, event) => {
-    // -------------------------------------------------------
-    // DISABLE INFORMATION CARD ON SMALL SCREENS
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // DISABLE HOVER INFORMATION ON SMALL SCREENS
+    // ---------------------------------------------------------
 
     if (window.innerWidth < 1024) {
       setHoveredSidebarItem(null);
@@ -317,9 +316,9 @@ function Navbar() {
       return;
     }
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // GET SIDEBAR
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     const sidebar =
       event.currentTarget.closest("aside");
@@ -328,9 +327,9 @@ function Navbar() {
       return;
     }
 
-    // -------------------------------------------------------
-    // GET POSITIONS
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // GET ELEMENT POSITIONS
+    // ---------------------------------------------------------
 
     const sidebarRect =
       sidebar.getBoundingClientRect();
@@ -338,19 +337,19 @@ function Navbar() {
     const itemRect =
       event.currentTarget.getBoundingClientRect();
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // POSITION SETTINGS
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     const gap = 10;
 
     const viewportPadding = 12;
 
-    const preferredWidth = 240;
+    const preferredWidth = 250;
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // HORIZONTAL POSITION
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     const left =
       sidebarRect.right + gap;
@@ -360,11 +359,11 @@ function Navbar() {
       left -
       viewportPadding;
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // NOT ENOUGH SPACE
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
-    if (availableWidth < 210) {
+    if (availableWidth < 220) {
       setHoveredSidebarItem(null);
 
       setHoverCardPosition((previous) => ({
@@ -375,33 +374,26 @@ function Navbar() {
       return;
     }
 
-    // -------------------------------------------------------
-    // FINAL WIDTH
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // FINAL CARD WIDTH
+    // ---------------------------------------------------------
 
     const width = Math.min(
       preferredWidth,
       availableWidth
     );
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // CENTER OF HOVERED ITEM
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     const anchorCenter =
       itemRect.top +
       itemRect.height / 2;
 
-    // -------------------------------------------------------
-    // INITIAL CARD POSITION
-    // -------------------------------------------------------
-
-    /*
-      The first render starts near the hovered item.
-
-      After the card is rendered, useLayoutEffect measures
-      its actual height and calculates the final position.
-    */
+    // ---------------------------------------------------------
+    // INITIAL POSITION
+    // ---------------------------------------------------------
 
     setHoveredSidebarItem(itemName);
 
@@ -418,7 +410,7 @@ function Navbar() {
   };
 
   // =========================================================
-  // ACTUAL HOVER CARD POSITION CALCULATION
+  // CALCULATE ACTUAL HOVER CARD POSITION
   // =========================================================
 
   useLayoutEffect(() => {
@@ -436,34 +428,34 @@ function Navbar() {
       return;
     }
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // GET ACTUAL CARD HEIGHT
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     const cardHeight =
       card.getBoundingClientRect().height;
 
     const viewportPadding = 12;
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // CENTER CARD AROUND HOVERED ITEM
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     let top =
       hoverCardPosition.anchorCenter -
       cardHeight / 2;
 
-    // -------------------------------------------------------
-    // TOP BOUNDARY
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // PREVENT TOP OVERFLOW
+    // ---------------------------------------------------------
 
     if (top < viewportPadding) {
       top = viewportPadding;
     }
 
-    // -------------------------------------------------------
-    // BOTTOM BOUNDARY
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // PREVENT BOTTOM OVERFLOW
+    // ---------------------------------------------------------
 
     const maxTop =
       window.innerHeight -
@@ -477,18 +469,18 @@ function Navbar() {
       );
     }
 
-    // -------------------------------------------------------
-    // FINAL SAFETY CHECK
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
+    // FINAL SAFETY
+    // ---------------------------------------------------------
 
     top = Math.max(
       viewportPadding,
       top
     );
 
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
     // UPDATE POSITION
-    // -------------------------------------------------------
+    // ---------------------------------------------------------
 
     if (
       Math.abs(
@@ -512,6 +504,27 @@ function Navbar() {
   // =========================================================
 
   const handleSidebarLeave = () => {
+    setHoveredSidebarItem(null);
+
+    setHoverCardPosition((previous) => ({
+      ...previous,
+      visible: false,
+    }));
+  };
+
+  // =========================================================
+  // SIDEBAR SCROLL
+  // =========================================================
+
+  const handleSidebarScroll = () => {
+    /*
+      When the sidebar itself is scrolled, the hovered menu
+      item changes its screen position.
+
+      Hide the information card until the user hovers
+      another menu item.
+    */
+
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -558,7 +571,7 @@ function Navbar() {
   }, []);
 
   // =========================================================
-  // PREVENT BACKGROUND SCROLL
+  // PREVENT BACKGROUND SCROLL WHILE SIDEBAR IS OPEN
   // =========================================================
 
   useEffect(() => {
@@ -589,8 +602,8 @@ function Navbar() {
     document.documentElement.style
       .overscrollBehavior = "none";
 
-    document.body.style.overscrollBehavior =
-      "none";
+    document.body.style
+      .overscrollBehavior = "none";
 
     return () => {
       document.documentElement.style.overflow =
@@ -954,7 +967,7 @@ function Navbar() {
       ===================================================== */}
 
       <aside
-        className={`fixed left-0 top-0 z-[60] h-screen w-64 sm:w-72 max-w-[85vw] transform bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-[60] flex h-screen w-64 max-w-[85vw] flex-col transform bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-72 ${
           menuOpen
             ? "translate-x-0"
             : "-translate-x-full"
@@ -964,10 +977,10 @@ function Navbar() {
       >
 
         {/* =================================================
-            SIDEBAR HEADER
+            SIDEBAR HEADER - FIXED
         ================================================= */}
 
-        <div className="flex h-20 items-center justify-between gap-2 border-b px-3 sm:px-4">
+        <div className="flex h-20 shrink-0 items-center justify-between gap-2 border-b px-3 sm:px-4">
 
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
 
@@ -1027,10 +1040,13 @@ function Navbar() {
         </div>
 
         {/* =================================================
-            SIDEBAR MENU
+            SCROLLABLE MENU AREA
         ================================================= */}
 
-        <div className="h-[calc(100vh-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4">
+        <div
+          onScroll={handleSidebarScroll}
+          className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
+        >
 
           <nav className="space-y-1">
 
@@ -1159,41 +1175,43 @@ function Navbar() {
 
             </div>
 
-            {/* =================================================
-                DIVIDER
-            ================================================= */}
+            {/* Extra bottom spacing inside scroll area */}
 
-            <div className="my-4 border-t" />
-
-            {/* =================================================
-                LOGOUT
-            ================================================= */}
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
-            >
-
-              <LogOut
-                size={20}
-                className="shrink-0"
-              />
-
-              <span className="text-[15px] font-medium">
-                Logout
-              </span>
-
-            </button>
+            <div className="h-4" />
 
           </nav>
+
+        </div>
+
+        {/* =================================================
+            LOGOUT - FIXED AT BOTTOM
+        ================================================= */}
+
+        <div className="shrink-0 border-t bg-white px-3 py-3 sm:px-4">
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
+          >
+
+            <LogOut
+              size={20}
+              className="shrink-0"
+            />
+
+            <span className="text-[15px] font-medium">
+              Logout
+            </span>
+
+          </button>
 
         </div>
 
       </aside>
 
       {/* =====================================================
-          HOVER INFORMATION / NOTIFICATION CARD
+          HOVER INFORMATION CARD
       ===================================================== */}
 
       {menuOpen &&
@@ -1212,13 +1230,13 @@ function Navbar() {
             aria-hidden="true"
           >
 
-            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-gray-700 shadow-xl">
+            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3 text-gray-700 shadow-xl">
 
               {/* =================================================
-                  SMALL TITLE
+                  INFORMATION TITLE
               ================================================= */}
 
-              <p className="mb-1.5 text-xs font-bold leading-4 text-blue-600">
+              <p className="mb-2 text-[13px] font-bold leading-5 text-blue-600">
                 {currentHoverInfo.title}
               </p>
 
@@ -1226,27 +1244,27 @@ function Navbar() {
                   DIVIDER
               ================================================= */}
 
-              <div className="mb-1.5 h-px bg-blue-100" />
+              <div className="mb-2 h-px bg-blue-100" />
 
               {/* =================================================
                   INFORMATION ITEMS
               ================================================= */}
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
 
                 {currentHoverInfo.items.map(
                   (text) => (
 
                     <div
                       key={text}
-                      className="flex items-start gap-1.5 text-[11px] leading-4 text-gray-600"
+                      className="flex items-start gap-2 text-xs leading-5 text-gray-600"
                     >
 
-                      {/* SMALL BLUE DOT */}
+                      {/* BLUE DOT */}
 
-                      <span className="mt-[5px] h-1 w-1 shrink-0 rounded-full bg-blue-500" />
+                      <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
 
-                      {/* SMALL TEXT */}
+                      {/* INFORMATION TEXT */}
 
                       <span>
                         {text}
@@ -1263,7 +1281,7 @@ function Navbar() {
                   CARD ARROW
               ================================================= */}
 
-              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[6px] border-r-[6px] border-y-transparent border-r-white" />
+              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white" />
 
             </div>
 
