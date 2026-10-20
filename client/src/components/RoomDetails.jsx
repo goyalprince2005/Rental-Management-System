@@ -19,7 +19,7 @@ function RoomDetails() {
   const { id } = useParams();
 
   // =========================================================
-  // ROOM DATA
+  // DEFAULT ROOM DATA
   // =========================================================
 
   const rooms = {
@@ -28,7 +28,7 @@ function RoomDetails() {
       property: "Green View Apartments",
       location: "Bhopal",
       floor: 1,
-      rent: "₹5,000",
+      rent: 5000,
       tenant: "Rahul Sharma",
       status: "Occupied",
     },
@@ -38,7 +38,7 @@ function RoomDetails() {
       property: "Green View Apartments",
       location: "Bhopal",
       floor: 1,
-      rent: "₹6,000",
+      rent: 6000,
       tenant: "Aman Kumar",
       status: "Occupied",
     },
@@ -48,7 +48,7 @@ function RoomDetails() {
       property: "Shyam Residency",
       location: "Bhopal",
       floor: 2,
-      rent: "₹5,500",
+      rent: 5500,
       tenant: "Neha Sharma",
       status: "Due",
     },
@@ -58,13 +58,55 @@ function RoomDetails() {
       property: "Shyam Residency",
       location: "Bhopal",
       floor: 2,
-      rent: "₹5,500",
+      rent: 5500,
       tenant: "None",
       status: "Available",
     },
   };
 
-  const room = rooms[id];
+  // =========================================================
+  // LOAD SAVED ROOM DATA FROM LOCAL STORAGE
+  // =========================================================
+
+  let savedRooms = {};
+
+  try {
+    savedRooms =
+      JSON.parse(
+        localStorage.getItem("rentalManagementRooms") || "{}"
+      ) || {};
+  } catch (error) {
+    console.error("Unable to load saved room data:", error);
+  }
+
+  // Saved values take priority over default values.
+  const room = rooms[id]
+    ? {
+        ...rooms[id],
+        ...(savedRooms[id] || {}),
+      }
+    : null;
+
+  // =========================================================
+  // FORMAT RENT IN INDIAN CURRENCY
+  // =========================================================
+
+  const formatCurrency = (value) => {
+    const amount =
+      typeof value === "number"
+        ? value
+        : Number(String(value ?? "").replace(/[₹,\s]/g, ""));
+
+    if (!Number.isFinite(amount)) {
+      return value || "Not specified";
+    }
+
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   // =========================================================
   // STATUS STYLE
@@ -93,26 +135,12 @@ function RoomDetails() {
   if (!room) {
     return (
       <div className="min-h-screen bg-gray-100 overflow-x-hidden">
-
-        {/* ===================================================== */}
-        {/* COMMON NAVBAR */}
-        {/* ===================================================== */}
-
         <Navbar />
 
-        {/* ===================================================== */}
-        {/* ERROR CONTENT */}
-        {/* ===================================================== */}
-
         <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-
             <div className="mx-auto w-fit p-4 bg-gray-100 rounded-full">
-              <DoorOpen
-                size={32}
-                className="text-gray-500"
-              />
+              <DoorOpen size={32} className="text-gray-500" />
             </div>
 
             <h2 className="text-2xl font-bold text-gray-800 mt-5">
@@ -129,39 +157,26 @@ function RoomDetails() {
               className="mt-6 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
             >
               <ArrowLeft size={18} />
-
               Back to Rooms
             </button>
-
           </div>
-
         </main>
-
       </div>
     );
   }
 
+  // =========================================================
+  // MAIN ROOM DETAILS PAGE
+  // =========================================================
+
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
-
-      {/* ===================================================== */}
       {/* COMMON NAVBAR */}
-      {/* ===================================================== */}
-
       <Navbar />
 
-      {/* ===================================================== */}
-      {/* MAIN CONTENT */}
-      {/* ===================================================== */}
-
       <main className="p-4 md:p-6 max-w-5xl mx-auto">
-
-        {/* ================================================= */}
         {/* PAGE HEADING */}
-        {/* ================================================= */}
-
         <div className="mb-6">
-
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
             Room Details
           </h1>
@@ -169,186 +184,106 @@ function RoomDetails() {
           <p className="text-gray-500 mt-1">
             View complete information about this room.
           </p>
-
         </div>
 
-
-        {/* ===================================================== */}
         {/* ROOM DETAILS CARD */}
-        {/* ===================================================== */}
-
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-
-          {/* ================================================= */}
           {/* ROOM HEADER */}
-          {/* ================================================= */}
-
           <div className="p-5 md:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-
             {/* ROOM TITLE */}
-
             <div className="flex items-center gap-4 min-w-0">
-
               <div className="p-4 bg-blue-50 rounded-xl shrink-0">
-                <DoorOpen
-                  size={32}
-                  className="text-blue-600"
-                />
+                <DoorOpen size={32} className="text-blue-600" />
               </div>
 
               <div className="min-w-0">
-
                 <h3 className="text-2xl font-bold text-gray-800">
                   Room {room.roomNumber}
                 </h3>
 
                 {/* PROPERTY */}
-
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
+                  <Building2 size={16} className="shrink-0" />
 
-                  <Building2
-                    size={16}
-                    className="shrink-0"
-                  />
-
-                  <span className="truncate">
-                    {room.property}
-                  </span>
-
+                  <span className="truncate">{room.property}</span>
                 </div>
 
                 {/* LOCATION */}
-
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
+                  <MapPin size={16} className="shrink-0" />
 
-                  <MapPin
-                    size={16}
-                    className="shrink-0"
-                  />
-
-                  <span>
-                    {room.location}
-                  </span>
-
+                  <span>{room.location}</span>
                 </div>
-
               </div>
-
             </div>
 
-
-            {/* ================================================= */}
             {/* STATUS */}
-            {/* ================================================= */}
-
             <span
               className={`self-start sm:self-center shrink-0 px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle()}`}
             >
               {room.status}
             </span>
-
           </div>
 
-
-          {/* ================================================= */}
           {/* ROOM INFORMATION */}
-          {/* ================================================= */}
-
           <div className="p-5 md:p-6">
-
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               Room Information
             </h3>
 
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-              {/* ================================================= */}
               {/* FLOOR */}
-              {/* ================================================= */}
-
               <div className="bg-gray-50 rounded-xl p-4">
-
                 <div className="flex items-center gap-2 text-gray-500">
-
                   <Layers size={18} />
 
-                  <p className="text-sm">
-                    Floor
-                  </p>
-
+                  <p className="text-sm">Floor</p>
                 </div>
 
                 <p className="text-2xl font-bold text-gray-800 mt-2">
                   {room.floor}
                 </p>
-
               </div>
 
-
-              {/* ================================================= */}
               {/* MONTHLY RENT */}
-              {/* ================================================= */}
-
               <div className="bg-gray-50 rounded-xl p-4">
-
                 <div className="flex items-center gap-2 text-gray-500">
-
                   <IndianRupee size={18} />
 
-                  <p className="text-sm">
-                    Monthly Rent
-                  </p>
-
+                  <p className="text-sm">Monthly Rent</p>
                 </div>
 
                 <p className="text-2xl font-bold text-gray-800 mt-2">
-                  {room.rent}
+                  {formatCurrency(room.rent)}
                 </p>
-
               </div>
 
-
-              {/* ================================================= */}
               {/* TENANT */}
-              {/* ================================================= */}
-
               <div className="bg-blue-50 rounded-xl p-4">
-
                 <div className="flex items-center gap-2 text-blue-600">
-
                   <User size={18} />
 
-                  <p className="text-sm">
-                    Tenant
-                  </p>
-
+                  <p className="text-sm">Tenant</p>
                 </div>
 
                 <p className="text-xl font-bold text-blue-600 mt-2 break-words">
-                  {room.tenant}
+                  {room.tenant || "None"}
                 </p>
-
               </div>
 
-
-              {/* ================================================= */}
               {/* CURRENT STATUS */}
-              {/* ================================================= */}
-
               <div
                 className={`rounded-xl p-4 ${
                   room.status === "Occupied"
                     ? "bg-red-50"
                     : room.status === "Due"
                     ? "bg-yellow-50"
-                    : "bg-green-50"
+                    : room.status === "Available"
+                    ? "bg-green-50"
+                    : "bg-gray-50"
                 }`}
               >
-
-                <p className="text-sm text-gray-500">
-                  Current Status
-                </p>
+                <p className="text-sm text-gray-500">Current Status</p>
 
                 <p
                   className={`text-xl font-bold mt-2 ${
@@ -356,114 +291,68 @@ function RoomDetails() {
                       ? "text-red-600"
                       : room.status === "Due"
                       ? "text-yellow-600"
-                      : "text-green-600"
+                      : room.status === "Available"
+                      ? "text-green-600"
+                      : "text-gray-600"
                   }`}
                 >
                   {room.status}
                 </p>
-
               </div>
-
             </div>
 
-
-            {/* ===================================================== */}
             {/* PROPERTY INFORMATION */}
-            {/* ===================================================== */}
-
             <div className="mt-8">
-
               <h3 className="text-lg font-bold text-gray-800 mb-4">
                 Property Information
               </h3>
 
               <div className="border border-gray-200 rounded-xl p-5">
-
                 <div className="flex items-center gap-3 min-w-0">
-
                   <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-
-                    <Building2
-                      size={24}
-                      className="text-blue-600"
-                    />
-
+                    <Building2 size={24} className="text-blue-600" />
                   </div>
 
                   <div className="min-w-0">
-
                     <h4 className="font-bold text-lg text-gray-800 truncate">
                       {room.property}
                     </h4>
 
                     <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
-
                       <MapPin size={15} />
 
-                      <span>
-                        {room.location}
-                      </span>
-
+                      <span>{room.location}</span>
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
-
             </div>
 
-
-            {/* ===================================================== */}
             {/* ACTION BUTTONS */}
-            {/* ===================================================== */}
-
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
-
-              {/* ================================================= */}
               {/* BACK */}
-              {/* ================================================= */}
-
               <button
                 type="button"
                 onClick={() => navigate("/rooms")}
                 className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
               >
-
                 <ArrowLeft size={18} />
-
                 Back to Rooms
-
               </button>
 
-
-              {/* ================================================= */}
               {/* EDIT */}
-              {/* ================================================= */}
-
               <button
                 type="button"
-                onClick={() =>
-                  navigate(`/edit-room/${id}`)
-                }
+                onClick={() => navigate(`/edit-room/${id}`)}
                 className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
               >
-
                 <Pencil size={18} />
-
                 Edit Room
-
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 }
