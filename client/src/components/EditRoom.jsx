@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -8,105 +8,207 @@ import {
 } from "lucide-react";
 import Navbar from "./Navbar";
 
+const STORAGE_KEY = "rentalManagementRooms";
+
+// =========================================================
+// DEFAULT ROOM DATA
+// Used only when no saved room data exists.
+// =========================================================
+
+const defaultRooms = {
+  101: {
+    roomNumber: "101",
+    property: "Green View Apartments",
+    location: "Bhopal",
+    floor: 1,
+    rent: 5000,
+    tenant: "Rahul Sharma",
+    status: "Occupied",
+  },
+  102: {
+    roomNumber: "102",
+    property: "Green View Apartments",
+    location: "Bhopal",
+    floor: 1,
+    rent: 6000,
+    tenant: "Aman Kumar",
+    status: "Occupied",
+  },
+  203: {
+    roomNumber: "203",
+    property: "Shyam Residency",
+    location: "Bhopal",
+    floor: 2,
+    rent: 5500,
+    tenant: "Neha Sharma",
+    status: "Due",
+  },
+  204: {
+    roomNumber: "204",
+    property: "Shyam Residency",
+    location: "Bhopal",
+    floor: 2,
+    rent: 5500,
+    tenant: "",
+    status: "Available",
+  },
+};
+
+// =========================================================
+// READ SAVED ROOM DATA
+// =========================================================
+
+const readSavedRooms = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (!stored) {
+      return {};
+    }
+
+    const parsed = JSON.parse(stored);
+
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      Array.isArray(parsed)
+    ) {
+      return {};
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("Unable to read saved rooms:", error);
+    return {};
+  }
+};
+
+// =========================================================
+// GET ROOM BY ID
+// Supports both default and dynamically added rooms.
+// =========================================================
+
+const getRoomById = (id) => {
+  const savedRooms = readSavedRooms();
+  const defaultRoom = defaultRooms[id];
+  const savedRoom = savedRooms[String(id)];
+
+  if (!defaultRoom && !savedRoom) {
+    return null;
+  }
+
+  return {
+    ...(defaultRoom || {}),
+    ...(savedRoom || {}),
+    id: savedRoom?.id ?? defaultRoom?.id ?? Number(id),
+  };
+};
+
+// =========================================================
+// FORMAT RENT FOR THE FORM
+// =========================================================
+
+const normalizeRent = (rent) => {
+  if (rent === null || rent === undefined || rent === "") {
+    return "";
+  }
+
+  if (typeof rent === "number") {
+    return String(rent);
+  }
+
+  return String(rent).replace(/[₹,\s]/g, "");
+};
+
+// =========================================================
+// EDIT ROOM COMPONENT
+// =========================================================
+
 function EditRoom() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // =========================================================
-  // DEFAULT ROOM DATA
-  // =========================================================
-
-  const rooms = {
-    101: {
-      roomNumber: "101",
-      property: "Green View Apartments",
-      location: "Bhopal",
-      floor: "1",
-      rent: "5000",
-      tenant: "Rahul Sharma",
-      status: "Occupied",
-    },
-    102: {
-      roomNumber: "102",
-      property: "Green View Apartments",
-      location: "Bhopal",
-      floor: "1",
-      rent: "6000",
-      tenant: "Aman Kumar",
-      status: "Occupied",
-    },
-    203: {
-      roomNumber: "203",
-      property: "Shyam Residency",
-      location: "Bhopal",
-      floor: "2",
-      rent: "5500",
-      tenant: "Neha Sharma",
-      status: "Due",
-    },
-    204: {
-      roomNumber: "204",
-      property: "Shyam Residency",
-      location: "Bhopal",
-      floor: "2",
-      rent: "5500",
-      tenant: "",
-      status: "Available",
-    },
-  };
-
-  const existingRoom = rooms[id];
-
-  // =========================================================
-  // LOAD SAVED DATA OR USE DEFAULT DATA
-  // =========================================================
-
+  // Re-read the stored data when the route ID changes.
   const [roomData, setRoomData] = useState(() => {
-    let savedRooms = {};
+    const room = getRoomById(id);
 
-    try {
-      savedRooms =
-        JSON.parse(
-          localStorage.getItem("rentalManagementRooms") || "{}"
-        ) || {};
-    } catch (error) {
-      console.error("Unable to load saved rooms:", error);
+    if (!room) {
+      return {
+        roomNumber: id || "",
+        property: "",
+        location: "",
+        floor: "",
+        rent: "",
+        tenant: "",
+        status: "Available",
+      };
     }
 
-    const defaultRoom = existingRoom || {
-      roomNumber: id || "",
-      property: "",
-      location: "",
-      floor: "",
-      rent: "",
-      tenant: "",
-      status: "Available",
-    };
-
-    const savedRoom = savedRooms[id] || {};
-
     return {
-      ...defaultRoom,
-      ...savedRoom,
-      floor: String(savedRoom.floor ?? defaultRoom.floor ?? ""),
-      rent: String(savedRoom.rent ?? defaultRoom.rent ?? ""),
+      ...room,
+      roomNumber: String(room.roomNumber ?? ""),
+      property: String(room.property ?? ""),
+      location: String(room.location ?? ""),
+      floor: String(room.floor ?? ""),
+      rent: normalizeRent(room.rent),
+      tenant:
+        room.tenant === "None"
+          ? ""
+          : String(room.tenant ?? ""),
+      status: room.status ?? "Available",
     };
   });
-
-  // =========================================================
-  // ERROR, SUCCESS AND SAVING STATES
-  // =========================================================
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   // =========================================================
+  // LOAD THE CORRECT ROOM WHEN THE ID CHANGES
+  // =========================================================
+
+  useEffect(() => {
+    const room = getRoomById(id);
+
+    setError("");
+    setSuccess("");
+    setIsSaving(false);
+
+    if (!room) {
+      setRoomData({
+        roomNumber: id || "",
+        property: "",
+        location: "",
+        floor: "",
+        rent: "",
+        tenant: "",
+        status: "Available",
+      });
+
+      return;
+    }
+
+    setRoomData({
+      ...room,
+      roomNumber: String(room.roomNumber ?? ""),
+      property: String(room.property ?? ""),
+      location: String(room.location ?? ""),
+      floor: String(room.floor ?? ""),
+      rent: normalizeRent(room.rent),
+      tenant:
+        room.tenant === "None"
+          ? ""
+          : String(room.tenant ?? ""),
+      status: room.status ?? "Available",
+    });
+  }, [id]);
+
+  // =========================================================
   // HANDLE INPUT CHANGE
   // =========================================================
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
     setRoomData((previous) => ({
       ...previous,
@@ -121,10 +223,12 @@ function EditRoom() {
   // HANDLE SAVE
   // =========================================================
 
-  const handleSave = (e) => {
-    e.preventDefault();
+  const handleSave = (event) => {
+    event.preventDefault();
 
-    if (isSaving) return;
+    if (isSaving) {
+      return;
+    }
 
     setError("");
     setSuccess("");
@@ -167,16 +271,18 @@ function EditRoom() {
       return;
     }
 
-    // Tenant validation
+    // Tenant validation for occupied rooms
     if (
       roomData.status === "Occupied" &&
       !roomData.tenant.trim()
     ) {
-      setError("Please enter tenant name for an occupied room.");
+      setError(
+        "Please enter tenant name for an occupied room."
+      );
       return;
     }
 
-    // Available room should not have a tenant
+    // Available rooms cannot have an assigned tenant
     if (
       roomData.status === "Available" &&
       roomData.tenant.trim()
@@ -188,11 +294,12 @@ function EditRoom() {
     }
 
     // =======================================================
-    // PREPARE UPDATED ROOM DATA
+    // PREPARE UPDATED ROOM
     // =======================================================
 
     const updatedRoomData = {
       ...roomData,
+      id: Number(id),
       roomNumber: roomData.roomNumber.trim(),
       property: roomData.property.trim(),
       location: roomData.location.trim(),
@@ -206,37 +313,36 @@ function EditRoom() {
     // SAVE TO LOCAL STORAGE
     // =======================================================
 
-    try {
-      const savedRooms =
-        JSON.parse(
-          localStorage.getItem("rentalManagementRooms") || "{}"
-        ) || {};
+    setIsSaving(true);
 
+    try {
+      const savedRooms = readSavedRooms();
+
+      // Preserve all other room records.
       const updatedRooms = {
         ...savedRooms,
-        [id]: updatedRoomData,
+        [String(id)]: updatedRoomData,
       };
 
       localStorage.setItem(
-        "rentalManagementRooms",
+        STORAGE_KEY,
         JSON.stringify(updatedRooms)
       );
 
-      // Verify the saved data
-      const verification = JSON.parse(
-        localStorage.getItem("rentalManagementRooms") || "{}"
-      );
+      // Verify that the record was saved.
+      const verification = readSavedRooms();
+      const verifiedRoom = verification[String(id)];
 
       if (
-        !verification[id] ||
-        Number(verification[id].rent) !== updatedRoomData.rent
+        !verifiedRoom ||
+        Number(verifiedRoom.rent) !== updatedRoomData.rent ||
+        String(verifiedRoom.roomNumber) !==
+          updatedRoomData.roomNumber
       ) {
         throw new Error("Unable to verify saved room data.");
       }
 
-      console.log("Updated Room Data:", updatedRoomData);
-      console.log("All Saved Rooms:", verification);
-
+      // Update the form with normalized values.
       setRoomData({
         ...updatedRoomData,
         floor: String(updatedRoomData.floor),
@@ -244,15 +350,20 @@ function EditRoom() {
       });
 
       setSuccess("Room details updated successfully.");
-      setIsSaving(true);
 
-      // Navigate only after the save succeeds
-      setTimeout(() => {
-        navigate(`/room-details/${id}`);
-      }, 800);
+      // Navigate only after saving succeeds.
+      navigate(`/room-details/${id}`, {
+        state: {
+          roomUpdated: true,
+        },
+      });
     } catch (saveError) {
       console.error("Unable to save room data:", saveError);
-      setError("Unable to save room details. Please try again.");
+
+      setError(
+        "Unable to save room details. Please try again."
+      );
+
       setIsSaving(false);
     }
   };
@@ -269,7 +380,9 @@ function EditRoom() {
   // ROOM NOT FOUND
   // =========================================================
 
-  if (!existingRoom) {
+  const roomExists = Boolean(getRoomById(id));
+
+  if (!roomExists) {
     return (
       <div className="min-h-screen bg-gray-100">
         <Navbar />
@@ -309,10 +422,8 @@ function EditRoom() {
 
   return (
     <div className="h-screen bg-gray-100 overflow-hidden">
-      {/* NAVBAR */}
       <Navbar />
 
-      {/* SCROLLABLE CONTENT */}
       <div className="h-[calc(100vh-64px)] overflow-y-auto overflow-x-hidden">
         <main className="p-4 md:p-6 max-w-3xl mx-auto">
           {/* PAGE HEADING */}
@@ -340,7 +451,10 @@ function EditRoom() {
             </div>
 
             {/* FORM */}
-            <form onSubmit={handleSave} className="p-5 space-y-5">
+            <form
+              onSubmit={handleSave}
+              className="p-5 space-y-5"
+            >
               {/* ERROR MESSAGE */}
               {error && (
                 <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
@@ -349,7 +463,9 @@ function EditRoom() {
                     className="mt-0.5 flex-shrink-0"
                   />
 
-                  <p className="text-sm font-medium">{error}</p>
+                  <p className="text-sm font-medium">
+                    {error}
+                  </p>
                 </div>
               )}
 
@@ -361,7 +477,9 @@ function EditRoom() {
                     className="mt-0.5 flex-shrink-0"
                   />
 
-                  <p className="text-sm font-medium">{success}</p>
+                  <p className="text-sm font-medium">
+                    {success}
+                  </p>
                 </div>
               )}
 
@@ -382,7 +500,8 @@ function EditRoom() {
                   onChange={handleChange}
                   placeholder="Enter room number"
                   required
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
 
@@ -403,7 +522,8 @@ function EditRoom() {
                   onChange={handleChange}
                   placeholder="Enter property name"
                   required
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
 
@@ -424,7 +544,8 @@ function EditRoom() {
                   onChange={handleChange}
                   placeholder="Enter location"
                   required
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
 
@@ -445,8 +566,10 @@ function EditRoom() {
                   onChange={handleChange}
                   placeholder="Enter floor number"
                   min="0"
+                  step="1"
                   required
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
 
@@ -456,7 +579,7 @@ function EditRoom() {
                   htmlFor="rent"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
-                  Monthly Rent
+                  Monthly Rent (₹)
                 </label>
 
                 <input
@@ -470,7 +593,8 @@ function EditRoom() {
                   step="1"
                   inputMode="numeric"
                   required
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
               </div>
 
@@ -490,7 +614,8 @@ function EditRoom() {
                   value={roomData.tenant}
                   onChange={handleChange}
                   placeholder="Enter tenant name"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 />
 
                 <p className="text-xs text-gray-400 mt-1">
@@ -512,7 +637,8 @@ function EditRoom() {
                   name="status"
                   value={roomData.status}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={isSaving}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                 >
                   <option value="Occupied">Occupied</option>
                   <option value="Available">Available</option>
