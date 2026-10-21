@@ -1,5 +1,7 @@
-import React from "react";
+
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
+
 import {
   BarChart3,
   IndianRupee,
@@ -14,39 +16,412 @@ import {
 
 import Navbar from "./Navbar";
 
+// =========================================================
+// LOCAL STORAGE KEYS
+// =========================================================
+
+const PROPERTY_STORAGE_KEY = "rentalManagementProperties";
+const ROOM_STORAGE_KEY = "rentalManagementRooms";
+const TENANT_STORAGE_KEY = "rentalManagementTenants";
+const RENT_STORAGE_KEY = "rentalManagementRentBills";
+
+// =========================================================
+// DEFAULT DATA
+// Used only when the relevant storage key does not exist.
+// =========================================================
+
+const DEFAULT_PROPERTIES = [
+  {
+    id: 1,
+    name: "Green View Apartments",
+    location: "Bhopal",
+    floors: 5,
+  },
+  {
+    id: 2,
+    name: "Shyam Residency",
+    location: "Bhopal",
+    floors: 2,
+  },
+];
+
+const DEFAULT_ROOMS = {
+  101: {
+    id: 101,
+    roomNumber: "101",
+    property: "Green View Apartments",
+    propertyId: 1,
+    floor: 1,
+    rent: 5000,
+    tenant: "Rahul Sharma",
+    status: "Occupied",
+  },
+  102: {
+    id: 102,
+    roomNumber: "102",
+    property: "Green View Apartments",
+    propertyId: 1,
+    floor: 1,
+    rent: 6000,
+    tenant: "Aman Kumar",
+    status: "Occupied",
+  },
+  203: {
+    id: 203,
+    roomNumber: "203",
+    property: "Shyam Residency",
+    propertyId: 2,
+    floor: 2,
+    rent: 5500,
+    tenant: "Neha Sharma",
+    status: "Due",
+  },
+  204: {
+    id: 204,
+    roomNumber: "204",
+    property: "Shyam Residency",
+    propertyId: 2,
+    floor: 2,
+    rent: 5500,
+    tenant: "",
+    status: "Available",
+  },
+};
+
+const DEFAULT_RENT_RECORDS = [
+  {
+    id: 1,
+    tenant: "Rahul Sharma",
+    property: "Green View Apartments",
+    propertyId: 1,
+    room: "101",
+    roomId: 101,
+    rent: 5000,
+    status: "Paid",
+  },
+  {
+    id: 2,
+    tenant: "Aman Kumar",
+    property: "Green View Apartments",
+    propertyId: 1,
+    room: "102",
+    roomId: 102,
+    rent: 6000,
+    status: "Paid",
+  },
+  {
+    id: 3,
+    tenant: "Neha Sharma",
+    property: "Shyam Residency",
+    propertyId: 2,
+    room: "203",
+    roomId: 203,
+    rent: 5500,
+    status: "Due",
+  },
+];
+
+// =========================================================
+// READ LOCAL STORAGE SAFELY
+// =========================================================
+
+function readStorage(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+
+    if (stored === null) {
+      return fallback;
+    }
+
+    return JSON.parse(stored);
+  } catch (error) {
+    console.error(`Unable to read ${key}:`, error);
+    return fallback;
+  }
+}
+
+// =========================================================
+// NORMALIZE ARRAY OR OBJECT COLLECTIONS
+// =========================================================
+
+function toArray(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value);
+  }
+
+  return [];
+}
+
+// =========================================================
+// TENANT NAME HELPER
+// =========================================================
+
+function getTenantName(tenant) {
+  if (typeof tenant === "string") {
+    return tenant.trim();
+  }
+
+  if (tenant && typeof tenant === "object") {
+    return String(
+      tenant.name ||
+      tenant.fullName ||
+      tenant.tenantName ||
+      ""
+    ).trim();
+  }
+
+  return "";
+}
+
+// =========================================================
+// CHECK WHETHER A ROOM HAS A TENANT
+// =========================================================
+
+function hasTenant(room) {
+  const tenantName = getTenantName(room.tenant);
+
+  return (
+    tenantName !== "" &&
+    tenantName.toLowerCase() !== "none"
+  );
+}
+
+// =========================================================
+// NORMALIZE CURRENCY VALUES
+// =========================================================
+
+function getAmount(value) {
+  const amount =
+    typeof value === "number"
+      ? value
+      : Number(
+          String(value ?? "").replace(/[₹,\s]/g, "")
+        );
+
+  return Number.isFinite(amount) && amount >= 0
+    ? amount
+    : 0;
+}
+
+// =========================================================
+// FORMAT CURRENCY
+// =========================================================
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(getAmount(amount));
+}
+
+// =========================================================
+// READ PROPERTIES
+// =========================================================
+
+function loadProperties() {
+  const stored = readStorage(
+    PROPERTY_STORAGE_KEY,
+    null
+  );
+
+  if (stored === null) {
+    return DEFAULT_PROPERTIES;
+  }
+
+  return Array.isArray(stored) ? stored : [];
+}
+
+// =========================================================
+// READ ROOMS
+// =========================================================
+
+function loadRooms() {
+  const stored = readStorage(
+    ROOM_STORAGE_KEY,
+    null
+  );
+
+  // No room storage yet: use the original demo rooms.
+  if (stored === null) {
+    return Object.values(DEFAULT_ROOMS);
+  }
+
+  if (
+    !stored ||
+    typeof stored !== "object" ||
+    Array.isArray(stored)
+  ) {
+    return [];
+  }
+
+  // Merge defaults with saved rooms. Saved room fields
+  // override default fields for the same internal ID.
+  return Object.values({
+    ...DEFAULT_ROOMS,
+    ...stored,
+  }).filter(
+    (room) =>
+      room &&
+      room.id !== undefined &&
+      room.id !== null
+  );
+}
+
+// =========================================================
+// MATCH A ROOM TO A PROPERTY
+// =========================================================
+
+function roomBelongsToProperty(room, property) {
+  if (
+    room.propertyId !== undefined &&
+    room.propertyId !== null &&
+    room.propertyId !== ""
+  ) {
+    return (
+      String(room.propertyId) === String(property.id)
+    );
+  }
+
+  return (
+    String(room.property ?? "").trim().toLowerCase() ===
+    String(property.name ?? "").trim().toLowerCase()
+  );
+}
+
+// =========================================================
+// REPORTS COMPONENT
+// =========================================================
+
 function Reports() {
-  // =========================================================
-  // MOCK REPORT DATA
-  // Replace this data with backend/API data in the future.
-  // =========================================================
+  // -------------------------------------------------------
+  // LOAD SAVED DATA
+  // -------------------------------------------------------
 
-  const reportData = {
-    totalProperties: 2,
-    totalRooms: 6,
-    occupiedRooms: 3,
-    totalTenants: 3,
-    monthlyRent: 16500,
-    collectedRent: 11000,
-  };
+  const properties = useMemo(
+    () => loadProperties(),
+    []
+  );
 
-  // =========================================================
+  const rooms = useMemo(
+    () => loadRooms(),
+    []
+  );
+
+  const tenants = useMemo(
+    () =>
+      toArray(
+        readStorage(TENANT_STORAGE_KEY, [])
+      ),
+    []
+  );
+
+  const rentRecords = useMemo(() => {
+    const stored = readStorage(
+      RENT_STORAGE_KEY,
+      null
+    );
+
+    // Use saved bills when the rent-bill collection exists.
+    if (Array.isArray(stored)) {
+      return stored;
+    }
+
+    // Use demo records only when no saved rent-bill
+    // collection exists and the room data is still demo data.
+    if (localStorage.getItem(ROOM_STORAGE_KEY) === null) {
+      return DEFAULT_RENT_RECORDS;
+    }
+
+    // There is no saved bill collection. Do not claim
+    // payments have been collected from room data alone.
+    return [];
+  }, []);
+
+  // -------------------------------------------------------
+  // PROPERTY, ROOM, AND TENANT STATISTICS
+  // -------------------------------------------------------
+
+  const reportData = useMemo(() => {
+    const totalProperties = properties.length;
+    const totalRooms = rooms.length;
+
+    const occupiedRooms = rooms.filter(hasTenant).length;
+
+    const vacantRooms = Math.max(
+      0,
+      totalRooms - occupiedRooms
+    );
+
+    // Prefer distinct saved tenant records when available.
+    // Otherwise, count distinct tenant names assigned to rooms.
+    const distinctRoomTenants = new Set(
+      rooms
+        .filter(hasTenant)
+        .map((room) =>
+          getTenantName(room.tenant).toLowerCase()
+        )
+    );
+
+    const totalTenants =
+      tenants.length > 0
+        ? tenants.length
+        : distinctRoomTenants.size;
+
+    const monthlyRent = rooms.reduce(
+      (total, room) =>
+        total + getAmount(room.rent),
+      0
+    );
+
+    // Only rent records explicitly marked Paid count
+    // toward collected rent.
+    const collectedRent = rentRecords
+      .filter(
+        (record) => record.status === "Paid"
+      )
+      .reduce(
+        (total, record) =>
+          total + getAmount(record.rent),
+        0
+      );
+
+    const pendingRent = rentRecords
+      .filter(
+        (record) => record.status === "Due"
+      )
+      .reduce(
+        (total, record) =>
+          total + getAmount(record.rent),
+        0
+      );
+
+    return {
+      totalProperties,
+      totalRooms,
+      occupiedRooms,
+      vacantRooms,
+      totalTenants,
+      monthlyRent,
+      collectedRent,
+      pendingRent,
+    };
+  }, [properties, rooms, tenants, rentRecords]);
+
+  // -------------------------------------------------------
   // CALCULATED REPORT VALUES
-  // =========================================================
-
-  const vacantRooms = Math.max(
-    0,
-    reportData.totalRooms - reportData.occupiedRooms
-  );
-
-  const pendingRent = Math.max(
-    0,
-    reportData.monthlyRent - reportData.collectedRent
-  );
+  // -------------------------------------------------------
 
   const occupancyRate =
     reportData.totalRooms > 0
       ? Math.round(
-          (reportData.occupiedRooms / reportData.totalRooms) * 100
+          (reportData.occupiedRooms /
+            reportData.totalRooms) *
+            100
         )
       : 0;
 
@@ -55,17 +430,16 @@ function Reports() {
       ? Math.min(
           100,
           Math.round(
-            (reportData.collectedRent / reportData.monthlyRent) * 100
+            (reportData.collectedRent /
+              reportData.monthlyRent) *
+              100
           )
         )
       : 0;
 
-  const formatCurrency = (amount) =>
-    `₹${amount.toLocaleString("en-IN")}`;
-
-  // =========================================================
-  // REUSABLE REPORT LINKS
-  // =========================================================
+  // -------------------------------------------------------
+  // QUICK ACCESS LINKS
+  // -------------------------------------------------------
 
   const quickLinks = [
     {
@@ -117,9 +491,12 @@ function Reports() {
     },
   };
 
+  // -------------------------------------------------------
+  // RENDER
+  // -------------------------------------------------------
+
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* COMMON NAVBAR */}
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
@@ -127,7 +504,10 @@ function Reports() {
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-3 bg-blue-50 rounded-xl">
-              <BarChart3 size={26} className="text-blue-600" />
+              <BarChart3
+                size={26}
+                className="text-blue-600"
+              />
             </div>
 
             <div>
@@ -136,14 +516,15 @@ function Reports() {
               </h1>
 
               <p className="text-gray-500 text-sm mt-1">
-                Overview of properties, occupancy, tenants, and rent
-                collection.
+                Overview of properties, occupancy, tenants,
+                and rent collection.
               </p>
             </div>
           </div>
 
           <p className="text-xs text-gray-400 mt-3">
-            Demo report · Based on mock data
+            Figures calculated from saved property, room,
+            tenant, and rent records.
           </p>
         </div>
 
@@ -153,11 +534,17 @@ function Reports() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-50 rounded-xl">
-                <Building2 size={25} className="text-blue-600" />
+                <Building2
+                  size={25}
+                  className="text-blue-600"
+                />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Properties</p>
+                <p className="text-sm text-gray-500">
+                  Properties
+                </p>
+
                 <h3 className="text-2xl font-bold text-gray-800">
                   {reportData.totalProperties}
                 </h3>
@@ -177,11 +564,17 @@ function Reports() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-purple-50 rounded-xl">
-                <DoorOpen size={25} className="text-purple-600" />
+                <DoorOpen
+                  size={25}
+                  className="text-purple-600"
+                />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Total Rooms</p>
+                <p className="text-sm text-gray-500">
+                  Total Rooms
+                </p>
+
                 <h3 className="text-2xl font-bold text-gray-800">
                   {reportData.totalRooms}
                 </h3>
@@ -201,11 +594,17 @@ function Reports() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-green-50 rounded-xl">
-                <Users size={25} className="text-green-600" />
+                <Users
+                  size={25}
+                  className="text-green-600"
+                />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Tenants</p>
+                <p className="text-sm text-gray-500">
+                  Tenants
+                </p>
+
                 <h3 className="text-2xl font-bold text-gray-800">
                   {reportData.totalTenants}
                 </h3>
@@ -225,11 +624,17 @@ function Reports() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-yellow-50 rounded-xl">
-                <TrendingUp size={25} className="text-yellow-600" />
+                <TrendingUp
+                  size={25}
+                  className="text-yellow-600"
+                />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">Occupancy Rate</p>
+                <p className="text-sm text-gray-500">
+                  Occupancy Rate
+                </p>
+
                 <h3 className="text-2xl font-bold text-gray-800">
                   {occupancyRate}%
                 </h3>
@@ -237,7 +642,8 @@ function Reports() {
             </div>
 
             <p className="mt-4 text-sm text-gray-500">
-              {reportData.occupiedRooms} occupied · {vacantRooms} vacant
+              {reportData.occupiedRooms} occupied ·{" "}
+              {reportData.vacantRooms} vacant
             </p>
           </div>
         </div>
@@ -250,7 +656,8 @@ function Reports() {
             </h2>
 
             <p className="text-sm text-gray-500 mt-1">
-              Monthly expected rent compared with collected rent.
+              Monthly expected rent compared with recorded
+              rent collection.
             </p>
           </div>
 
@@ -260,13 +667,21 @@ function Reports() {
               <div className="bg-blue-50 rounded-xl p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <IndianRupee size={22} className="text-blue-600" />
+                    <IndianRupee
+                      size={22}
+                      className="text-blue-600"
+                    />
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">Expected Rent</p>
+                    <p className="text-sm text-gray-600">
+                      Expected Rent
+                    </p>
+
                     <h3 className="text-2xl font-bold text-gray-800">
-                      {formatCurrency(reportData.monthlyRent)}
+                      {formatCurrency(
+                        reportData.monthlyRent
+                      )}
                     </h3>
                   </div>
                 </div>
@@ -283,9 +698,14 @@ function Reports() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">Collected Rent</p>
+                    <p className="text-sm text-gray-600">
+                      Collected Rent
+                    </p>
+
                     <h3 className="text-2xl font-bold text-green-700">
-                      {formatCurrency(reportData.collectedRent)}
+                      {formatCurrency(
+                        reportData.collectedRent
+                      )}
                     </h3>
                   </div>
                 </div>
@@ -295,13 +715,21 @@ function Reports() {
               <div className="bg-yellow-50 rounded-xl p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <Clock size={22} className="text-yellow-700" />
+                    <Clock
+                      size={22}
+                      className="text-yellow-700"
+                    />
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">Pending Rent</p>
+                    <p className="text-sm text-gray-600">
+                      Pending Rent
+                    </p>
+
                     <h3 className="text-2xl font-bold text-yellow-700">
-                      {formatCurrency(pendingRent)}
+                      {formatCurrency(
+                        reportData.pendingRent
+                      )}
                     </h3>
                   </div>
                 </div>
@@ -315,8 +743,9 @@ function Reports() {
                   <h3 className="font-semibold text-gray-800">
                     Collection Progress
                   </h3>
+
                   <p className="text-sm text-gray-500">
-                    Percentage of expected rent collected.
+                    Percentage of expected rent recorded as paid.
                   </p>
                 </div>
 
@@ -335,14 +764,35 @@ function Reports() {
               >
                 <div
                   className="bg-green-600 h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${collectionRate}%` }}
+                  style={{
+                    width: `${collectionRate}%`,
+                  }}
                 />
               </div>
 
               <div className="flex justify-between gap-3 text-xs text-gray-500 mt-2">
-                <span>Collected: {formatCurrency(reportData.collectedRent)}</span>
-                <span>Pending: {formatCurrency(pendingRent)}</span>
+                <span>
+                  Collected:{" "}
+                  {formatCurrency(
+                    reportData.collectedRent
+                  )}
+                </span>
+
+                <span>
+                  Pending:{" "}
+                  {formatCurrency(
+                    reportData.pendingRent
+                  )}
+                </span>
               </div>
+
+              {rentRecords.length === 0 && (
+                <p className="text-xs text-gray-400 mt-3">
+                  No saved rent bills were found. Collection
+                  figures will update when rent records are
+                  available.
+                </p>
+              )}
             </div>
 
             <Link
@@ -359,13 +809,17 @@ function Reports() {
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-blue-50 rounded-xl">
-              <BarChart3 size={24} className="text-blue-600" />
+              <BarChart3
+                size={24}
+                className="text-blue-600"
+              />
             </div>
 
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Room Occupancy
               </h2>
+
               <p className="text-sm text-gray-500">
                 Occupied and vacant room breakdown.
               </p>
@@ -374,16 +828,22 @@ function Reports() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div className="rounded-xl border border-green-100 bg-green-50 p-4">
-              <p className="text-sm text-gray-600">Occupied Rooms</p>
+              <p className="text-sm text-gray-600">
+                Occupied Rooms
+              </p>
+
               <p className="text-2xl font-bold text-green-700 mt-1">
                 {reportData.occupiedRooms}
               </p>
             </div>
 
             <div className="rounded-xl border border-orange-100 bg-orange-50 p-4">
-              <p className="text-sm text-gray-600">Vacant Rooms</p>
+              <p className="text-sm text-gray-600">
+                Vacant Rooms
+              </p>
+
               <p className="text-2xl font-bold text-orange-700 mt-1">
-                {vacantRooms}
+                {reportData.vacantRooms}
               </p>
             </div>
           </div>
@@ -408,13 +868,15 @@ function Reports() {
           >
             <div
               className="bg-blue-600 h-3 rounded-full transition-all duration-500"
-              style={{ width: `${occupancyRate}%` }}
+              style={{
+                width: `${occupancyRate}%`,
+              }}
             />
           </div>
 
           <p className="text-sm text-gray-500 mt-2">
-            {reportData.occupiedRooms} of {reportData.totalRooms} rooms are
-            occupied.
+            {reportData.occupiedRooms} of{" "}
+            {reportData.totalRooms} rooms have assigned tenants.
           </p>
 
           <Link
@@ -443,7 +905,9 @@ function Reports() {
                   to={item.path}
                   className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4 hover:shadow-md hover:border-gray-200 transition-all group"
                 >
-                  <div className={`p-3 rounded-xl ${styles.icon}`}>
+                  <div
+                    className={`p-3 rounded-xl ${styles.icon}`}
+                  >
                     <Icon size={23} />
                   </div>
 
