@@ -31,26 +31,17 @@ const formatRent = (rent) => {
 function RoomCard({ room }) {
   const navigate = useNavigate();
 
-  // =========================================================
   // VIEW ROOM
-  // =========================================================
-
   const handleView = () => {
     navigate(`/room-details/${room.id}`);
   };
 
-  // =========================================================
   // EDIT ROOM
-  // =========================================================
-
   const handleEdit = () => {
     navigate(`/edit-room/${room.id}`);
   };
 
-  // =========================================================
   // STATUS STYLE
-  // =========================================================
-
   const getStatusStyle = () => {
     switch (room.status) {
       case "Occupied":
@@ -67,44 +58,45 @@ function RoomCard({ room }) {
     }
   };
 
-  // =========================================================
   // TENANT DISPLAY
-  // =========================================================
+  const tenantValue =
+    typeof room.tenant === "string" ? room.tenant.trim() : "";
 
   const tenantName =
-    room.tenant &&
-    room.tenant.trim() &&
-    room.tenant.trim().toLowerCase() !== "none"
-      ? room.tenant
+    tenantValue && tenantValue.toLowerCase() !== "none"
+      ? tenantValue
       : "No tenant assigned";
 
-  // =========================================================
-  // RENDER
-  // =========================================================
+  // ROOM IDENTIFIERS
+  const roomNumber = room.roomNumber ?? "Not specified";
+  const internalId = room.id ?? "Not available";
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow duration-200">
       {/* ROOM HEADER */}
       <div className="flex items-start justify-between gap-3">
-        {/* ROOM INFORMATION */}
         <div className="flex items-center gap-3 min-w-0">
-          {/* ROOM ICON */}
           <div className="p-3 bg-blue-50 rounded-xl shrink-0">
-            <DoorOpen
-              size={24}
-              className="text-blue-600"
-            />
+            <DoorOpen size={24} className="text-blue-600" />
           </div>
 
-          {/* ROOM TITLE */}
           <div className="min-w-0">
             <h3 className="text-lg font-bold text-gray-800 truncate">
-              Room {room.roomNumber}
+              Room {roomNumber}
             </h3>
 
-            <p className="text-sm text-gray-500 mt-0.5">
-              Room ID: {room.id}
-            </p>
+            <div className="mt-1 space-y-1">
+              <p className="text-sm text-gray-500">
+                Room Number:{" "}
+                <span className="font-medium text-gray-700">
+                  {roomNumber}
+                </span>
+              </p>
+
+              <p className="text-xs text-gray-400 break-all">
+                Internal ID: {internalId}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -120,11 +112,7 @@ function RoomCard({ room }) {
       <div className="mt-5 space-y-3">
         {/* PROPERTY */}
         <div className="flex items-center gap-3 text-gray-600 min-w-0">
-          <Building2
-            size={18}
-            className="shrink-0 text-gray-500"
-          />
-
+          <Building2 size={18} className="shrink-0 text-gray-500" />
           <span className="text-sm truncate">
             {room.property || "Property not specified"}
           </span>
@@ -132,11 +120,7 @@ function RoomCard({ room }) {
 
         {/* FLOOR */}
         <div className="flex items-center gap-3 text-gray-600">
-          <Layers
-            size={18}
-            className="shrink-0 text-gray-500"
-          />
-
+          <Layers size={18} className="shrink-0 text-gray-500" />
           <span className="text-sm">
             Floor {room.floor ?? "Not specified"}
           </span>
@@ -144,24 +128,16 @@ function RoomCard({ room }) {
 
         {/* MONTHLY RENT */}
         <div className="flex items-center gap-3 text-gray-600">
-          <IndianRupee
-            size={18}
-            className="shrink-0 text-gray-500"
-          />
-
+          <IndianRupee size={18} className="shrink-0 text-gray-500" />
           <span className="text-sm font-medium">
             {formatRent(room.rent)}
           </span>
-
-          <span className="text-xs text-gray-400">
-            / month
-          </span>
+          <span className="text-xs text-gray-400">/ month</span>
         </div>
 
         {/* TENANT */}
         <div className="text-sm text-gray-500">
           Tenant:{" "}
-
           <span
             className={`font-medium ${
               tenantName === "No tenant assigned"
@@ -176,25 +152,21 @@ function RoomCard({ room }) {
 
       {/* ACTION BUTTONS */}
       <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-        {/* VIEW BUTTON */}
         <button
           type="button"
           onClick={handleView}
           className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
         >
           <Eye size={17} />
-
           <span>View</span>
         </button>
 
-        {/* EDIT BUTTON */}
         <button
           type="button"
           onClick={handleEdit}
           className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
         >
           <Pencil size={17} />
-
           <span>Edit</span>
         </button>
       </div>
