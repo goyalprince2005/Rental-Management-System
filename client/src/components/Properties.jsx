@@ -18,40 +18,93 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-
 import Navbar from "./Navbar";
+
+// =========================================================
+// LOCAL STORAGE CONFIGURATION
+// =========================================================
+
+const PROPERTY_STORAGE_KEY = "rentalManagementProperties";
+
+const DEFAULT_PROPERTIES = [
+  {
+    id: 1,
+    name: "Green View Apartments",
+    location: "Bhopal",
+    address: "Bhopal, Madhya Pradesh",
+    floors: 5,
+    rooms: 13,
+    available: 3,
+    occupied: 10,
+    status: "Active",
+  },
+  {
+    id: 2,
+    name: "Shyam Residency",
+    location: "Bhopal",
+    address: "Bhopal, Madhya Pradesh",
+    floors: 2,
+    rooms: 6,
+    available: 1,
+    occupied: 5,
+    status: "Active",
+  },
+];
+
+// =========================================================
+// LOAD PROPERTIES FROM LOCAL STORAGE
+// =========================================================
+
+const loadProperties = () => {
+  try {
+    const savedProperties = localStorage.getItem(
+      PROPERTY_STORAGE_KEY
+    );
+
+    if (savedProperties === null) {
+      return DEFAULT_PROPERTIES;
+    }
+
+    const parsedProperties = JSON.parse(savedProperties);
+
+    if (Array.isArray(parsedProperties)) {
+      return parsedProperties;
+    }
+
+    return DEFAULT_PROPERTIES;
+  } catch (error) {
+    console.error("Failed to load properties:", error);
+    return DEFAULT_PROPERTIES;
+  }
+};
 
 function Properties() {
   const navigate = useNavigate();
 
   // =========================================================
   // PROPERTY DATA
+  // Load saved properties when the component initializes.
   // =========================================================
 
-  const [properties, setProperties] = useState([
-    {
-      id: 1,
-      name: "Green View Apartments",
-      location: "Bhopal",
-      address: "Bhopal, Madhya Pradesh",
-      floors: 5,
-      rooms: 13,
-      available: 3,
-      occupied: 10,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Shyam Residency",
-      location: "Bhopal",
-      address: "Bhopal, Madhya Pradesh",
-      floors: 2,
-      rooms: 6,
-      available: 1,
-      occupied: 5,
-      status: "Active",
-    },
-  ]);
+  const [properties, setProperties] = useState(
+    () => loadProperties()
+  );
+
+  // =========================================================
+  // SAVE PROPERTIES TO LOCAL STORAGE
+  // Runs whenever the property list changes.
+  // =========================================================
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        PROPERTY_STORAGE_KEY,
+        JSON.stringify(properties)
+      );
+    } catch (error) {
+      console.error("Failed to save properties:", error);
+    }
+  }, [properties]);
 
   // =========================================================
   // SEARCH
@@ -165,13 +218,13 @@ function Properties() {
       }
 
       return (
-        property.name
+        String(property.name || "")
           .toLowerCase()
           .includes(searchValue) ||
-        property.location
+        String(property.location || "")
           .toLowerCase()
           .includes(searchValue) ||
-        property.address
+        String(property.address || "")
           .toLowerCase()
           .includes(searchValue)
       );
@@ -216,10 +269,10 @@ function Properties() {
   };
 
   // =========================================================
-  // OPEN ADD PROPERTY MODAL
+  // RESET FORM
   // =========================================================
 
-  const handleOpenAddProperty = () => {
+  const resetForm = () => {
     setFormData({
       name: "",
       location: "",
@@ -227,7 +280,14 @@ function Properties() {
       floors: "",
       status: "Active",
     });
+  };
 
+  // =========================================================
+  // OPEN ADD PROPERTY MODAL
+  // =========================================================
+
+  const handleOpenAddProperty = () => {
+    resetForm();
     setError("");
     setShowAddProperty(true);
   };
@@ -242,52 +302,67 @@ function Properties() {
   };
 
   // =========================================================
-  // ADD PROPERTY
+  // VALIDATE PROPERTY FORM
   // =========================================================
 
-  const handleAddProperty = (event) => {
-    event.preventDefault();
-
-    // ---------------- VALIDATION ----------------
-
+  const validatePropertyForm = () => {
     if (
       !formData.name.trim() ||
       !formData.location.trim() ||
       !formData.address.trim() ||
       !formData.floors
     ) {
-      setError(
-        "Please fill in all required fields."
-      );
+      setError("Please fill in all required fields.");
+      return false;
+    }
+
+    const floorCount = Number(formData.floors);
+
+    if (
+      !Number.isFinite(floorCount) ||
+      !Number.isInteger(floorCount) ||
+      floorCount < 1
+    ) {
+      setError("Total floors must be a whole number of at least 1.");
+      return false;
+    }
+
+    return true;
+  };
+
+  // =========================================================
+  // CHECK DUPLICATE PROPERTY NAME
+  // =========================================================
+
+  const propertyNameExists = (name, excludedId = null) => {
+    const normalizedName = name.trim().toLowerCase();
+
+    return properties.some(
+      (property) =>
+        property.id !== excludedId &&
+        String(property.name || "")
+          .trim()
+          .toLowerCase() === normalizedName
+    );
+  };
+
+  // =========================================================
+  // ADD PROPERTY
+  // =========================================================
+
+  const handleAddProperty = (event) => {
+    event.preventDefault();
+
+    if (!validatePropertyForm()) {
       return;
     }
 
-    // ---------------- FLOOR VALIDATION ----------------
-
-    if (Number(formData.floors) < 1) {
-      setError(
-        "Total floors must be at least 1."
-      );
-      return;
-    }
-
-    // ---------------- DUPLICATE PROPERTY CHECK ----------------
-
-    const propertyAlreadyExists =
-      properties.some(
-        (property) =>
-          property.name.toLowerCase() ===
-          formData.name.trim().toLowerCase()
-      );
-
-    if (propertyAlreadyExists) {
+    if (propertyNameExists(formData.name)) {
       setError(
         "A property with this name already exists."
       );
       return;
     }
-
-    // ---------------- CREATE NEW PROPERTY ----------------
 
     const newProperty = {
       id: Date.now(),
@@ -301,25 +376,13 @@ function Properties() {
       status: formData.status,
     };
 
-    // ---------------- UPDATE PROPERTY LIST ----------------
-
     setProperties((previousProperties) => [
       ...previousProperties,
       newProperty,
     ]);
 
-    // ---------------- CLOSE MODAL ----------------
-
     setShowAddProperty(false);
-
-    setFormData({
-      name: "",
-      location: "",
-      address: "",
-      floors: "",
-      status: "Active",
-    });
-
+    resetForm();
     setError("");
   };
 
@@ -329,11 +392,11 @@ function Properties() {
 
   const handleEditProperty = (property) => {
     setFormData({
-      name: property.name,
-      location: property.location,
-      address: property.address,
-      floors: String(property.floors),
-      status: property.status,
+      name: property.name || "",
+      location: property.location || "",
+      address: property.address || "",
+      floors: String(property.floors ?? ""),
+      status: property.status || "Active",
     });
 
     setEditingPropertyId(property.id);
@@ -348,47 +411,21 @@ function Properties() {
   const handleSaveProperty = (event) => {
     event.preventDefault();
 
-    // ---------------- VALIDATION ----------------
+    if (!validatePropertyForm()) {
+      return;
+    }
 
     if (
-      !formData.name.trim() ||
-      !formData.location.trim() ||
-      !formData.address.trim() ||
-      !formData.floors
+      propertyNameExists(
+        formData.name,
+        editingPropertyId
+      )
     ) {
-      setError(
-        "Please fill in all required fields."
-      );
-      return;
-    }
-
-    // ---------------- FLOOR VALIDATION ----------------
-
-    if (Number(formData.floors) < 1) {
-      setError(
-        "Total floors must be at least 1."
-      );
-      return;
-    }
-
-    // ---------------- DUPLICATE PROPERTY CHECK ----------------
-
-    const duplicateProperty =
-      properties.some(
-        (property) =>
-          property.id !== editingPropertyId &&
-          property.name.toLowerCase() ===
-            formData.name.trim().toLowerCase()
-      );
-
-    if (duplicateProperty) {
       setError(
         "A property with this name already exists."
       );
       return;
     }
-
-    // ---------------- UPDATE PROPERTY ----------------
 
     setProperties((previousProperties) =>
       previousProperties.map((property) =>
@@ -405,19 +442,10 @@ function Properties() {
       )
     );
 
-    // ---------------- CLOSE MODAL ----------------
-
     setShowEditProperty(false);
     setEditingPropertyId(null);
+    resetForm();
     setError("");
-
-    setFormData({
-      name: "",
-      location: "",
-      address: "",
-      floors: "",
-      status: "Active",
-    });
   };
 
   // =========================================================
@@ -428,14 +456,7 @@ function Properties() {
     setShowEditProperty(false);
     setEditingPropertyId(null);
     setError("");
-
-    setFormData({
-      name: "",
-      location: "",
-      address: "",
-      floors: "",
-      status: "Active",
-    });
+    resetForm();
   };
 
   // =========================================================
@@ -460,25 +481,13 @@ function Properties() {
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
-
-      {/* =====================================================
-          COMMON NAVBAR
-      ===================================================== */}
-
+      {/* COMMON NAVBAR */}
       <Navbar />
 
-      {/* =====================================================
-          MAIN CONTENT
-      ===================================================== */}
-
+      {/* MAIN CONTENT */}
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
-
-        {/* =================================================
-            PAGE HEADER
-        ================================================= */}
-
+        {/* PAGE HEADER */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
               My Properties
@@ -489,36 +498,22 @@ function Properties() {
             </p>
           </div>
 
-          {/* =================================================
-              ADD PROPERTY BUTTON
-          ================================================= */}
-
+          {/* ADD PROPERTY BUTTON */}
           <button
             type="button"
             onClick={handleOpenAddProperty}
             className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm shrink-0"
           >
             <Plus size={20} />
-
-            <span>
-              Add Property
-            </span>
+            <span>Add Property</span>
           </button>
-
         </div>
 
-        {/* =====================================================
-            PROPERTY SUMMARY CARDS
-        ===================================================== */}
-
+        {/* PROPERTY SUMMARY CARDS */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-
           {/* TOTAL PROPERTIES */}
-
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
-
             <div className="flex items-center justify-between gap-3">
-
               <div>
                 <p className="text-sm text-gray-500">
                   Total Properties
@@ -535,17 +530,12 @@ function Properties() {
                   className="text-blue-600"
                 />
               </div>
-
             </div>
-
           </div>
 
           {/* ACTIVE PROPERTIES */}
-
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
-
             <div className="flex items-center justify-between gap-3">
-
               <div>
                 <p className="text-sm text-gray-500">
                   Active Properties
@@ -562,17 +552,12 @@ function Properties() {
                   className="text-green-600"
                 />
               </div>
-
             </div>
-
           </div>
 
           {/* TOTAL ROOMS */}
-
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
-
             <div className="flex items-center justify-between gap-3">
-
               <div>
                 <p className="text-sm text-gray-500">
                   Total Rooms
@@ -589,17 +574,12 @@ function Properties() {
                   className="text-indigo-600"
                 />
               </div>
-
             </div>
-
           </div>
 
           {/* AVAILABLE ROOMS */}
-
           <div className="bg-white rounded-xl border shadow-sm p-4 hover:shadow-md transition">
-
             <div className="flex items-center justify-between gap-3">
-
               <div>
                 <p className="text-sm text-gray-500">
                   Available Rooms
@@ -616,25 +596,15 @@ function Properties() {
                   className="text-blue-600"
                 />
               </div>
-
             </div>
-
           </div>
-
         </div>
 
-        {/* =====================================================
-            SEARCH SECTION
-        ===================================================== */}
-
+        {/* SEARCH SECTION */}
         <div className="bg-white rounded-xl border shadow-sm p-4 mb-6">
-
           <div className="flex flex-col sm:flex-row gap-3">
-
             {/* SEARCH INPUT */}
-
             <div className="relative flex-1">
-
               <Search
                 size={19}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -660,45 +630,29 @@ function Properties() {
                   <X size={18} />
                 </button>
               )}
-
             </div>
 
             {/* SEARCH RESULT COUNT */}
-
             <div className="flex items-center justify-center sm:justify-start px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 whitespace-nowrap">
               {filteredProperties.length}{" "}
               {filteredProperties.length === 1
                 ? "property"
                 : "properties"}
             </div>
-
           </div>
-
         </div>
 
-        {/* =====================================================
-            PROPERTY CARDS
-        ===================================================== */}
-
+        {/* PROPERTY CARDS */}
         {filteredProperties.length > 0 ? (
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
             {filteredProperties.map((property) => (
-
               <div
                 key={property.id}
                 className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
               >
-
-                {/* =================================================
-                    PROPERTY HEADER
-                ================================================= */}
-
+                {/* PROPERTY HEADER */}
                 <div className="p-5 border-b flex justify-between items-start gap-3">
-
                   <div className="flex items-start gap-3 min-w-0">
-
                     <div className="p-3 bg-blue-50 rounded-lg shrink-0">
                       <Building2
                         size={26}
@@ -707,29 +661,21 @@ function Properties() {
                     </div>
 
                     <div className="min-w-0">
-
                       <h3 className="text-xl font-bold text-gray-800 truncate">
                         {property.name}
                       </h3>
 
                       <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-
                         <MapPin size={15} />
 
                         <span className="truncate">
                           {property.location}
                         </span>
-
                       </div>
-
                     </div>
-
                   </div>
 
-                  {/* =================================================
-                      STATUS
-                  ================================================= */}
-
+                  {/* STATUS */}
                   <span
                     className={`px-3 py-1 rounded-full text-sm shrink-0 ${
                       property.status === "Active"
@@ -739,19 +685,12 @@ function Properties() {
                   >
                     {property.status}
                   </span>
-
                 </div>
 
-                {/* =================================================
-                    PROPERTY INFORMATION
-                ================================================= */}
-
+                {/* PROPERTY INFORMATION */}
                 <div className="p-5">
-
                   {/* ADDRESS */}
-
                   <div className="mb-4">
-
                     <p className="text-xs text-gray-500 mb-1">
                       Address
                     </p>
@@ -759,17 +698,12 @@ function Properties() {
                     <p className="text-sm text-gray-700">
                       {property.address}
                     </p>
-
                   </div>
 
                   {/* PROPERTY STATS */}
-
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-
                     {/* FLOORS */}
-
                     <div className="bg-gray-50 rounded-lg p-3">
-
                       <p className="text-xs text-gray-500">
                         Floors
                       </p>
@@ -777,13 +711,10 @@ function Properties() {
                       <p className="text-xl font-bold mt-1 text-gray-800">
                         {property.floors}
                       </p>
-
                     </div>
 
                     {/* ROOMS */}
-
                     <div className="bg-gray-50 rounded-lg p-3">
-
                       <p className="text-xs text-gray-500">
                         Rooms
                       </p>
@@ -791,13 +722,10 @@ function Properties() {
                       <p className="text-xl font-bold mt-1 text-gray-800">
                         {property.rooms}
                       </p>
-
                     </div>
 
                     {/* AVAILABLE */}
-
                     <div className="bg-green-50 rounded-lg p-3">
-
                       <p className="text-xs text-gray-500">
                         Available
                       </p>
@@ -805,13 +733,10 @@ function Properties() {
                       <p className="text-xl font-bold text-green-600 mt-1">
                         {property.available}
                       </p>
-
                     </div>
 
                     {/* OCCUPIED */}
-
                     <div className="bg-blue-50 rounded-lg p-3">
-
                       <p className="text-xs text-gray-500">
                         Occupied
                       </p>
@@ -819,19 +744,12 @@ function Properties() {
                       <p className="text-xl font-bold text-blue-600 mt-1">
                         {property.occupied}
                       </p>
-
                     </div>
-
                   </div>
 
-                  {/* =================================================
-                      ACTION BUTTONS
-                  ================================================= */}
-
+                  {/* ACTION BUTTONS */}
                   <div className="flex gap-3 mt-5">
-
                     {/* VIEW DETAILS */}
-
                     <button
                       type="button"
                       onClick={() =>
@@ -839,17 +757,11 @@ function Properties() {
                       }
                       className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition"
                     >
-
                       <Eye size={18} />
-
-                      <span>
-                        View Details
-                      </span>
-
+                      <span>View Details</span>
                     </button>
 
                     {/* EDIT */}
-
                     <button
                       type="button"
                       onClick={() =>
@@ -857,40 +769,25 @@ function Properties() {
                       }
                       className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
                     >
-
                       <Pencil size={18} />
 
                       <span className="hidden sm:block">
                         Edit
                       </span>
-
                     </button>
-
                   </div>
-
                 </div>
-
               </div>
-
             ))}
-
           </div>
-
         ) : (
-
-          /* =====================================================
-             NO SEARCH RESULTS
-          ===================================================== */
-
+          /* NO SEARCH RESULTS */
           <div className="bg-white rounded-xl border shadow-sm p-10 text-center">
-
             <div className="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4">
-
               <Search
                 size={28}
                 className="text-blue-600"
               />
-
             </div>
 
             <h3 className="text-lg font-semibold text-gray-800">
@@ -906,17 +803,11 @@ function Properties() {
               onClick={handleClearSearch}
               className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
-
               <X size={17} />
-
               Clear Search
-
             </button>
-
           </div>
-
         )}
-
       </main>
 
       {/* =====================================================
@@ -924,19 +815,11 @@ function Properties() {
       ===================================================== */}
 
       {showAddProperty && (
-
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
-
-            {/* =================================================
-                MODAL HEADER
-            ================================================= */}
-
+            {/* MODAL HEADER */}
             <div className="flex items-center justify-between px-5 py-4 border-b">
-
               <div>
-
                 <h3 className="text-xl font-bold text-gray-800">
                   Add New Property
                 </h3>
@@ -944,42 +827,30 @@ function Properties() {
                 <p className="text-sm text-gray-500 mt-1">
                   Add a new rental property to your account.
                 </p>
-
               </div>
 
               {/* CLOSE */}
-
               <button
                 type="button"
                 onClick={handleCloseAddProperty}
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close add property form"
               >
-
                 <X
                   size={22}
                   className="text-gray-600"
                 />
-
               </button>
-
             </div>
 
-            {/* =================================================
-                SCROLLABLE FORM CONTENT
-            ================================================= */}
-
+            {/* SCROLLABLE FORM CONTENT */}
             <div className="max-h-[calc(90vh-85px)] overflow-y-auto">
-
               <form
                 onSubmit={handleAddProperty}
                 className="p-5 space-y-4"
               >
-
                 {/* PROPERTY NAME */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Property Name
                   </label>
@@ -992,13 +863,10 @@ function Properties() {
                     placeholder="e.g. Green View Apartments"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* LOCATION */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Location
                   </label>
@@ -1011,13 +879,10 @@ function Properties() {
                     placeholder="e.g. Bhopal"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* ADDRESS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Address
                   </label>
@@ -1030,13 +895,10 @@ function Properties() {
                     rows="3"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* TOTAL FLOORS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Total Floors
                   </label>
@@ -1048,15 +910,13 @@ function Properties() {
                     onChange={handleChange}
                     placeholder="e.g. 5"
                     min="1"
+                    step="1"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* STATUS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
@@ -1067,21 +927,12 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-
-                    <option value="Active">
-                      Active
-                    </option>
-
-                    <option value="Inactive">
-                      Inactive
-                    </option>
-
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
                   </select>
-
                 </div>
 
                 {/* ERROR */}
-
                 {error && (
                   <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                     {error}
@@ -1089,9 +940,7 @@ function Properties() {
                 )}
 
                 {/* BUTTONS */}
-
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-
                   <button
                     type="button"
                     onClick={handleCloseAddProperty}
@@ -1106,17 +955,11 @@ function Properties() {
                   >
                     Add Property
                   </button>
-
                 </div>
-
               </form>
-
             </div>
-
           </div>
-
         </div>
-
       )}
 
       {/* =====================================================
@@ -1124,19 +967,11 @@ function Properties() {
       ===================================================== */}
 
       {showEditProperty && (
-
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
-
-            {/* =================================================
-                EDIT MODAL HEADER
-            ================================================= */}
-
+            {/* EDIT MODAL HEADER */}
             <div className="flex items-center justify-between px-5 py-4 border-b">
-
               <div>
-
                 <h3 className="text-xl font-bold text-gray-800">
                   Edit Property
                 </h3>
@@ -1144,42 +979,30 @@ function Properties() {
                 <p className="text-sm text-gray-500 mt-1">
                   Update your property information.
                 </p>
-
               </div>
 
               {/* CLOSE */}
-
               <button
                 type="button"
                 onClick={handleCloseEditProperty}
                 className="p-2 rounded-lg hover:bg-gray-100 transition"
                 aria-label="Close edit property form"
               >
-
                 <X
                   size={22}
                   className="text-gray-600"
                 />
-
               </button>
-
             </div>
 
-            {/* =================================================
-                SCROLLABLE EDIT FORM
-            ================================================= */}
-
+            {/* SCROLLABLE EDIT FORM */}
             <div className="max-h-[calc(90vh-85px)] overflow-y-auto">
-
               <form
                 onSubmit={handleSaveProperty}
                 className="p-5 space-y-4"
               >
-
                 {/* PROPERTY NAME */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Property Name
                   </label>
@@ -1192,13 +1015,10 @@ function Properties() {
                     placeholder="e.g. Green View Apartments"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* LOCATION */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Location
                   </label>
@@ -1211,13 +1031,10 @@ function Properties() {
                     placeholder="e.g. Bhopal"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* ADDRESS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Address
                   </label>
@@ -1230,13 +1047,10 @@ function Properties() {
                     rows="3"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* TOTAL FLOORS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Total Floors
                   </label>
@@ -1248,15 +1062,13 @@ function Properties() {
                     onChange={handleChange}
                     placeholder="e.g. 5"
                     min="1"
+                    step="1"
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-
                 </div>
 
                 {/* STATUS */}
-
                 <div>
-
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
@@ -1267,21 +1079,12 @@ function Properties() {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-
-                    <option value="Active">
-                      Active
-                    </option>
-
-                    <option value="Inactive">
-                      Inactive
-                    </option>
-
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
                   </select>
-
                 </div>
 
                 {/* ERROR */}
-
                 {error && (
                   <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                     {error}
@@ -1289,9 +1092,7 @@ function Properties() {
                 )}
 
                 {/* BUTTONS */}
-
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-
                   <button
                     type="button"
                     onClick={handleCloseEditProperty}
@@ -1306,19 +1107,12 @@ function Properties() {
                   >
                     Save Changes
                   </button>
-
                 </div>
-
               </form>
-
             </div>
-
           </div>
-
         </div>
-
       )}
-
     </div>
   );
 }
