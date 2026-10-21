@@ -14,10 +14,19 @@ import {
 
 import Navbar from "./Navbar";
 
+const ROOM_STORAGE_KEY = "rentalManagementRooms";
+const PROPERTY_STORAGE_KEY = "rentalManagementProperties";
+
+// =========================================================
+// DEFAULT ROOM DATA
+// =========================================================
+
 const DEFAULT_ROOMS = {
   101: {
+    id: 101,
     roomNumber: "101",
     property: "Green View Apartments",
+    propertyId: 1,
     location: "Bhopal",
     floor: 1,
     rent: 5000,
@@ -26,8 +35,10 @@ const DEFAULT_ROOMS = {
   },
 
   102: {
+    id: 102,
     roomNumber: "102",
     property: "Green View Apartments",
+    propertyId: 1,
     location: "Bhopal",
     floor: 1,
     rent: 6000,
@@ -36,8 +47,10 @@ const DEFAULT_ROOMS = {
   },
 
   203: {
+    id: 203,
     roomNumber: "203",
     property: "Shyam Residency",
+    propertyId: 2,
     location: "Bhopal",
     floor: 2,
     rent: 5500,
@@ -46,55 +59,172 @@ const DEFAULT_ROOMS = {
   },
 
   204: {
+    id: 204,
     roomNumber: "204",
     property: "Shyam Residency",
+    propertyId: 2,
     location: "Bhopal",
     floor: 2,
     rent: 5500,
-    tenant: "None",
+    tenant: "",
     status: "Available",
   },
 };
 
+// =========================================================
+// READ SAVED ROOMS
+// =========================================================
+
 function getSavedRooms() {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem("rentalManagementRooms") || "{}"
-    );
+    const stored = localStorage.getItem(ROOM_STORAGE_KEY);
 
-    return saved && typeof saved === "object" && !Array.isArray(saved)
-      ? saved
+    if (!stored) {
+      return {};
+    }
+
+    const parsed = JSON.parse(stored);
+
+    return parsed &&
+      typeof parsed === "object" &&
+      !Array.isArray(parsed)
+      ? parsed
       : {};
   } catch (error) {
-    console.error("Unable to load saved room data:", error);
+    console.error("Unable to load saved rooms:", error);
     return {};
   }
 }
 
+// =========================================================
+// READ SAVED PROPERTIES
+// =========================================================
+
+function getSavedProperties() {
+  try {
+    const stored = localStorage.getItem(
+      PROPERTY_STORAGE_KEY
+    );
+
+    // Use the original properties if the storage key
+    // has not been created yet.
+    if (stored === null) {
+      return [
+        {
+          id: 1,
+          name: "Green View Apartments",
+          location: "Bhopal",
+          floors: 5,
+          status: "Active",
+        },
+        {
+          id: 2,
+          name: "Shyam Residency",
+          location: "Bhopal",
+          floors: 2,
+          status: "Active",
+        },
+      ];
+    }
+
+    const parsed = JSON.parse(stored);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Unable to load saved properties:", error);
+    return [];
+  }
+}
+
+// =========================================================
+// FIND PROPERTY FOR A ROOM
+// Match property ID first, then use property name
+// for older rooms that don't contain propertyId.
+// =========================================================
+
+function findPropertyForRoom(room, properties) {
+  if (
+    room.propertyId !== null &&
+    room.propertyId !== undefined &&
+    room.propertyId !== ""
+  ) {
+    const propertyById = properties.find(
+      (property) =>
+        String(property.id) === String(room.propertyId)
+    );
+
+    if (propertyById) {
+      return propertyById;
+    }
+  }
+
+  const roomPropertyName = String(
+    room.property ?? ""
+  )
+    .trim()
+    .toLowerCase();
+
+  if (!roomPropertyName) {
+    return null;
+  }
+
+  return (
+    properties.find(
+      (property) =>
+        String(property.name ?? "")
+          .trim()
+          .toLowerCase() === roomPropertyName
+    ) || null
+  );
+}
+
+// =========================================================
+// GET ROOM BY INTERNAL ID
+// Supports default and dynamically added rooms.
+// =========================================================
+
 function getRoomById(id) {
   const savedRooms = getSavedRooms();
-  const defaultRoom = DEFAULT_ROOMS[id];
-  const savedRoom = savedRooms[id];
+  const defaultRoom = DEFAULT_ROOMS[String(id)];
+  const savedRoom = savedRooms[String(id)];
 
-  // Accept either a default room or a room saved dynamically.
   if (!defaultRoom && !savedRoom) {
     return null;
   }
 
-  return {
+  // Saved room values take priority over defaults.
+  const room = {
     ...(defaultRoom || {}),
     ...(savedRoom || {}),
     id: savedRoom?.id ?? defaultRoom?.id ?? Number(id),
   };
+
+  const properties = getSavedProperties();
+  const property = findPropertyForRoom(room, properties);
+
+  return {
+    ...room,
+    propertyId: room.propertyId ?? property?.id ?? null,
+    property: property?.name ?? room.property ?? "",
+    location: property?.location ?? room.location ?? "",
+  };
 }
 
+// =========================================================
+// FORMAT CURRENCY
+// =========================================================
+
 function formatCurrency(value) {
+  if (value === "" || value === null || value === undefined) {
+    return "Not specified";
+  }
+
   const amount =
     typeof value === "number"
       ? value
-      : Number(String(value ?? "").replace(/[₹,\s]/g, ""));
+      : Number(String(value).replace(/[₹,\s]/g, ""));
 
-  if (value === "" || value == null || !Number.isFinite(amount)) {
+  if (!Number.isFinite(amount)) {
     return "Not specified";
   }
 
@@ -104,6 +234,10 @@ function formatCurrency(value) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+// =========================================================
+// STATUS BADGE STYLE
+// =========================================================
 
 function getStatusStyle(status) {
   switch (status) {
@@ -121,11 +255,19 @@ function getStatusStyle(status) {
   }
 }
 
+// =========================================================
+// ROOM DETAILS COMPONENT
+// =========================================================
+
 function RoomDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const room = getRoomById(id);
+
+  // =======================================================
+  // ROOM NOT FOUND
+  // =======================================================
 
   if (!room) {
     return (
@@ -135,7 +277,10 @@ function RoomDetails() {
         <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
             <div className="mx-auto w-fit p-4 bg-gray-100 rounded-full">
-              <DoorOpen size={32} className="text-gray-500" />
+              <DoorOpen
+                size={32}
+                className="text-gray-500"
+              />
             </div>
 
             <h2 className="text-2xl font-bold text-gray-800 mt-5">
@@ -143,7 +288,7 @@ function RoomDetails() {
             </h2>
 
             <p className="text-gray-500 mt-2">
-              The requested room does not exist.
+              The room with internal ID {id} could not be found.
             </p>
 
             <button
@@ -160,10 +305,20 @@ function RoomDetails() {
     );
   }
 
+  // =======================================================
+  // DISPLAY VALUES
+  // =======================================================
+
   const tenantName =
-    room.tenant && String(room.tenant).trim() !== ""
+    room.tenant &&
+    String(room.tenant).trim() !== "" &&
+    String(room.tenant).trim().toLowerCase() !== "none"
       ? room.tenant
       : "None";
+
+  const roomNumber = room.roomNumber ?? "Not specified";
+  const internalRoomId = room.id ?? id;
+  const roomStatus = room.status || "Not specified";
 
   const statusBackground =
     room.status === "Occupied"
@@ -182,6 +337,10 @@ function RoomDetails() {
       : room.status === "Available"
       ? "text-green-600"
       : "text-gray-600";
+
+  // =======================================================
+  // MAIN UI
+  // =======================================================
 
   return (
     <div className="min-h-screen bg-gray-100 overflow-x-hidden">
@@ -205,30 +364,45 @@ function RoomDetails() {
           <div className="p-5 md:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
             <div className="flex items-center gap-4 min-w-0">
               <div className="p-4 bg-blue-50 rounded-xl shrink-0">
-                <DoorOpen size={32} className="text-blue-600" />
+                <DoorOpen
+                  size={32}
+                  className="text-blue-600"
+                />
               </div>
 
               <div className="min-w-0">
                 <h3 className="text-2xl font-bold text-gray-800">
-                  Room {room.roomNumber}
+                  Room {roomNumber}
                 </h3>
 
-                <div className="flex items-center gap-2 text-gray-500 mt-1">
+                <p className="text-xs text-gray-400 mt-1 break-all">
+                  Internal Room ID: {internalRoomId}
+                </p>
+
+                <div className="flex items-center gap-2 text-gray-500 mt-2">
                   <Building2 size={16} className="shrink-0" />
-                  <span className="truncate">{room.property || "Not specified"}</span>
+
+                  <span className="truncate">
+                    {room.property || "Not specified"}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-500 mt-1">
                   <MapPin size={16} className="shrink-0" />
-                  <span>{room.location || "Not specified"}</span>
+
+                  <span>
+                    {room.location || "Not specified"}
+                  </span>
                 </div>
               </div>
             </div>
 
             <span
-              className={`self-start sm:self-center shrink-0 px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle(room.status)}`}
+              className={`self-start sm:self-center shrink-0 px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle(
+                room.status
+              )}`}
             >
-              {room.status || "Not specified"}
+              {roomStatus}
             </span>
           </div>
 
@@ -277,10 +451,12 @@ function RoomDetails() {
 
               {/* CURRENT STATUS */}
               <div className={`rounded-xl p-4 ${statusBackground}`}>
-                <p className="text-sm text-gray-500">Current Status</p>
+                <p className="text-sm text-gray-500">
+                  Current Status
+                </p>
 
                 <p className={`text-xl font-bold mt-2 ${statusText}`}>
-                  {room.status || "Not specified"}
+                  {roomStatus}
                 </p>
               </div>
             </div>
@@ -294,7 +470,10 @@ function RoomDetails() {
               <div className="border border-gray-200 rounded-xl p-5">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="p-3 bg-blue-50 rounded-lg shrink-0">
-                    <Building2 size={24} className="text-blue-600" />
+                    <Building2
+                      size={24}
+                      className="text-blue-600"
+                    />
                   </div>
 
                   <div className="min-w-0">
@@ -304,8 +483,19 @@ function RoomDetails() {
 
                     <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
                       <MapPin size={15} />
-                      <span>{room.location || "Not specified"}</span>
+
+                      <span>
+                        {room.location || "Not specified"}
+                      </span>
                     </div>
+
+                    {room.propertyId !== null &&
+                      room.propertyId !== undefined &&
+                      room.propertyId !== "" && (
+                        <p className="text-xs text-gray-400 mt-2 break-all">
+                          Property ID: {room.propertyId}
+                        </p>
+                      )}
                   </div>
                 </div>
               </div>
