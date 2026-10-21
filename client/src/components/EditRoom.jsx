@@ -9,16 +9,17 @@ import {
 import Navbar from "./Navbar";
 
 const STORAGE_KEY = "rentalManagementRooms";
+const PROPERTY_STORAGE_KEY = "rentalManagementProperties";
 
 // =========================================================
 // DEFAULT ROOM DATA
-// Used only when no saved room data exists.
 // =========================================================
 
 const defaultRooms = {
   101: {
     roomNumber: "101",
     property: "Green View Apartments",
+    propertyId: 1,
     location: "Bhopal",
     floor: 1,
     rent: 5000,
@@ -28,6 +29,7 @@ const defaultRooms = {
   102: {
     roomNumber: "102",
     property: "Green View Apartments",
+    propertyId: 1,
     location: "Bhopal",
     floor: 1,
     rent: 6000,
@@ -37,6 +39,7 @@ const defaultRooms = {
   203: {
     roomNumber: "203",
     property: "Shyam Residency",
+    propertyId: 2,
     location: "Bhopal",
     floor: 2,
     rent: 5500,
@@ -46,6 +49,7 @@ const defaultRooms = {
   204: {
     roomNumber: "204",
     property: "Shyam Residency",
+    propertyId: 2,
     location: "Bhopal",
     floor: 2,
     rent: 5500,
@@ -55,7 +59,7 @@ const defaultRooms = {
 };
 
 // =========================================================
-// READ SAVED ROOM DATA
+// READ SAVED ROOMS
 // =========================================================
 
 const readSavedRooms = () => {
@@ -68,15 +72,11 @@ const readSavedRooms = () => {
 
     const parsed = JSON.parse(stored);
 
-    if (
-      !parsed ||
-      typeof parsed !== "object" ||
-      Array.isArray(parsed)
-    ) {
-      return {};
-    }
-
-    return parsed;
+    return parsed &&
+      typeof parsed === "object" &&
+      !Array.isArray(parsed)
+      ? parsed
+      : {};
   } catch (error) {
     console.error("Unable to read saved rooms:", error);
     return {};
@@ -84,28 +84,104 @@ const readSavedRooms = () => {
 };
 
 // =========================================================
+// READ SAVED PROPERTIES
+// =========================================================
+
+const readSavedProperties = () => {
+  try {
+    const stored = localStorage.getItem(
+      PROPERTY_STORAGE_KEY
+    );
+
+    if (stored === null) {
+      return [
+        {
+          id: 1,
+          name: "Green View Apartments",
+          location: "Bhopal",
+          floors: 5,
+          status: "Active",
+        },
+        {
+          id: 2,
+          name: "Shyam Residency",
+          location: "Bhopal",
+          floors: 2,
+          status: "Active",
+        },
+      ];
+    }
+
+    const parsed = JSON.parse(stored);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error(
+      "Unable to read saved properties:",
+      error
+    );
+
+    return [];
+  }
+};
+
+// =========================================================
+// FIND PROPERTY
+// Match by ID first, then by name for legacy room records.
+// =========================================================
+
+const findPropertyForRoom = (room, properties) => {
+  if (room.propertyId !== null && room.propertyId !== undefined) {
+    const propertyById = properties.find(
+      (property) =>
+        String(property.id) === String(room.propertyId)
+    );
+
+    if (propertyById) {
+      return propertyById;
+    }
+  }
+
+  return properties.find(
+    (property) =>
+      String(property.name || "").trim().toLowerCase() ===
+      String(room.property || "").trim().toLowerCase()
+  );
+};
+
+// =========================================================
 // GET ROOM BY ID
-// Supports both default and dynamically added rooms.
+// Supports default and dynamically added rooms.
 // =========================================================
 
 const getRoomById = (id) => {
   const savedRooms = readSavedRooms();
-  const defaultRoom = defaultRooms[id];
+  const defaultRoom = defaultRooms[String(id)];
   const savedRoom = savedRooms[String(id)];
 
   if (!defaultRoom && !savedRoom) {
     return null;
   }
 
-  return {
+  const room = {
     ...(defaultRoom || {}),
     ...(savedRoom || {}),
-    id: savedRoom?.id ?? defaultRoom?.id ?? Number(id),
+    id: savedRoom?.id ?? Number(id),
+  };
+
+  const properties = readSavedProperties();
+  const property = findPropertyForRoom(room, properties);
+
+  return {
+    ...room,
+    propertyId: room.propertyId ?? property?.id,
+    property: property?.name ?? room.property ?? "",
+    location: property?.location ?? room.location ?? "",
   };
 };
 
 // =========================================================
-// FORMAT RENT FOR THE FORM
+// NORMALIZE RENT
 // =========================================================
 
 const normalizeRent = (rent) => {
@@ -121,6 +197,26 @@ const normalizeRent = (rent) => {
 };
 
 // =========================================================
+// NORMALIZE ROOM FOR FORM
+// =========================================================
+
+const normalizeRoomForForm = (room, id) => ({
+  ...room,
+  id: room.id ?? Number(id),
+  roomNumber: String(room.roomNumber ?? ""),
+  property: String(room.property ?? ""),
+  propertyId: room.propertyId ?? "",
+  location: String(room.location ?? ""),
+  floor: String(room.floor ?? ""),
+  rent: normalizeRent(room.rent),
+  tenant:
+    room.tenant === "None"
+      ? ""
+      : String(room.tenant ?? ""),
+  status: room.status ?? "Available",
+});
+
+// =========================================================
 // EDIT ROOM COMPONENT
 // =========================================================
 
@@ -128,35 +224,22 @@ function EditRoom() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Re-read the stored data when the route ID changes.
   const [roomData, setRoomData] = useState(() => {
     const room = getRoomById(id);
 
-    if (!room) {
-      return {
-        roomNumber: id || "",
-        property: "",
-        location: "",
-        floor: "",
-        rent: "",
-        tenant: "",
-        status: "Available",
-      };
-    }
-
-    return {
-      ...room,
-      roomNumber: String(room.roomNumber ?? ""),
-      property: String(room.property ?? ""),
-      location: String(room.location ?? ""),
-      floor: String(room.floor ?? ""),
-      rent: normalizeRent(room.rent),
-      tenant:
-        room.tenant === "None"
-          ? ""
-          : String(room.tenant ?? ""),
-      status: room.status ?? "Available",
-    };
+    return room
+      ? normalizeRoomForForm(room, id)
+      : {
+          id: Number(id),
+          roomNumber: "",
+          property: "",
+          propertyId: "",
+          location: "",
+          floor: "",
+          rent: "",
+          tenant: "",
+          status: "Available",
+        };
   });
 
   const [error, setError] = useState("");
@@ -164,7 +247,7 @@ function EditRoom() {
   const [isSaving, setIsSaving] = useState(false);
 
   // =========================================================
-  // LOAD THE CORRECT ROOM WHEN THE ID CHANGES
+  // LOAD ROOM WHEN ROUTE ID CHANGES
   // =========================================================
 
   useEffect(() => {
@@ -176,8 +259,10 @@ function EditRoom() {
 
     if (!room) {
       setRoomData({
-        roomNumber: id || "",
+        id: Number(id),
+        roomNumber: "",
         property: "",
+        propertyId: "",
         location: "",
         floor: "",
         rent: "",
@@ -188,19 +273,7 @@ function EditRoom() {
       return;
     }
 
-    setRoomData({
-      ...room,
-      roomNumber: String(room.roomNumber ?? ""),
-      property: String(room.property ?? ""),
-      location: String(room.location ?? ""),
-      floor: String(room.floor ?? ""),
-      rent: normalizeRent(room.rent),
-      tenant:
-        room.tenant === "None"
-          ? ""
-          : String(room.tenant ?? ""),
-      status: room.status ?? "Available",
-    });
+    setRoomData(normalizeRoomForForm(room, id));
   }, [id]);
 
   // =========================================================
@@ -233,48 +306,84 @@ function EditRoom() {
     setError("");
     setSuccess("");
 
-    // Room number validation
-    if (!roomData.roomNumber.trim()) {
+    // -------------------------------------------------------
+    // ROOM NUMBER VALIDATION
+    // -------------------------------------------------------
+
+    const roomNumber = roomData.roomNumber.trim();
+
+    if (!roomNumber) {
       setError("Please enter room number.");
       return;
     }
 
-    // Property validation
-    if (!roomData.property.trim()) {
+    // -------------------------------------------------------
+    // PROPERTY VALIDATION
+    // -------------------------------------------------------
+
+    const propertyName = roomData.property.trim();
+
+    if (!propertyName) {
       setError("Please enter property name.");
       return;
     }
 
-    // Location validation
-    if (!roomData.location.trim()) {
+    // -------------------------------------------------------
+    // LOCATION VALIDATION
+    // -------------------------------------------------------
+
+    const location = roomData.location.trim();
+
+    if (!location) {
       setError("Please enter location.");
       return;
     }
 
-    // Floor validation
+    // -------------------------------------------------------
+    // FLOOR VALIDATION
+    // -------------------------------------------------------
+
+    const floor = Number(roomData.floor);
+
     if (
       roomData.floor === "" ||
-      !Number.isFinite(Number(roomData.floor)) ||
-      Number(roomData.floor) < 0
+      !Number.isFinite(floor) ||
+      !Number.isInteger(floor) ||
+      floor < 0
     ) {
-      setError("Please enter a valid floor number.");
+      setError(
+        "Please enter a valid whole-number floor."
+      );
       return;
     }
 
-    // Rent validation
+    // -------------------------------------------------------
+    // RENT VALIDATION
+    // -------------------------------------------------------
+
+    const rent = Number(roomData.rent);
+
     if (
       roomData.rent === "" ||
-      !Number.isFinite(Number(roomData.rent)) ||
-      Number(roomData.rent) <= 0
+      !Number.isFinite(rent) ||
+      !Number.isInteger(rent) ||
+      rent <= 0
     ) {
-      setError("Please enter a valid monthly rent.");
+      setError(
+        "Please enter a positive whole-number monthly rent."
+      );
       return;
     }
 
-    // Tenant validation for occupied rooms
+    // -------------------------------------------------------
+    // TENANT VALIDATION
+    // -------------------------------------------------------
+
+    const tenant = roomData.tenant.trim();
+
     if (
       roomData.status === "Occupied" &&
-      !roomData.tenant.trim()
+      !tenant
     ) {
       setError(
         "Please enter tenant name for an occupied room."
@@ -282,10 +391,9 @@ function EditRoom() {
       return;
     }
 
-    // Available rooms cannot have an assigned tenant
     if (
       roomData.status === "Available" &&
-      roomData.tenant.trim()
+      tenant
     ) {
       setError(
         "An available room cannot have an assigned tenant."
@@ -293,32 +401,166 @@ function EditRoom() {
       return;
     }
 
-    // =======================================================
+    // -------------------------------------------------------
+    // LOAD CURRENT ROOM AND PROPERTY RECORDS
+    // -------------------------------------------------------
+
+    const savedRooms = readSavedRooms();
+    const properties = readSavedProperties();
+
+    const currentRoom =
+      getRoomById(id) || roomData;
+
+    const selectedProperty = findPropertyForRoom(
+      {
+        ...currentRoom,
+        property: propertyName,
+        propertyId: roomData.propertyId,
+      },
+      properties
+    );
+
+    // Preserve the room's existing property relationship.
+    // If it is a legacy room, match the property by name.
+    const propertyId =
+      selectedProperty?.id ??
+      roomData.propertyId ??
+      currentRoom.propertyId;
+
+    // -------------------------------------------------------
+    // CHECK DUPLICATE ROOM NUMBER
+    // -------------------------------------------------------
+
+    const duplicateRoom = Object.entries(savedRooms).some(
+      ([savedId, savedRoom]) => {
+        if (
+          String(savedId) === String(id) ||
+          !savedRoom ||
+          typeof savedRoom !== "object"
+        ) {
+          return false;
+        }
+
+        const sameRoomNumber =
+          String(savedRoom.roomNumber || "")
+            .trim()
+            .toLowerCase() === roomNumber.toLowerCase();
+
+        const savedProperty = findPropertyForRoom(
+          savedRoom,
+          properties
+        );
+
+        const sameProperty =
+          propertyId !== null &&
+          propertyId !== undefined &&
+          savedRoom.propertyId !== null &&
+          savedRoom.propertyId !== undefined
+            ? String(savedRoom.propertyId) ===
+              String(propertyId)
+            : String(
+                savedProperty?.name ?? savedRoom.property ?? ""
+              ).trim().toLowerCase() ===
+              String(
+                selectedProperty?.name ?? propertyName
+              ).trim().toLowerCase();
+
+        return sameRoomNumber && sameProperty;
+      }
+    );
+
+    // Also check other default rooms that may not have been
+    // saved to localStorage yet.
+    const duplicateDefaultRoom = Object.entries(defaultRooms).some(
+      ([defaultId, defaultRoom]) => {
+        if (String(defaultId) === String(id)) {
+          return false;
+        }
+
+        const savedVersion = savedRooms[String(defaultId)];
+        const otherRoom = {
+          ...defaultRoom,
+          ...(savedVersion || {}),
+        };
+
+        const sameRoomNumber =
+          String(otherRoom.roomNumber || "")
+            .trim()
+            .toLowerCase() === roomNumber.toLowerCase();
+
+        const otherProperty = findPropertyForRoom(
+          otherRoom,
+          properties
+        );
+
+        const sameProperty =
+          propertyId !== null &&
+          propertyId !== undefined &&
+          otherRoom.propertyId !== null &&
+          otherRoom.propertyId !== undefined
+            ? String(otherRoom.propertyId) ===
+              String(propertyId)
+            : String(
+                otherProperty?.name ?? otherRoom.property ?? ""
+              ).trim().toLowerCase() ===
+              String(
+                selectedProperty?.name ?? propertyName
+              ).trim().toLowerCase();
+
+        return sameRoomNumber && sameProperty;
+      }
+    );
+
+    if (duplicateRoom || duplicateDefaultRoom) {
+      setError(
+        "This room number already exists in the selected property."
+      );
+      return;
+    }
+
+    // -------------------------------------------------------
+    // VALIDATE PROPERTY FLOOR COUNT WHEN AVAILABLE
+    // -------------------------------------------------------
+
+    if (selectedProperty?.floors !== undefined) {
+      const maximumFloor = Number(selectedProperty.floors);
+
+      if (
+        Number.isFinite(maximumFloor) &&
+        floor > maximumFloor
+      ) {
+        setError(
+          `The selected property has ${maximumFloor} floor(s). Please enter a valid floor.`
+        );
+        return;
+      }
+    }
+
+    // -------------------------------------------------------
     // PREPARE UPDATED ROOM
-    // =======================================================
+    // -------------------------------------------------------
 
     const updatedRoomData = {
+      ...currentRoom,
       ...roomData,
-      id: Number(id),
-      roomNumber: roomData.roomNumber.trim(),
-      property: roomData.property.trim(),
-      location: roomData.location.trim(),
-      floor: Number(roomData.floor),
-      rent: Number(roomData.rent),
-      tenant: roomData.tenant.trim(),
+      id: currentRoom.id ?? Number(id),
+      roomNumber,
+      property: selectedProperty?.name ?? propertyName,
+      propertyId,
+      location: selectedProperty?.location ?? location,
+      floor,
+      rent,
+      tenant,
       status: roomData.status,
     };
 
-    // =======================================================
+    // -------------------------------------------------------
     // SAVE TO LOCAL STORAGE
-    // =======================================================
+    // -------------------------------------------------------
 
     setIsSaving(true);
 
     try {
-      const savedRooms = readSavedRooms();
-
-      // Preserve all other room records.
       const updatedRooms = {
         ...savedRooms,
         [String(id)]: updatedRoomData,
@@ -329,36 +571,36 @@ function EditRoom() {
         JSON.stringify(updatedRooms)
       );
 
-      // Verify that the record was saved.
+      // Verify that the room was saved correctly.
       const verification = readSavedRooms();
       const verifiedRoom = verification[String(id)];
 
       if (
         !verifiedRoom ||
-        Number(verifiedRoom.rent) !== updatedRoomData.rent ||
-        String(verifiedRoom.roomNumber) !==
-          updatedRoomData.roomNumber
+        Number(verifiedRoom.rent) !== rent ||
+        String(verifiedRoom.roomNumber) !== roomNumber
       ) {
-        throw new Error("Unable to verify saved room data.");
+        throw new Error(
+          "Unable to verify saved room data."
+        );
       }
 
-      // Update the form with normalized values.
-      setRoomData({
-        ...updatedRoomData,
-        floor: String(updatedRoomData.floor),
-        rent: String(updatedRoomData.rent),
-      });
+      setRoomData(
+        normalizeRoomForForm(verifiedRoom, id)
+      );
 
       setSuccess("Room details updated successfully.");
 
-      // Navigate only after saving succeeds.
       navigate(`/room-details/${id}`, {
         state: {
           roomUpdated: true,
         },
       });
     } catch (saveError) {
-      console.error("Unable to save room data:", saveError);
+      console.error(
+        "Unable to save room data:",
+        saveError
+      );
 
       setError(
         "Unable to save room details. Please try again."
@@ -648,7 +890,6 @@ function EditRoom() {
 
               {/* ACTION BUTTONS */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                {/* CANCEL */}
                 <button
                   type="button"
                   onClick={handleCancel}
@@ -659,7 +900,6 @@ function EditRoom() {
                   Cancel
                 </button>
 
-                {/* SAVE */}
                 <button
                   type="submit"
                   disabled={isSaving}
