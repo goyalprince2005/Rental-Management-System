@@ -769,7 +769,7 @@ function Navbar() {
                 DESKTOP NAVIGATION
             ================================================= */}
 
-            <div className="mx-3 hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
+            <div className="mx-3 hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
 
               {navItems.map((item) => {
 
