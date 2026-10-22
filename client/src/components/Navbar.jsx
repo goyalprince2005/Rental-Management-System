@@ -698,22 +698,43 @@ function Navbar() {
 
             <div className="flex min-w-0 shrink-0 items-center gap-2">
 
-              {/* HAMBURGER */}
+              
+{/* HAMBURGER WITH HOVER TOOLTIP */}
 
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(true);
-                  setProfileOpen(false);
-                }}
-                className="shrink-0 rounded-lg p-2 transition hover:bg-blue-50"
-                aria-label="Open owner menu"
-              >
-                <Menu
-                  size={24}
-                  className="text-gray-700"
-                />
-              </button>
+<div className="group relative shrink-0">
+  <button
+    type="button"
+    onClick={() => {
+      setMenuOpen(true);
+      setProfileOpen(false);
+    }}
+    className="flex items-center justify-center rounded-lg p-2
+      text-gray-700 transition hover:bg-blue-50
+      focus:outline-none focus:ring-2 focus:ring-blue-300"
+    aria-label="Open owner menu"
+    aria-expanded={menuOpen}
+    aria-controls="owner-sidebar"
+    title="Open sidebar"
+  >
+    <Menu size={24} className="text-gray-700" />
+  </button>
+
+  {/* HOVER MESSAGE */}
+
+  
+<span
+  role="tooltip"
+  className="pointer-events-none invisible absolute left-0 top-full z-[100]
+  mt-2 whitespace-nowrap rounded-lg
+  bg-slate-900 px-3 py-2 text-xs font-semibold text-white
+  shadow-lg opacity-0 transition-opacity duration-200
+  group-hover:visible group-hover:opacity-100"
+>
+  Open sidebar
+</span>
+
+</div>
+
 
               {/* LOGO */}
 
