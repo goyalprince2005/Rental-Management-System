@@ -699,6 +699,8 @@ function Navbar() {
             <div className="flex min-w-0 shrink-0 items-center gap-2">
 
               
+
+
 {/* HAMBURGER WITH HOVER TOOLTIP */}
 
 <div className="group relative shrink-0">
@@ -707,6 +709,12 @@ function Navbar() {
     onClick={() => {
       setMenuOpen(true);
       setProfileOpen(false);
+      setHoveredSidebarItem(null);
+
+      setHoverCardPosition((previous) => ({
+        ...previous,
+        visible: false,
+      }));
     }}
     className="flex items-center justify-center rounded-lg p-2
       text-gray-700 transition hover:bg-blue-50
@@ -714,26 +722,26 @@ function Navbar() {
     aria-label="Open owner menu"
     aria-expanded={menuOpen}
     aria-controls="owner-sidebar"
-    title="Open sidebar"
   >
     <Menu size={24} className="text-gray-700" />
   </button>
 
-  {/* HOVER MESSAGE */}
+  {/* BLACK TOOLTIP — BELOW THE HAMBURGER */}
 
-  
-<span
-  role="tooltip"
-  className="pointer-events-none invisible absolute left-0 top-full z-[100]
-  mt-2 whitespace-nowrap rounded-lg
+  {!menuOpen && (
+    <span
+      role="tooltip"
+    className="pointer-events-none invisible absolute left-0 top-full z-[100]
+  mt-2 hidden whitespace-nowrap rounded-lg
   bg-slate-900 px-3 py-2 text-xs font-semibold text-white
   shadow-lg opacity-0 transition-opacity duration-200
-  group-hover:visible group-hover:opacity-100"
->
-  Open sidebar
-</span>
-
+  group-hover:visible group-hover:opacity-100 lg:block"  
+    >
+      Open sidebar
+    </span>
+  )}
 </div>
+
 
 
               {/* LOGO */}
