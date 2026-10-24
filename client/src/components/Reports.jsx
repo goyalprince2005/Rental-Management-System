@@ -26,8 +26,8 @@ const TENANT_STORAGE_KEY = "rentalManagementTenants";
 const RENT_STORAGE_KEY = "rentalManagementRentBills";
 
 // =========================================================
-// DEFAULT DATA
-// Used only when the relevant storage key does not exist.
+// DEFAULT DEMO DATA
+// Used only when the corresponding storage key is absent.
 // =========================================================
 
 const DEFAULT_PROPERTIES = [
@@ -45,8 +45,8 @@ const DEFAULT_PROPERTIES = [
   },
 ];
 
-const DEFAULT_ROOMS = {
-  101: {
+const DEFAULT_ROOMS = [
+  {
     id: 101,
     roomNumber: "101",
     property: "Green View Apartments",
@@ -56,7 +56,7 @@ const DEFAULT_ROOMS = {
     tenant: "Rahul Sharma",
     status: "Occupied",
   },
-  102: {
+  {
     id: 102,
     roomNumber: "102",
     property: "Green View Apartments",
@@ -66,7 +66,7 @@ const DEFAULT_ROOMS = {
     tenant: "Aman Kumar",
     status: "Occupied",
   },
-  203: {
+  {
     id: 203,
     roomNumber: "203",
     property: "Shyam Residency",
@@ -74,9 +74,9 @@ const DEFAULT_ROOMS = {
     floor: 2,
     rent: 5500,
     tenant: "Neha Sharma",
-    status: "Due",
+    status: "Occupied",
   },
-  204: {
+  {
     id: 204,
     roomNumber: "204",
     property: "Shyam Residency",
@@ -86,7 +86,7 @@ const DEFAULT_ROOMS = {
     tenant: "",
     status: "Available",
   },
-};
+];
 
 const DEFAULT_RENT_RECORDS = [
   {
@@ -168,9 +168,9 @@ function getTenantName(tenant) {
   if (tenant && typeof tenant === "object") {
     return String(
       tenant.name ||
-      tenant.fullName ||
-      tenant.tenantName ||
-      ""
+        tenant.fullName ||
+        tenant.tenantName ||
+        ""
     ).trim();
   }
 
@@ -182,7 +182,7 @@ function getTenantName(tenant) {
 // =========================================================
 
 function hasTenant(room) {
-  const tenantName = getTenantName(room.tenant);
+  const tenantName = getTenantName(room?.tenant);
 
   return (
     tenantName !== "" &&
@@ -208,6 +208,41 @@ function getAmount(value) {
 }
 
 // =========================================================
+// GET RENT AMOUNT FROM A BILL
+// Supports either rent or amount fields.
+// =========================================================
+
+function getRentAmount(record) {
+  return getAmount(record?.rent ?? record?.amount);
+}
+
+// =========================================================
+// NORMALIZE RENT STATUS
+// =========================================================
+
+function normalizeStatus(status) {
+  return String(status ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+}
+
+function isPaid(record) {
+  return normalizeStatus(record?.status) === "paid";
+}
+
+function isPending(record) {
+  const status = normalizeStatus(record?.status);
+
+  return [
+    "due",
+    "pending",
+    "overdue",
+    "unpaid",
+  ].includes(status);
+}
+
+// =========================================================
 // FORMAT CURRENCY
 // =========================================================
 
@@ -224,47 +259,33 @@ function formatCurrency(amount) {
 // =========================================================
 
 function loadProperties() {
-  const stored = readStorage(
-    PROPERTY_STORAGE_KEY,
-    null
-  );
+  const stored = readStorage(PROPERTY_STORAGE_KEY, null);
 
   if (stored === null) {
     return DEFAULT_PROPERTIES;
   }
 
-  return Array.isArray(stored) ? stored : [];
+  return toArray(stored).filter(
+    (property) =>
+      property &&
+      property.id !== undefined &&
+      property.id !== null
+  );
 }
 
 // =========================================================
 // READ ROOMS
+// Do not merge demo rooms into saved room data.
 // =========================================================
 
 function loadRooms() {
-  const stored = readStorage(
-    ROOM_STORAGE_KEY,
-    null
-  );
+  const stored = readStorage(ROOM_STORAGE_KEY, null);
 
-  // No room storage yet: use the original demo rooms.
   if (stored === null) {
-    return Object.values(DEFAULT_ROOMS);
+    return DEFAULT_ROOMS;
   }
 
-  if (
-    !stored ||
-    typeof stored !== "object" ||
-    Array.isArray(stored)
-  ) {
-    return [];
-  }
-
-  // Merge defaults with saved rooms. Saved room fields
-  // override default fields for the same internal ID.
-  return Object.values({
-    ...DEFAULT_ROOMS,
-    ...stored,
-  }).filter(
+  return toArray(stored).filter(
     (room) =>
       room &&
       room.id !== undefined &&
@@ -273,24 +294,40 @@ function loadRooms() {
 }
 
 // =========================================================
-// MATCH A ROOM TO A PROPERTY
+// READ TENANTS
 // =========================================================
 
-function roomBelongsToProperty(room, property) {
-  if (
-    room.propertyId !== undefined &&
-    room.propertyId !== null &&
-    room.propertyId !== ""
-  ) {
-    return (
-      String(room.propertyId) === String(property.id)
-    );
+function loadTenants() {
+  const stored = readStorage(TENANT_STORAGE_KEY, null);
+
+  if (stored === null) {
+    return [];
   }
 
-  return (
-    String(room.property ?? "").trim().toLowerCase() ===
-    String(property.name ?? "").trim().toLowerCase()
-  );
+  return toArray(stored).filter(Boolean);
+}
+
+// =========================================================
+// READ RENT RECORDS
+// =========================================================
+
+function loadRentRecords() {
+  const stored = readStorage(RENT_STORAGE_KEY, null);
+
+  if (stored !== null) {
+    return toArray(stored).filter(Boolean);
+  }
+
+  // Demo rent figures are used only when neither saved
+  // rooms nor saved rent bills exist.
+  const savedRooms = readStorage(ROOM_STORAGE_KEY, null);
+
+  if (savedRooms === null) {
+    return DEFAULT_RENT_RECORDS;
+  }
+
+  // Never invent collected rent for saved room data.
+  return [];
 }
 
 // =========================================================
@@ -299,57 +336,23 @@ function roomBelongsToProperty(room, property) {
 
 function Reports() {
   // -------------------------------------------------------
-  // LOAD SAVED DATA
+  // LOAD DATA
   // -------------------------------------------------------
 
-  const properties = useMemo(
-    () => loadProperties(),
-    []
-  );
-
-  const rooms = useMemo(
-    () => loadRooms(),
-    []
-  );
-
-  const tenants = useMemo(
-    () =>
-      toArray(
-        readStorage(TENANT_STORAGE_KEY, [])
-      ),
-    []
-  );
-
-  const rentRecords = useMemo(() => {
-    const stored = readStorage(
-      RENT_STORAGE_KEY,
-      null
-    );
-
-    // Use saved bills when the rent-bill collection exists.
-    if (Array.isArray(stored)) {
-      return stored;
-    }
-
-    // Use demo records only when no saved rent-bill
-    // collection exists and the room data is still demo data.
-    if (localStorage.getItem(ROOM_STORAGE_KEY) === null) {
-      return DEFAULT_RENT_RECORDS;
-    }
-
-    // There is no saved bill collection. Do not claim
-    // payments have been collected from room data alone.
-    return [];
-  }, []);
+  const properties = useMemo(() => loadProperties(), []);
+  const rooms = useMemo(() => loadRooms(), []);
+  const tenants = useMemo(() => loadTenants(), []);
+  const rentRecords = useMemo(() => loadRentRecords(), []);
 
   // -------------------------------------------------------
-  // PROPERTY, ROOM, AND TENANT STATISTICS
+  // CALCULATE REPORT STATISTICS
   // -------------------------------------------------------
 
   const reportData = useMemo(() => {
     const totalProperties = properties.length;
     const totalRooms = rooms.length;
 
+    // Determine occupancy from tenant assignment.
     const occupiedRooms = rooms.filter(hasTenant).length;
 
     const vacantRooms = Math.max(
@@ -357,8 +360,8 @@ function Reports() {
       totalRooms - occupiedRooms
     );
 
-    // Prefer distinct saved tenant records when available.
-    // Otherwise, count distinct tenant names assigned to rooms.
+    // Prefer saved tenant records when available.
+    // Otherwise, count distinct tenants assigned to rooms.
     const distinctRoomTenants = new Set(
       rooms
         .filter(hasTenant)
@@ -372,31 +375,27 @@ function Reports() {
         ? tenants.length
         : distinctRoomTenants.size;
 
-    const monthlyRent = rooms.reduce(
-      (total, room) =>
-        total + getAmount(room.rent),
-      0
-    );
-
-    // Only rent records explicitly marked Paid count
-    // toward collected rent.
-    const collectedRent = rentRecords
-      .filter(
-        (record) => record.status === "Paid"
-      )
+    // Expected rent only includes rooms with assigned tenants.
+    const monthlyRent = rooms
+      .filter(hasTenant)
       .reduce(
-        (total, record) =>
-          total + getAmount(record.rent),
+        (total, room) => total + getAmount(room.rent),
         0
       );
 
-    const pendingRent = rentRecords
-      .filter(
-        (record) => record.status === "Due"
-      )
+    // Only bills explicitly marked Paid count as collected.
+    const collectedRent = rentRecords
+      .filter(isPaid)
       .reduce(
-        (total, record) =>
-          total + getAmount(record.rent),
+        (total, record) => total + getRentAmount(record),
+        0
+      );
+
+    // Include common unpaid statuses in pending rent.
+    const pendingRent = rentRecords
+      .filter(isPending)
+      .reduce(
+        (total, record) => total + getRentAmount(record),
         0
       );
 
@@ -413,7 +412,7 @@ function Reports() {
   }, [properties, rooms, tenants, rentRecords]);
 
   // -------------------------------------------------------
-  // CALCULATED REPORT VALUES
+  // CALCULATED PERCENTAGES
   // -------------------------------------------------------
 
   const occupancyRate =
@@ -501,6 +500,7 @@ function Reports() {
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
         {/* PAGE HEADING */}
+
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-3 bg-blue-50 rounded-xl">
@@ -523,14 +523,16 @@ function Reports() {
           </div>
 
           <p className="text-xs text-gray-400 mt-3">
-            Figures calculated from saved property, room,
+            Figures are calculated from saved property, room,
             tenant, and rent records.
           </p>
         </div>
 
         {/* STATISTICS CARDS */}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
           {/* PROPERTIES */}
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-50 rounded-xl">
@@ -561,6 +563,7 @@ function Reports() {
           </div>
 
           {/* TOTAL ROOMS */}
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-purple-50 rounded-xl">
@@ -591,6 +594,7 @@ function Reports() {
           </div>
 
           {/* TENANTS */}
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-green-50 rounded-xl">
@@ -621,6 +625,7 @@ function Reports() {
           </div>
 
           {/* OCCUPANCY */}
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-yellow-50 rounded-xl">
@@ -649,6 +654,7 @@ function Reports() {
         </div>
 
         {/* RENT COLLECTION REPORT */}
+
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div className="p-5 border-b border-gray-100">
             <h2 className="text-lg font-bold text-gray-800">
@@ -656,14 +662,14 @@ function Reports() {
             </h2>
 
             <p className="text-sm text-gray-500 mt-1">
-              Monthly expected rent compared with recorded
-              rent collection.
+              Expected rent compared with recorded rent collection.
             </p>
           </div>
 
           <div className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* EXPECTED RENT */}
+
               <div className="bg-blue-50 rounded-xl p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg">
@@ -679,15 +685,14 @@ function Reports() {
                     </p>
 
                     <h3 className="text-2xl font-bold text-gray-800">
-                      {formatCurrency(
-                        reportData.monthlyRent
-                      )}
+                      {formatCurrency(reportData.monthlyRent)}
                     </h3>
                   </div>
                 </div>
               </div>
 
               {/* COLLECTED RENT */}
+
               <div className="bg-green-50 rounded-xl p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg">
@@ -703,15 +708,14 @@ function Reports() {
                     </p>
 
                     <h3 className="text-2xl font-bold text-green-700">
-                      {formatCurrency(
-                        reportData.collectedRent
-                      )}
+                      {formatCurrency(reportData.collectedRent)}
                     </h3>
                   </div>
                 </div>
               </div>
 
               {/* PENDING RENT */}
+
               <div className="bg-yellow-50 rounded-xl p-5">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white rounded-lg">
@@ -727,9 +731,7 @@ function Reports() {
                     </p>
 
                     <h3 className="text-2xl font-bold text-yellow-700">
-                      {formatCurrency(
-                        reportData.pendingRent
-                      )}
+                      {formatCurrency(reportData.pendingRent)}
                     </h3>
                   </div>
                 </div>
@@ -737,6 +739,7 @@ function Reports() {
             </div>
 
             {/* COLLECTION PROGRESS */}
+
             <div className="mt-7">
               <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                 <div>
@@ -764,48 +767,50 @@ function Reports() {
               >
                 <div
                   className="bg-green-600 h-3 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${collectionRate}%`,
-                  }}
+                  style={{ width: `${collectionRate}%` }}
                 />
               </div>
 
               <div className="flex justify-between gap-3 text-xs text-gray-500 mt-2">
                 <span>
                   Collected:{" "}
-                  {formatCurrency(
-                    reportData.collectedRent
-                  )}
+                  {formatCurrency(reportData.collectedRent)}
                 </span>
 
                 <span>
                   Pending:{" "}
-                  {formatCurrency(
-                    reportData.pendingRent
-                  )}
+                  {formatCurrency(reportData.pendingRent)}
                 </span>
               </div>
 
               {rentRecords.length === 0 && (
                 <p className="text-xs text-gray-400 mt-3">
                   No saved rent bills were found. Collection
-                  figures will update when rent records are
-                  available.
+                  figures will update when rent records are available.
                 </p>
               )}
-            </div>
 
-            <Link
-              to="/rent-bills"
-              className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 hover:text-blue-800"
-            >
-              View rent and bills
-              <ArrowRight size={17} />
-            </Link>
+              {reportData.monthlyRent === 0 &&
+                reportData.totalRooms > 0 && (
+                  <p className="text-xs text-gray-400 mt-2">
+                    No expected rent was found for occupied rooms.
+                    Check the room assignments and rent amounts.
+                  </p>
+                )}
+
+              <Link
+                to="/rent-bills"
+                className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 hover:text-blue-800"
+              >
+                View rent and bills
+                <ArrowRight size={17} />
+              </Link>
+            </div>
           </div>
         </section>
 
         {/* ROOM OCCUPANCY REPORT */}
+
         <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-blue-50 rounded-xl">
@@ -868,15 +873,13 @@ function Reports() {
           >
             <div
               className="bg-blue-600 h-3 rounded-full transition-all duration-500"
-              style={{
-                width: `${occupancyRate}%`,
-              }}
+              style={{ width: `${occupancyRate}%` }}
             />
           </div>
 
           <p className="text-sm text-gray-500 mt-2">
-            {reportData.occupiedRooms} of{" "}
-            {reportData.totalRooms} rooms have assigned tenants.
+            {reportData.occupiedRooms} of {reportData.totalRooms}{" "}
+            rooms have assigned tenants.
           </p>
 
           <Link
@@ -889,6 +892,7 @@ function Reports() {
         </section>
 
         {/* QUICK NAVIGATION */}
+
         <section>
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Quick Access
