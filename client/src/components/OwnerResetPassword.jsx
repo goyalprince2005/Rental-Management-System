@@ -4,6 +4,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import Footer from "./Footer";
 
@@ -23,14 +24,17 @@ function OwnerResetPassword() {
   // =========================================================
 
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [passwordError, setPasswordError] =
-    useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
 
+  const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] =
     useState("");
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // =========================================================
   // OWNER SESSION VALIDATION
@@ -42,11 +46,7 @@ function OwnerResetPassword() {
         "passwordResetVerification"
       );
 
-      if (!storedData) {
-        return null;
-      }
-
-      return JSON.parse(storedData);
+      return storedData ? JSON.parse(storedData) : null;
     } catch {
       return null;
     }
@@ -73,11 +73,7 @@ function OwnerResetPassword() {
       return "Password must contain at least one number.";
     }
 
-    if (
-      !/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(
-        password
-      )
-    ) {
+    if (!/[!@#$%^&*(),.?":{}|<>_\-\\[\]/`~;'+=]/.test(password)) {
       return "Password must contain at least one special character.";
     }
 
@@ -91,12 +87,12 @@ function OwnerResetPassword() {
   const handleResetPassword = (e) => {
     e.preventDefault();
 
+    if (isSubmitting) return;
+
     setPasswordError("");
     setConfirmPasswordError("");
 
-    // =======================================================
-    // MOBILE CHECK
-    // =======================================================
+    // Validate URL information.
 
     if (!mobileNumber) {
       setPasswordError(
@@ -105,10 +101,6 @@ function OwnerResetPassword() {
       return;
     }
 
-    // =======================================================
-    // ROLE CHECK
-    // =======================================================
-
     if (role !== "owner") {
       setPasswordError(
         "Invalid owner password reset request. Please try again."
@@ -116,9 +108,7 @@ function OwnerResetPassword() {
       return;
     }
 
-    // =======================================================
-    // OTP VERIFICATION CHECK
-    // =======================================================
+    // Validate OTP verification.
 
     const verificationData = getVerificationData();
 
@@ -134,26 +124,21 @@ function OwnerResetPassword() {
       return;
     }
 
-    // =======================================================
-    // NEW PASSWORD CHECK
-    // =======================================================
+    // Validate the new password.
 
     if (!newPassword) {
       setPasswordError("Please enter a new password.");
       return;
     }
 
-    const validationError =
-      validatePassword(newPassword);
+    const validationError = validatePassword(newPassword);
 
     if (validationError) {
       setPasswordError(validationError);
       return;
     }
 
-    // =======================================================
-    // CONFIRM PASSWORD CHECK
-    // =======================================================
+    // Validate the confirmation password.
 
     if (!confirmPassword) {
       setConfirmPasswordError(
@@ -163,40 +148,35 @@ function OwnerResetPassword() {
     }
 
     if (newPassword !== confirmPassword) {
-      setConfirmPasswordError(
-        "Passwords do not match."
-      );
+      setConfirmPasswordError("Passwords do not match.");
       return;
     }
 
     // =======================================================
-    // SAVE OWNER PASSWORD
+    // SAVE PASSWORD — LOCAL DEMO ONLY
     // =======================================================
 
-    localStorage.setItem(
-      `ownerPassword_${mobileNumber}`,
-      newPassword
-    );
+    try {
+      setIsSubmitting(true);
 
-    // =======================================================
-    // PASSWORD RESET SUCCESS
-    // =======================================================
+      localStorage.setItem(
+        `ownerPassword_${mobileNumber}`,
+        newPassword
+      );
 
-    alert("Owner password reset successfully.");
+      // Remove the verification session after success.
 
-    // =======================================================
-    // REMOVE OTP VERIFICATION SESSION
-    // =======================================================
+      localStorage.removeItem("passwordResetVerification");
 
-    localStorage.removeItem(
-      "passwordResetVerification"
-    );
+      alert("Owner password reset successfully.");
 
-    // =======================================================
-    // GO TO OWNER LOGIN
-    // =======================================================
-
-    navigate("/owner-login");
+      navigate("/owner-login", { replace: true });
+    } catch {
+      setPasswordError(
+        "Unable to reset your password. Please try again."
+      );
+      setIsSubmitting(false);
+    }
   };
 
   // =========================================================
@@ -210,165 +190,212 @@ function OwnerResetPassword() {
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-gray-100">
+      <main className="flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
 
-      {/* ===================================================== */}
-      {/* MAIN CONTENT */}
-      {/* ===================================================== */}
-
-      <main className="flex-1 flex items-center justify-center p-4">
-
-        <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
-
-          {/* ================================================= */}
           {/* HEADING */}
-          {/* ================================================= */}
 
-          <h1 className="text-3xl font-bold text-center text-gray-800">
+          <h1 className="text-center text-3xl font-bold text-gray-800">
             Owner Reset Password
           </h1>
 
-          <p className="text-center text-gray-500 mt-2 mb-6">
+          <p className="mb-6 mt-2 text-center text-gray-500">
             Create a new password for your owner account.
           </p>
 
-          {/* ================================================= */}
           {/* MOBILE NUMBER */}
-          {/* ================================================= */}
 
           {mobileNumber && (
-            <p className="text-center text-sm text-gray-500 mb-5">
+            <p className="mb-5 text-center text-sm text-gray-500">
               Resetting password for{" "}
-
               <span className="font-medium text-gray-700">
                 {mobileNumber}
               </span>
             </p>
           )}
 
-          {/* ================================================= */}
           {/* FORM */}
-          {/* ================================================= */}
 
           <form
             onSubmit={handleResetPassword}
             className="space-y-5"
+            noValidate
           >
-
-            {/* ================================================= */}
             {/* NEW PASSWORD */}
-            {/* ================================================= */}
 
             <div>
-
               <label
                 htmlFor="owner-new-password"
-                className="block mb-2 font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700"
               >
                 New Password
               </label>
 
-              <input
-                id="owner-new-password"
-                type="password"
-                value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value);
-                  setPasswordError("");
-                }}
-                placeholder="Enter new password"
-                autoComplete="new-password"
-                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  passwordError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-              />
+              <div className="relative">
+                <input
+                  id="owner-new-password"
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setPasswordError("");
+                  }}
+                  placeholder="Enter new password"
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(passwordError)}
+                  aria-describedby={
+                    passwordError
+                      ? "owner-password-error"
+                      : undefined
+                  }
+                  className={`w-full rounded-lg border px-4 py-2.5 pr-12
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      passwordError
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowNewPassword((previous) => !previous)
+                  }
+                  aria-label={
+                    showNewPassword
+                      ? "Hide new password"
+                      : "Show new password"
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2
+                    text-gray-500 hover:text-blue-600"
+                >
+                  {showNewPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
 
               {passwordError && (
-                <p className="text-red-500 text-sm mt-2">
+                <p
+                  id="owner-password-error"
+                  role="alert"
+                  className="mt-2 text-sm text-red-500"
+                >
                   {passwordError}
                 </p>
               )}
 
+              <p className="mt-2 text-xs text-gray-500">
+                Use at least 8 characters with uppercase,
+                lowercase, a number, and a special character.
+              </p>
             </div>
 
-            {/* ================================================= */}
             {/* CONFIRM PASSWORD */}
-            {/* ================================================= */}
 
             <div>
-
               <label
                 htmlFor="owner-confirm-password"
-                className="block mb-2 font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700"
               >
                 Confirm Password
               </label>
 
-              <input
-                id="owner-confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  setConfirmPasswordError("");
-                }}
-                placeholder="Confirm new password"
-                autoComplete="new-password"
-                className={`w-full border rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  confirmPasswordError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
-              />
+              <div className="relative">
+                <input
+                  id="owner-confirm-password"
+                  type={
+                    showConfirmPassword ? "text" : "password"
+                  }
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setConfirmPasswordError("");
+                  }}
+                  placeholder="Confirm new password"
+                  autoComplete="new-password"
+                  aria-invalid={Boolean(confirmPasswordError)}
+                  aria-describedby={
+                    confirmPasswordError
+                      ? "owner-confirm-password-error"
+                      : undefined
+                  }
+                  className={`w-full rounded-lg border px-4 py-2.5 pr-12
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      confirmPasswordError
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowConfirmPassword(
+                      (previous) => !previous
+                    )
+                  }
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirmation password"
+                      : "Show confirmation password"
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2
+                    text-gray-500 hover:text-blue-600"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
 
               {confirmPasswordError && (
-                <p className="text-red-500 text-sm mt-2">
+                <p
+                  id="owner-confirm-password-error"
+                  role="alert"
+                  className="mt-2 text-sm text-red-500"
+                >
                   {confirmPasswordError}
                 </p>
               )}
-
             </div>
 
-            {/* ================================================= */}
             {/* RESET BUTTON */}
-            {/* ================================================= */}
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
+              disabled={isSubmitting}
+              className="w-full rounded-lg bg-blue-600 py-3 text-white
+                transition hover:bg-blue-700 disabled:cursor-not-allowed
+                disabled:opacity-60"
             >
-              Reset Owner Password
+              {isSubmitting
+                ? "Resetting Password..."
+                : "Reset Owner Password"}
             </button>
-
           </form>
 
-          {/* ================================================= */}
           {/* BACK LINK */}
-          {/* ================================================= */}
 
           <div className="mt-6 text-center">
-
             <Link
               to={backUrl}
               className="text-blue-600 hover:underline"
             >
               ← Back to Owner Forgot Password
             </Link>
-
           </div>
-
         </div>
-
       </main>
 
-      {/* ===================================================== */}
       {/* FOOTER */}
-      {/* ===================================================== */}
 
       <Footer />
-
     </div>
   );
 }
