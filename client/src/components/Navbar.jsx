@@ -1,3 +1,4 @@
+
 import React, {
   useEffect,
   useLayoutEffect,
@@ -22,6 +23,8 @@ import {
   LogOut,
   UserCircle,
   Lock,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 function Navbar() {
@@ -40,21 +43,48 @@ function Navbar() {
   // =========================================================
 
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [profileOpen, setProfileOpen] = useState(false);
+
+  // =========================================================
+  // DARK / LIGHT MODE
+  // =========================================================
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem("theme") === "dark";
+    } catch (error) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDarkMode);
+
+    try {
+      localStorage.setItem(
+        "theme",
+        isDarkMode ? "dark" : "light"
+      );
+    } catch (error) {
+      console.error("Unable to save theme preference:", error);
+    }
+  }, [isDarkMode]);
+
+  const toggleTheme = () => {
+    setIsDarkMode((previous) => !previous);
+  };
 
   const [hoveredSidebarItem, setHoveredSidebarItem] =
     useState(null);
 
-  const [hoverCardPosition, setHoverCardPosition] =
-    useState({
-      top: 100,
-      left: 300,
-      width: 250,
-      anchorCenter: 100,
-      maxHeight: 500,
-      visible: false,
-    });
+  const [hoverCardPosition, setHoverCardPosition] = useState({
+    top: 100,
+    left: 300,
+    width: 250,
+    anchorCenter: 100,
+    maxHeight: 500,
+    visible: false,
+  });
 
   // =========================================================
   // NAVIGATION ITEMS
@@ -66,43 +96,36 @@ function Navbar() {
       path: "/owner-dashboard",
       icon: Home,
     },
-
     {
       name: "Properties",
       path: "/properties",
       icon: Building2,
     },
-
     {
       name: "Rooms",
       path: "/rooms",
       icon: DoorOpen,
     },
-
     {
       name: "Tenants",
       path: "/tenants",
       icon: Users,
     },
-
     {
       name: "Rent & Bills",
       path: "/rent-bills",
       icon: Receipt,
     },
-
     {
       name: "Payments",
       path: "/payments",
       icon: CreditCard,
     },
-
     {
       name: "Documents",
       path: "/documents",
       icon: FileText,
     },
-
     {
       name: "Reports",
       path: "/reports",
@@ -266,7 +289,6 @@ function Navbar() {
   const handleLogout = () => {
     closeMenu();
     setProfileOpen(false);
-
     navigate("/");
   };
 
@@ -276,7 +298,6 @@ function Navbar() {
 
   const handleMyDetails = () => {
     setProfileOpen(false);
-
     navigate("/settings");
   };
 
@@ -286,7 +307,6 @@ function Navbar() {
 
   const handleChangePassword = () => {
     setProfileOpen(false);
-
     navigate("/owner-change-password");
   };
 
@@ -295,10 +315,6 @@ function Navbar() {
   // =========================================================
 
   const handleSidebarHover = (itemName, event) => {
-    // ---------------------------------------------------------
-    // DISABLE HOVER CARD ON SMALL SCREENS
-    // ---------------------------------------------------------
-
     if (window.innerWidth < 1024) {
       setHoveredSidebarItem(null);
 
@@ -310,52 +326,21 @@ function Navbar() {
       return;
     }
 
-    // ---------------------------------------------------------
-    // GET SIDEBAR
-    // ---------------------------------------------------------
+    const sidebar = event.currentTarget.closest("aside");
 
-    const sidebar =
-      event.currentTarget.closest("aside");
+    if (!sidebar) return;
 
-    if (!sidebar) {
-      return;
-    }
-
-    // ---------------------------------------------------------
-    // GET POSITIONS
-    // ---------------------------------------------------------
-
-    const sidebarRect =
-      sidebar.getBoundingClientRect();
-
-    const itemRect =
-      event.currentTarget.getBoundingClientRect();
-
-    // ---------------------------------------------------------
-    // POSITION SETTINGS
-    // ---------------------------------------------------------
+    const sidebarRect = sidebar.getBoundingClientRect();
+    const itemRect = event.currentTarget.getBoundingClientRect();
 
     const gap = 10;
-
     const viewportPadding = 12;
-
     const preferredWidth = 250;
 
-    // ---------------------------------------------------------
-    // HORIZONTAL POSITION
-    // ---------------------------------------------------------
-
-    const left =
-      sidebarRect.right + gap;
+    const left = sidebarRect.right + gap;
 
     const availableWidth =
-      window.innerWidth -
-      left -
-      viewportPadding;
-
-    // ---------------------------------------------------------
-    // NOT ENOUGH HORIZONTAL SPACE
-    // ---------------------------------------------------------
+      window.innerWidth - left - viewportPadding;
 
     if (availableWidth < 220) {
       setHoveredSidebarItem(null);
@@ -368,26 +353,10 @@ function Navbar() {
       return;
     }
 
-    // ---------------------------------------------------------
-    // FINAL WIDTH
-    // ---------------------------------------------------------
-
-    const width = Math.min(
-      preferredWidth,
-      availableWidth
-    );
-
-    // ---------------------------------------------------------
-    // CENTER OF HOVERED SIDEBAR ITEM
-    // ---------------------------------------------------------
+    const width = Math.min(preferredWidth, availableWidth);
 
     const anchorCenter =
-      itemRect.top +
-      itemRect.height / 2;
-
-    // ---------------------------------------------------------
-    // SHOW CARD
-    // ---------------------------------------------------------
+      itemRect.top + itemRect.height / 2;
 
     setHoveredSidebarItem(itemName);
 
@@ -396,9 +365,7 @@ function Navbar() {
       left,
       width,
       anchorCenter,
-      maxHeight:
-        window.innerHeight -
-        viewportPadding * 2,
+      maxHeight: window.innerHeight - viewportPadding * 2,
       visible: true,
     });
   };
@@ -418,69 +385,28 @@ function Navbar() {
 
     const card = hoverCardRef.current;
 
-    if (!card) {
-      return;
-    }
+    if (!card) return;
 
-    // ---------------------------------------------------------
-    // ACTUAL CARD HEIGHT
-    // ---------------------------------------------------------
-
-    const cardHeight =
-      card.getBoundingClientRect().height;
-
+    const cardHeight = card.getBoundingClientRect().height;
     const viewportPadding = 12;
 
-    // ---------------------------------------------------------
-    // CENTER CARD AROUND HOVERED ITEM
-    // ---------------------------------------------------------
-
     let top =
-      hoverCardPosition.anchorCenter -
-      cardHeight / 2;
-
-    // ---------------------------------------------------------
-    // PREVENT TOP OVERFLOW
-    // ---------------------------------------------------------
+      hoverCardPosition.anchorCenter - cardHeight / 2;
 
     if (top < viewportPadding) {
       top = viewportPadding;
     }
 
-    // ---------------------------------------------------------
-    // PREVENT BOTTOM OVERFLOW
-    // ---------------------------------------------------------
-
     const maxTop =
-      window.innerHeight -
-      cardHeight -
-      viewportPadding;
+      window.innerHeight - cardHeight - viewportPadding;
 
     if (top > maxTop) {
-      top = Math.max(
-        viewportPadding,
-        maxTop
-      );
+      top = Math.max(viewportPadding, maxTop);
     }
 
-    // ---------------------------------------------------------
-    // FINAL SAFETY
-    // ---------------------------------------------------------
+    top = Math.max(viewportPadding, top);
 
-    top = Math.max(
-      viewportPadding,
-      top
-    );
-
-    // ---------------------------------------------------------
-    // UPDATE POSITION
-    // ---------------------------------------------------------
-
-    if (
-      Math.abs(
-        top - hoverCardPosition.top
-      ) > 1
-    ) {
+    if (Math.abs(top - hoverCardPosition.top) > 1) {
       setHoverCardPosition((previous) => ({
         ...previous,
         top,
@@ -535,18 +461,13 @@ function Navbar() {
     const handleClickOutside = (event) => {
       if (
         profileRef.current &&
-        !profileRef.current.contains(
-          event.target
-        )
+        !profileRef.current.contains(event.target)
       ) {
         setProfileOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener(
@@ -561,9 +482,7 @@ function Navbar() {
   // =========================================================
 
   useEffect(() => {
-    if (!menuOpen) {
-      return undefined;
-    }
+    if (!menuOpen) return undefined;
 
     const previousHtmlOverflow =
       document.documentElement.style.overflow;
@@ -572,38 +491,27 @@ function Navbar() {
       document.body.style.overflow;
 
     const previousHtmlOverscroll =
-      document.documentElement.style
-        .overscrollBehavior;
+      document.documentElement.style.overscrollBehavior;
 
     const previousBodyOverscroll =
-      document.body.style
-        .overscrollBehavior;
+      document.body.style.overscrollBehavior;
 
-    document.documentElement.style.overflow =
-      "hidden";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
 
-    document.body.style.overflow =
-      "hidden";
-
-    document.documentElement.style
-      .overscrollBehavior = "none";
-
-    document.body.style
-      .overscrollBehavior = "none";
+    document.documentElement.style.overscrollBehavior = "none";
+    document.body.style.overscrollBehavior = "none";
 
     return () => {
       document.documentElement.style.overflow =
         previousHtmlOverflow;
 
-      document.body.style.overflow =
-        previousBodyOverflow;
+      document.body.style.overflow = previousBodyOverflow;
 
-      document.documentElement.style
-        .overscrollBehavior =
+      document.documentElement.style.overscrollBehavior =
         previousHtmlOverscroll;
 
-      document.body.style
-        .overscrollBehavior =
+      document.body.style.overscrollBehavior =
         previousBodyOverscroll;
     };
   }, [menuOpen]);
@@ -613,9 +521,7 @@ function Navbar() {
   // =========================================================
 
   useEffect(() => {
-    if (!menuOpen) {
-      return undefined;
-    }
+    if (!menuOpen) return undefined;
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
@@ -623,16 +529,10 @@ function Navbar() {
       }
     };
 
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [menuOpen]);
 
@@ -663,16 +563,10 @@ function Navbar() {
       }));
     };
 
-    window.addEventListener(
-      "resize",
-      handleResize
-    );
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -682,278 +576,244 @@ function Navbar() {
 
   return (
     <>
+
       {/* =====================================================
           TOP NAVBAR
       ===================================================== */}
 
-      <nav className="sticky top-0 z-40 w-full border-b bg-white shadow-sm">
+      <nav className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
 
         <div className="w-full px-3 sm:px-4 lg:px-5">
-
-          <div className="flex h-16 items-center justify-between gap-2">
+          <div className="flex h-16 w-full min-w-0 items-center gap-2">
 
             {/* =================================================
                 LEFT SECTION
             ================================================= */}
 
-            <div className="flex min-w-0 shrink-0 items-center gap-2">
+           <div className="flex min-w-0 shrink-0 items-center gap-2">
 
-              
+              {/* HAMBURGER */}
 
+              <div className="group relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(true);
+                    setProfileOpen(false);
+                    setHoveredSidebarItem(null);
 
-{/* HAMBURGER WITH HOVER TOOLTIP */}
+                    setHoverCardPosition((previous) => ({
+                      ...previous,
+                      visible: false,
+                    }));
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200 dark:hover:bg-gray-800"
+                  aria-label="Open owner menu"
+                  aria-expanded={menuOpen}
+                  aria-controls="owner-sidebar"
+                >
+                  <Menu size={24} />
+                </button>
 
-<div className="group relative shrink-0">
-  <button
-    type="button"
-    onClick={() => {
-      setMenuOpen(true);
-      setProfileOpen(false);
-      setHoveredSidebarItem(null);
-
-      setHoverCardPosition((previous) => ({
-        ...previous,
-        visible: false,
-      }));
-    }}
-    className="flex items-center justify-center rounded-lg p-2
-      text-gray-700 transition hover:bg-blue-50
-      focus:outline-none focus:ring-2 focus:ring-blue-300"
-    aria-label="Open owner menu"
-    aria-expanded={menuOpen}
-    aria-controls="owner-sidebar"
-  >
-    <Menu size={24} className="text-gray-700" />
-  </button>
-
-  {/* BLACK TOOLTIP — BELOW THE HAMBURGER */}
-
-  {!menuOpen && (
-    <span
-      role="tooltip"
-    className="pointer-events-none invisible absolute left-0 top-full z-[100]
-  mt-2 hidden whitespace-nowrap rounded-lg
-  bg-slate-900 px-3 py-2 text-xs font-semibold text-white
-  shadow-lg opacity-0 transition-opacity duration-200
-  group-hover:visible group-hover:opacity-100 lg:block"  
-    >
-      Open sidebar
-    </span>
-  )}
-</div>
-
-
+                {!menuOpen && (
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none invisible absolute left-0 top-full z-[100] mt-2 hidden whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:visible group-hover:opacity-100 lg:block"
+                  >
+                    Open sidebar
+                  </span>
+                )}
+              </div>
 
               {/* LOGO */}
 
               <button
                 type="button"
                 onClick={() =>
-                  handleNavigation(
-                    "/owner-dashboard"
-                  )
+                  handleNavigation("/owner-dashboard")
                 }
-                className="flex shrink-0 items-center gap-2"
+                className="flex min-w-0 shrink items-center gap-2"
                 aria-label="Go to owner dashboard"
               >
-
-                <div className="rounded-lg bg-blue-50 p-2">
-
+                <div className="shrink-0 rounded-lg bg-blue-50 p-2 dark:bg-blue-950">
                   <Home
                     size={21}
-                    className="text-blue-600"
+                    className="text-blue-600 dark:text-blue-400"
                   />
-
                 </div>
 
-               <span className="hidden whitespace-nowrap text-[16px] font-semibold text-blue-800 sm:block">Rental Management
+                <span className="hidden max-w-[180px] truncate whitespace-nowrap text-[16px] font-semibold text-blue-800 dark:text-blue-400 sm:block lg:max-w-[210px]">
+                  Rental Management
                 </span>
-
               </button>
-
             </div>
 
-            {/* =================================================
-                DESKTOP NAVIGATION
-            ================================================= */}
+            
+{/* DESKTOP NAVIGATION */}
 
-            <div className="mx-3 hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
+<div className="hidden min-w-0 flex-1 items-center justify-center gap-1.5 min-[1200px]:flex">
+  {navItems.map((item) => {
+    const Icon = item.icon;
+    const active = isActive(item.path);
 
-              {navItems.map((item) => {
-
-                const Icon = item.icon;
-
-                const active =
-                  isActive(item.path);
-
-                return (
-                  <button
-                    type="button"
-                    key={item.name}
-                    onClick={() =>
-                      handleNavigation(
-                        item.path
-                      )
-                    }
-                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium transition ${
-                      active
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-blue-600"
-                    }`}
-                    aria-current={
-                      active
-                        ? "page"
-                        : undefined
-                    }
-                  >
-
-                    <Icon size={17} />
-
-                    <span>
-                      {item.name}
-                    </span>
-
-                  </button>
-                );
-              })}
-
-            </div>
+    return (
+      <button
+        type="button"
+        key={item.name}
+        onClick={() => handleNavigation(item.path)}
+      className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-medium transition xl:px-2.5 xl:text-sm ${
+          active
+            ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+            : "text-gray-600 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+        }`}
+        aria-current={active ? "page" : undefined}
+      >
+        <Icon size={16} />
+        <span>{item.name}</span>
+      </button>
+    );
+  })}
+</div>
 
             {/* =================================================
-                PROFILE MENU
+                RIGHT SECTION
             ================================================= */}
 
-            <div
-              ref={profileRef}
-              className="relative shrink-0"
-            >
+            <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+
+              {/* DARK / LIGHT MODE TOGGLE */}
 
               <button
                 type="button"
-                onClick={() =>
-                  setProfileOpen(
-                    (previous) => !previous
-                  )
+                onClick={toggleTheme}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-yellow-300 dark:hover:bg-gray-800"
+                aria-label={
+                  isDarkMode
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
                 }
-                className={`flex items-center gap-2 rounded-lg p-2 transition ${
-                  profileOpen
-                    ? "bg-blue-50 text-blue-600"
-                    : "hover:bg-gray-100"
-                }`}
-                aria-label="Open owner account"
-                aria-expanded={profileOpen}
+                title={
+                  isDarkMode
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
               >
-
-                <UserCircle
-                  size={28}
-                  className={
-                    profileOpen
-                      ? "text-blue-600"
-                      : "text-gray-600"
-                  }
-                />
-
-                <span className="hidden text-sm font-medium text-gray-700 sm:block">
-                  Owner
-                </span>
-
+                {isDarkMode ? (
+                  <Sun size={21} />
+                ) : (
+                  <Moon size={21} />
+                )}
               </button>
 
-              {/* PROFILE DROPDOWN */}
+              {/* PROFILE MENU */}
 
-              {profileOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border bg-white shadow-xl">
+              <div ref={profileRef} className="relative shrink-0">
 
-                  {/* PROFILE HEADER */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setProfileOpen((previous) => !previous)
+                  }
+                  className={`flex items-center gap-2 rounded-lg p-2 transition ${
+                    profileOpen
+                      ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  }`}
+                  aria-label="Open owner account"
+                  aria-expanded={profileOpen}
+                >
+                  <UserCircle
+                    size={28}
+                    className={
+                      profileOpen
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-300"
+                    }
+                  />
 
-                  <div className="border-b bg-gray-50 p-4">
+                  <span className="hidden text-sm font-medium text-gray-700 dark:text-gray-200 sm:block">
+                    Owner
+                  </span>
+                </button>
 
-                    <div className="flex items-center gap-3">
+                {/* PROFILE DROPDOWN */}
 
-                      <div className="rounded-full bg-blue-50 p-2">
+                {profileOpen && (
+                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
 
-                        <UserCircle
-                          size={24}
-                          className="text-blue-600"
-                        />
+                    {/* PROFILE HEADER */}
 
+                    <div className="border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                      <div className="flex items-center gap-3">
+
+                        <div className="rounded-full bg-blue-50 p-2 dark:bg-blue-950">
+                          <UserCircle
+                            size={24}
+                            className="text-blue-600 dark:text-blue-400"
+                          />
+                        </div>
+
+                        <div>
+                          <p className="font-semibold text-gray-800 dark:text-gray-100">
+                            Owner
+                          </p>
+
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Owner Account
+                          </p>
+                        </div>
                       </div>
-
-                      <div>
-
-                        <p className="font-semibold text-gray-800">
-                          Owner
-                        </p>
-
-                        <p className="text-xs text-gray-500">
-                          Owner Account
-                        </p>
-
-                      </div>
-
                     </div>
 
+                    {/* MY DETAILS */}
+
+                    <button
+                      type="button"
+                      onClick={handleMyDetails}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                    >
+                      <UserCircle size={18} />
+
+                      <span className="text-sm font-medium">
+                        My Details
+                      </span>
+                    </button>
+
+                    {/* CHANGE PASSWORD */}
+
+                    <button
+                      type="button"
+                      onClick={handleChangePassword}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                    >
+                      <Lock size={18} />
+
+                      <span className="text-sm font-medium">
+                        Change Password
+                      </span>
+                    </button>
+
+                    <div className="border-t border-gray-200 dark:border-gray-700" />
+
+                    {/* LOGOUT */}
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+                    >
+                      <LogOut size={18} />
+
+                      <span className="text-sm font-medium">
+                        Logout
+                      </span>
+                    </button>
                   </div>
-
-                  {/* MY DETAILS */}
-
-                  <button
-                    type="button"
-                    onClick={handleMyDetails}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
-                  >
-
-                    <UserCircle size={18} />
-
-                    <span className="text-sm font-medium">
-                      My Details
-                    </span>
-
-                  </button>
-
-                  {/* CHANGE PASSWORD */}
-
-                  <button
-                    type="button"
-                    onClick={handleChangePassword}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600"
-                  >
-
-                    <Lock size={18} />
-
-                    <span className="text-sm font-medium">
-                      Change Password
-                    </span>
-
-                  </button>
-
-                  <div className="border-t" />
-
-                  {/* LOGOUT */}
-
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
-                  >
-
-                    <LogOut size={18} />
-
-                    <span className="text-sm font-medium">
-                      Logout
-                    </span>
-
-                  </button>
-
-                </div>
-              )}
-
+                )}
+              </div>
             </div>
-
           </div>
-
         </div>
-
       </nav>
 
       {/* =====================================================
@@ -962,16 +822,14 @@ function Navbar() {
 
       <button
         type="button"
-        className={`fixed inset-0 z-40 bg-black/10 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 bg-black/10 transition-opacity duration-300 dark:bg-black/50 ${
           menuOpen
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0"
         }`}
         onClick={closeMenu}
         aria-label="Close owner menu overlay"
-        tabIndex={
-          menuOpen ? 0 : -1
-        }
+        tabIndex={menuOpen ? 0 : -1}
       />
 
       {/* =====================================================
@@ -979,10 +837,9 @@ function Navbar() {
       ===================================================== */}
 
       <aside
-        className={`fixed left-0 top-0 z-[60] flex h-screen w-64 max-w-[85vw] flex-col transform bg-white shadow-2xl transition-transform duration-300 ease-in-out sm:w-72 ${
-          menuOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
+        id="owner-sidebar"
+        className={`fixed left-0 top-0 z-[60] flex h-screen w-64 max-w-[85vw] flex-col transform bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:bg-gray-900 sm:w-72 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="Owner sidebar"
         aria-hidden={!menuOpen}
@@ -992,62 +849,51 @@ function Navbar() {
             SIDEBAR HEADER
         ================================================= */}
 
-        <div className="flex h-20 shrink-0 items-center justify-between gap-2 border-b px-3 sm:px-4">
+        <div className="flex h-20 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-3 dark:border-gray-700 sm:px-4">
 
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
 
-            <div className="shrink-0 rounded-lg bg-blue-50 p-2">
-
+            <div className="shrink-0 rounded-lg bg-blue-50 p-2 dark:bg-blue-950">
               <Home
                 size={22}
-                className="text-blue-600"
+                className="text-blue-600 dark:text-blue-400"
               />
-
             </div>
 
             <div className="min-w-0 flex-1">
+              <h2 className="break-words text-[15px] font-semibold leading-5 text-blue-800 dark:text-blue-400">
+                Rental Management
+              </h2>
 
-              <h2 className="break-words text-[15px] font-semibold leading-5 text-blue-800">
-  Rental Management
-</h2>
-
-<p className="mt-0.5 text-[11px] font-normal text-gray-500">
-  Owner Panel
-</p>
+              <p className="mt-0.5 text-[11px] font-normal text-gray-500 dark:text-gray-400">
+                Owner Panel
+              </p>
             </div>
-
           </div>
 
           {/* CLOSE BUTTON */}
 
           <div className="group relative shrink-0">
-
             <button
               type="button"
               onClick={closeMenu}
-              className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className="flex h-9 w-9 items-center justify-center rounded-lg transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:hover:bg-gray-800"
               aria-label="Close owner menu"
             >
-
               <X
                 size={22}
-                className="text-gray-600 transition group-hover:text-blue-600"
+                className="text-gray-600 transition group-hover:text-blue-600 dark:text-gray-300 dark:group-hover:text-blue-400"
               />
-
             </button>
 
             {/* CLOSE TOOLTIP */}
 
             <div className="pointer-events-none absolute right-0 top-full z-[70] mt-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-
               <div className="relative whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs font-semibold text-white shadow-xl">
                 Close sidebar
               </div>
-
             </div>
-
           </div>
-
         </div>
 
         {/* =================================================
@@ -1058,161 +904,101 @@ function Navbar() {
           onScroll={handleSidebarScroll}
           className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
         >
-
           <nav className="space-y-1">
 
             {/* MAIN MENU */}
 
             {navItems.map((item) => {
-
               const Icon = item.icon;
-
-              const active =
-                isActive(item.path);
+              const active = isActive(item.path);
 
               return (
                 <div
                   key={item.name}
-                  onMouseLeave={
-                    handleSidebarLeave
-                  }
+                  onMouseLeave={handleSidebarLeave}
                 >
-
                   <button
                     type="button"
                     onMouseEnter={(event) =>
-                      handleSidebarHover(
-                        item.name,
-                        event
-                      )
+                      handleSidebarHover(item.name, event)
                     }
                     onFocus={(event) =>
-                      handleSidebarHover(
-                        item.name,
-                        event
-                      )
+                      handleSidebarHover(item.name, event)
                     }
-                    onBlur={
-                      handleSidebarLeave
-                    }
+                    onBlur={handleSidebarLeave}
                     onClick={() =>
-                      handleNavigation(
-                        item.path
-                      )
+                      handleNavigation(item.path)
                     }
                     className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                       active
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-700 hover:bg-gray-100"
+                        ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                     }`}
-                    aria-current={
-                      active
-                        ? "page"
-                        : undefined
-                    }
+                    aria-current={active ? "page" : undefined}
                   >
-
-                    <Icon
-                      size={20}
-                      className="shrink-0"
-                    />
+                    <Icon size={20} className="shrink-0" />
 
                     <span className="flex-1 text-[15px] font-medium">
                       {item.name}
                     </span>
-
                   </button>
-
                 </div>
               );
             })}
 
             {/* SETTINGS */}
 
-            <div
-              onMouseLeave={
-                handleSidebarLeave
-              }
-            >
-
+            <div onMouseLeave={handleSidebarLeave}>
               <button
                 type="button"
                 onMouseEnter={(event) =>
-                  handleSidebarHover(
-                    "Settings",
-                    event
-                  )
+                  handleSidebarHover("Settings", event)
                 }
                 onFocus={(event) =>
-                  handleSidebarHover(
-                    "Settings",
-                    event
-                  )
+                  handleSidebarHover("Settings", event)
                 }
-                onBlur={
-                  handleSidebarLeave
-                }
+                onBlur={handleSidebarLeave}
                 onClick={() =>
-                  handleNavigation(
-                    "/settings"
-                  )
+                  handleNavigation("/settings")
                 }
                 className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                   isActive("/settings")
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                 }`}
                 aria-current={
-                  isActive("/settings")
-                    ? "page"
-                    : undefined
+                  isActive("/settings") ? "page" : undefined
                 }
               >
-
-                <Settings
-                  size={20}
-                  className="shrink-0"
-                />
+                <Settings size={20} className="shrink-0" />
 
                 <span className="flex-1 text-[15px] font-medium">
                   Settings
                 </span>
-
               </button>
-
             </div>
 
             <div className="h-4" />
-
           </nav>
-
         </div>
 
         {/* =================================================
-            LOGOUT - FIXED
+            LOGOUT - FIXED AT BOTTOM
         ================================================= */}
 
-        <div className="shrink-0 border-t bg-white px-3 py-3 sm:px-4">
-
+        <div className="shrink-0 border-t border-gray-200 bg-white px-3 py-3 dark:border-gray-700 dark:bg-gray-900 sm:px-4">
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
           >
-
-            <LogOut
-              size={20}
-              className="shrink-0"
-            />
+            <LogOut size={20} className="shrink-0" />
 
             <span className="text-[15px] font-medium">
               Logout
             </span>
-
           </button>
-
         </div>
-
       </aside>
 
       {/* =====================================================
@@ -1222,7 +1008,6 @@ function Navbar() {
       {menuOpen &&
         currentHoverInfo &&
         hoverCardPosition.visible && (
-
           <div
             ref={hoverCardRef}
             className="pointer-events-none fixed z-[70]"
@@ -1234,66 +1019,39 @@ function Navbar() {
             }}
             aria-hidden="true"
           >
+            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
 
-            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-xl">
+              {/* INFORMATION TITLE */}
 
-              {/* =================================================
-                  INFORMATION TITLE
-              ================================================= */}
-
-              <p className="mb-2.5 text-sm font-bold leading-5 text-blue-600">
+              <p className="mb-2.5 text-sm font-bold leading-5 text-blue-600 dark:text-blue-400">
                 {currentHoverInfo.title}
               </p>
 
-              {/* =================================================
-                  DIVIDER
-              ================================================= */}
+              {/* DIVIDER */}
 
-              <div className="mb-2.5 h-px bg-blue-100" />
+              <div className="mb-2.5 h-px bg-blue-100 dark:bg-gray-700" />
 
-              {/* =================================================
-                  INFORMATION ITEMS
-              ================================================= */}
+              {/* INFORMATION ITEMS */}
 
               <div className="space-y-1.5">
+                {currentHoverInfo.items.map((text) => (
+                  <div
+                    key={text}
+                    className="flex items-start gap-2 text-[13px] leading-5 text-gray-600 dark:text-gray-300"
+                  >
+                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
 
-                {currentHoverInfo.items.map(
-                  (text) => (
-
-                    <div
-                      key={text}
-                      className="flex items-start gap-2 text-[13px] leading-5 text-gray-600"
-                    >
-
-                      {/* BLUE DOT */}
-
-                      <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
-
-                      {/* INFORMATION TEXT */}
-
-                      <span>
-                        {text}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
+                    <span>{text}</span>
+                  </div>
+                ))}
               </div>
 
-              {/* =================================================
-                  CARD ARROW
-              ================================================= */}
+              {/* CARD ARROW */}
 
-              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white" />
-
+              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
             </div>
-
           </div>
-
         )}
-
     </>
   );
 }

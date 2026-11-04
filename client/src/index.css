@@ -1,25 +1,99 @@
 @import "tailwindcss";
 
-/* ========================================================= */
+/* =========================================================
+   GLOBAL THEME VARIABLES
+========================================================= */
+
+:root {
+    color-scheme: light;
+    /* Main surfaces */
+    --page-bg: #f8fafc;
+    --surface-bg: #ffffff;
+    --surface-secondary: #f1f5f9;
+    --sidebar-bg: #ffffff;
+    --navbar-bg: #ffffff;
+    /* Text */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    /* Borders */
+    --border-color: #e5e7eb;
+    /* Form elements */
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --input-text: #111827;
+    --placeholder-color: #9ca3af;
+    /* Interactive elements */
+    --hover-bg: #f1f5f9;
+    --active-bg: #eff6ff;
+    /* Shadows */
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
 
 
-/* ================= GLOBAL PAGE SETTINGS ================== */
+/* =========================================================
+   DARK THEME VARIABLES
+========================================================= */
+
+html.dark {
+    color-scheme: dark;
+    /* Main surfaces */
+    --page-bg: #111827;
+    --surface-bg: #1f2937;
+    --surface-secondary: #273449;
+    --sidebar-bg: #1f2937;
+    --navbar-bg: #1f2937;
+    /* Text */
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    /* Borders */
+    --border-color: #374151;
+    /* Form elements */
+    --input-bg: #273449;
+    --input-border: #4b5563;
+    --input-text: #f9fafb;
+    --placeholder-color: #9ca3af;
+    /* Interactive elements */
+    --hover-bg: #374151;
+    --active-bg: #1e3a5f;
+    /* Shadows */
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
+}
 
 
-/* ========================================================= */
+/* =========================================================
+   GLOBAL PAGE SETTINGS
+========================================================= */
 
 html {
     margin: 0;
-    /* Keep scrollbar space reserved.
-     Prevents horizontal layout movement when
-     the sidebar opens and body scrolling is locked. */
     scrollbar-gutter: stable;
-    /* Prevent unwanted overscroll movement */
     overscroll-behavior: none;
 }
 
 body {
     margin: 0;
-    /* Prevent horizontal movement */
     overflow-x: hidden;
+    background-color: var(--page-bg);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+
+/* React application root */
+
+#root {
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY: REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    body {
+        transition: none;
+    }
 }
