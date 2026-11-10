@@ -764,30 +764,37 @@ function TenantDetails() {
               </div>
             </div>
 
-            {/* ACTION BUTTONS */}
+           
+{/* ACTION BUTTONS */}
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <button
-                type="button"
-                onClick={() => navigate(getBackPath())}
-                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
-              >
-                <ArrowLeft size={18} />
-                {isTenantView
-                  ? "Back to Dashboard"
-                  : "Back to Tenants"}
-              </button>
+<div className="flex flex-col sm:flex-row gap-3 mt-8">
+  {/* BACK BUTTON */}
 
-              <button
-                type="button"
-                onClick={() => navigate(getEditPath())}
-                className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
-              >
-                {isTenantView
-                  ? "Edit My Details"
-                  : "Edit Tenant"}
-              </button>
-            </div>
+  <button
+    type="button"
+    onClick={() => navigate(getBackPath())}
+    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
+  >
+    <ArrowLeft size={18} />
+
+    {isTenantView
+      ? "Back to Dashboard"
+      : "Back to Tenants"}
+  </button>
+
+  {/* OWNER-ONLY EDIT BUTTON */}
+
+  {!isTenantView && (
+    <button
+      type="button"
+      onClick={() => navigate(getEditPath())}
+      className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+    >
+      Edit Tenant
+    </button>
+  )}
+</div>
+
           </div>
         </div>
       </main>
