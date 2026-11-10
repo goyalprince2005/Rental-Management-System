@@ -21,37 +21,27 @@ import {
   X,
   Settings,
   ChevronDown,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 function TenantNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // =========================================================
+  // COMPONENT STATE
+  // =========================================================
+
   const [isOpen, setIsOpen] = useState(false);
+
   const [isProfileOpen, setIsProfileOpen] =
     useState(false);
-
-  /*
-   * =========================================================
-   * SIDEBAR HOVER INFORMATION
-   * =========================================================
-   *
-   * Stores the sidebar item currently being hovered.
-   *
-   * This is informational only.
-   *
-   * It does NOT represent notifications,
-   * pending tasks, or unread counts.
-   */
 
   const [
     hoveredSidebarItem,
     setHoveredSidebarItem,
   ] = useState(null);
-
-  /*
-   * Position of the hover information card.
-   */
 
   const [
     hoverCardPosition,
@@ -61,17 +51,39 @@ function TenantNavbar() {
     left: 0,
   });
 
+  // =========================================================
+  // THEME STATE
+  // =========================================================
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => {
+      const savedTheme =
+        localStorage.getItem(
+          "rentalManagementTheme"
+        );
+
+      if (savedTheme) {
+        return savedTheme === "dark";
+      }
+
+      return document.documentElement.classList.contains(
+        "dark"
+      );
+    }
+  );
+
+  // =========================================================
+  // REFS
+  // =========================================================
+
   const profileRef = useRef(null);
 
-  // Used to remember the page position
-  // while the sidebar is open.
   const scrollPositionRef = useRef(0);
 
-  // Used to close the sidebar after navigation.
   const navigationTimerRef = useRef(null);
 
   // =========================================================
-  // MOCK TENANT DATA
+  // TENANT DATA
   // =========================================================
 
   const tenants = {
@@ -98,14 +110,7 @@ function TenantNavbar() {
   const tenant = tenants[tenantId];
 
   // =========================================================
-  // SIDEBAR HOVER INFORMATION
-  // =========================================================
-  //
-  // These descriptions represent the actual sections
-  // already available in the Tenant Portal.
-  //
-  // They are NOT notification badges.
-  // They do NOT represent pending actions.
+  // SIDEBAR INFORMATION
   // =========================================================
 
   const sidebarInfo = {
@@ -178,62 +183,43 @@ function TenantNavbar() {
   };
 
   // =========================================================
-  // LOGOUT
+  // APPLY THEME
   // =========================================================
 
-  const handleLogout = () => {
-    clearNavigationTimer();
+  useEffect(() => {
+    const root = document.documentElement;
 
-    localStorage.removeItem("tenantId");
+    if (isDarkMode) {
+      root.classList.add("dark");
 
-    setIsOpen(false);
-    setIsProfileOpen(false);
-    setHoveredSidebarItem(null);
+      localStorage.setItem(
+        "rentalManagementTheme",
+        "dark"
+      );
+    } else {
+      root.classList.remove("dark");
 
-    navigate("/tenant-login");
-  };
-
-  // =========================================================
-  // MY DETAILS
-  // =========================================================
-
-  const handleMyDetails = () => {
-    const currentTenantId =
-      localStorage.getItem("tenantId");
-
-    if (!currentTenantId) {
-      return;
+      localStorage.setItem(
+        "rentalManagementTheme",
+        "light"
+      );
     }
 
-    /*
-      Navigate first while sidebar + overlay
-      remain visible.
-    */
-
-    navigate(
-      `/tenant-details/${currentTenantId}?view=tenant`
+    window.dispatchEvent(
+      new CustomEvent("themeChanged", {
+        detail: {
+          theme: isDarkMode ? "dark" : "light",
+        },
+      })
     );
-
-    closeSidebarAfterNavigation();
-
-    setIsProfileOpen(false);
-  };
+  }, [isDarkMode]);
 
   // =========================================================
-  // CHANGE PASSWORD
+  // TOGGLE THEME
   // =========================================================
 
-  const handleChangePassword = () => {
-    /*
-      Navigate first.
-      Keep sidebar/overlay visible during route change.
-    */
-
-    navigate("/tenant-change-password");
-
-    closeSidebarAfterNavigation();
-
-    setIsProfileOpen(false);
+  const toggleTheme = () => {
+    setIsDarkMode((previous) => !previous);
   };
 
   // =========================================================
@@ -251,31 +237,11 @@ function TenantNavbar() {
   };
 
   // =========================================================
-  // SIDEBAR NAVIGATION
-  // =========================================================
-
-  const handleSidebarNavigation = (path) => {
-    /*
-      Navigate first while sidebar and overlay
-      are still visible.
-    */
-
-    navigate(path);
-
-    closeSidebarAfterNavigation();
-  };
-
-  // =========================================================
   // CLOSE SIDEBAR AFTER NAVIGATION
   // =========================================================
 
   const closeSidebarAfterNavigation = () => {
     clearNavigationTimer();
-
-    /*
-      Wait for route change to happen underneath
-      the overlay before closing the sidebar.
-    */
 
     navigationTimerRef.current =
       setTimeout(() => {
@@ -295,7 +261,70 @@ function TenantNavbar() {
     clearNavigationTimer();
 
     setIsOpen(false);
+
     setHoveredSidebarItem(null);
+  };
+
+  // =========================================================
+  // LOGOUT
+  // =========================================================
+
+  const handleLogout = () => {
+    clearNavigationTimer();
+
+    localStorage.removeItem("tenantId");
+
+    setIsOpen(false);
+
+    setIsProfileOpen(false);
+
+    setHoveredSidebarItem(null);
+
+    navigate("/tenant-login");
+  };
+
+  // =========================================================
+  // MY DETAILS
+  // =========================================================
+
+  const handleMyDetails = () => {
+    const currentTenantId =
+      localStorage.getItem("tenantId");
+
+    if (!currentTenantId) {
+      navigate("/tenant-login");
+      return;
+    }
+
+    navigate(
+      `/tenant-details/${currentTenantId}?view=tenant`
+    );
+
+    closeSidebarAfterNavigation();
+
+    setIsProfileOpen(false);
+  };
+
+  // =========================================================
+  // CHANGE PASSWORD
+  // =========================================================
+
+  const handleChangePassword = () => {
+    navigate("/tenant-change-password");
+
+    closeSidebarAfterNavigation();
+
+    setIsProfileOpen(false);
+  };
+
+  // =========================================================
+  // SIDEBAR NAVIGATION
+  // =========================================================
+
+  const handleSidebarNavigation = (path) => {
+    navigate(path);
+
+    closeSidebarAfterNavigation();
   };
 
   // =========================================================
@@ -306,19 +335,14 @@ function TenantNavbar() {
     itemName,
     event
   ) => {
+    if (window.innerWidth < 768) {
+      return;
+    }
+
     const rect =
       event.currentTarget.getBoundingClientRect();
 
-    /*
-      Width of the information card.
-    */
-
     const cardWidth = 280;
-
-    /*
-      Keep the information card inside
-      the visible browser window.
-    */
 
     const leftPosition = Math.min(
       rect.right + 12,
@@ -334,7 +358,10 @@ function TenantNavbar() {
         rect.top +
         rect.height / 2,
 
-      left: leftPosition,
+      left: Math.max(
+        12,
+        leftPosition
+      ),
     });
   };
 
@@ -347,7 +374,7 @@ function TenantNavbar() {
   };
 
   // =========================================================
-  // PROFILE DROPDOWN CLOSE
+  // PROFILE DROPDOWN: CLICK OUTSIDE
   // =========================================================
 
   useEffect(() => {
@@ -367,16 +394,52 @@ function TenantNavbar() {
       handleClickOutside
     );
 
+    document.addEventListener(
+      "touchstart",
+      handleClickOutside
+    );
+
     return () => {
       document.removeEventListener(
         "mousedown",
+        handleClickOutside
+      );
+
+      document.removeEventListener(
+        "touchstart",
         handleClickOutside
       );
     };
   }, []);
 
   // =========================================================
-  // LOCK BACKGROUND PAGE
+  // ESCAPE KEY
+  // =========================================================
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeSidebar();
+
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener(
+      "keydown",
+      handleEscape
+    );
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        handleEscape
+      );
+    };
+  }, []);
+
+  // =========================================================
+  // LOCK BACKGROUND SCROLL WHEN SIDEBAR IS OPEN
   // =========================================================
 
   useEffect(() => {
@@ -386,86 +449,74 @@ function TenantNavbar() {
     const body =
       document.body;
 
-    if (isOpen) {
-      /*
-        Save current scroll position only
-        when sidebar opens.
-      */
-
-      scrollPositionRef.current =
-        window.scrollY;
-
-      /*
-        Completely freeze background page.
-      */
-
-      body.style.position = "fixed";
-
-      body.style.top =
-        `-${scrollPositionRef.current}px`;
-
-      body.style.left = "0";
-      body.style.right = "0";
-      body.style.width = "100%";
-      body.style.overflow = "hidden";
-
-      /*
-        Prevent horizontal movement.
-      */
-
-      html.style.overflow = "hidden";
-
-      html.style.overscrollBehavior =
-        "none";
-    } else {
-      /*
-        Restore normal page.
-      */
-
-      const savedScrollPosition =
-        scrollPositionRef.current;
-
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-      body.style.overflow = "";
-
-      html.style.overflow = "";
-
-      html.style.overscrollBehavior =
-        "";
-
-      /*
-        Restore old scroll position only
-        when sidebar was normally closed.
-      */
-
-      if (
-        !navigationTimerRef.current
-      ) {
-        window.scrollTo(
-          0,
-          savedScrollPosition
-        );
-      }
-
-      setHoveredSidebarItem(null);
+    if (!isOpen) {
+      return undefined;
     }
 
-    return () => {
-      body.style.position = "";
-      body.style.top = "";
-      body.style.left = "";
-      body.style.right = "";
-      body.style.width = "";
-      body.style.overflow = "";
+    const previousBodyStyles = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+    };
 
-      html.style.overflow = "";
+    const previousHtmlStyles = {
+      overflow: html.style.overflow,
+      overscrollBehavior:
+        html.style.overscrollBehavior,
+    };
+
+    const savedScrollPosition =
+      scrollPositionRef.current;
+
+    body.style.position = "fixed";
+
+    body.style.top =
+      `-${savedScrollPosition}px`;
+
+    body.style.left = "0";
+
+    body.style.right = "0";
+
+    body.style.width = "100%";
+
+    body.style.overflow = "hidden";
+
+    html.style.overflow = "hidden";
+
+    html.style.overscrollBehavior = "none";
+
+    return () => {
+      body.style.position =
+        previousBodyStyles.position;
+
+      body.style.top =
+        previousBodyStyles.top;
+
+      body.style.left =
+        previousBodyStyles.left;
+
+      body.style.right =
+        previousBodyStyles.right;
+
+      body.style.width =
+        previousBodyStyles.width;
+
+      body.style.overflow =
+        previousBodyStyles.overflow;
+
+      html.style.overflow =
+        previousHtmlStyles.overflow;
 
       html.style.overscrollBehavior =
-        "none";
+        previousHtmlStyles.overscrollBehavior;
+
+      window.scrollTo(
+        0,
+        savedScrollPosition
+      );
     };
   }, [isOpen]);
 
@@ -480,13 +531,11 @@ function TenantNavbar() {
   }, []);
 
   // =========================================================
-  // ACTIVE PAGE
+  // ACTIVE ROUTE HELPERS
   // =========================================================
 
   const isActive = (path) => {
-    return (
-      location.pathname === path
-    );
+    return location.pathname === path;
   };
 
   const isDetailsActive = () => {
@@ -516,89 +565,87 @@ function TenantNavbar() {
 
   const currentHoverInfo =
     hoveredSidebarItem
-      ? sidebarInfo[
-          hoveredSidebarItem
-        ]
+      ? sidebarInfo[hoveredSidebarItem]
       : null;
-
-  return (
+        return (
     <>
       {/* ===================================================== */}
-      {/* ================= TOP NAVBAR ======================== */}
+      {/* TOP NAVBAR */}
       {/* ===================================================== */}
 
-      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
+      <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
 
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-4 md:px-6">
 
-          {/* ================= LEFT SIDE ================= */}
+          {/* LEFT SIDE */}
 
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
 
-            {/* HAMBURGER */}
+            {/* HAMBURGER + OPEN SIDEBAR TOOLTIP */}
 
-            <button
-              type="button"
-              onClick={() => {
-                clearNavigationTimer();
+            <div className="group relative shrink-0">
 
-                /*
-                  Save position before opening.
-                */
+              <button
+                type="button"
+                onClick={() => {
+                  clearNavigationTimer();
 
-                scrollPositionRef.current =
-                  window.scrollY;
+                  scrollPositionRef.current =
+                    window.scrollY;
 
-                setIsOpen(true);
+                  setIsOpen(true);
 
-                setIsProfileOpen(
-                  false
-                );
-              }}
-              className="p-2 rounded-lg hover:bg-green-50 transition"
-              aria-label="Open tenant menu"
-              title="Open Menu"
-            >
-              <Menu
-                size={24}
-                className="text-gray-700"
-              />
-            </button>
+                  setIsProfileOpen(false);
+                }}
+                className="rounded-lg p-2 transition hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:hover:bg-gray-800"
+                aria-label="Open tenant sidebar"
+                aria-expanded={isOpen}
+                
+              >
+                <Menu
+                  size={24}
+                  className="text-gray-700 dark:text-gray-200"
+                />
+              </button>
+
+              <span className="pointer-events-none absolute left-[calc(50%+12px)] top-full z-[100] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                Open Sidebar
+              </span>
+
+            </div>
 
             {/* LOGO */}
 
             <button
               type="button"
               onClick={() =>
-                navigate(
-                  "/tenant-dashboard"
-                )
+                navigate("/tenant-dashboard")
               }
-              className="flex items-center gap-3"
+              className="flex min-w-0 items-center gap-2 sm:gap-3"
+              aria-label="Go to tenant dashboard"
             >
-              <div className="p-2 bg-green-50 rounded-lg">
+              <div className="shrink-0 rounded-lg bg-green-50 p-2 dark:bg-green-900/30">
 
                 <Home
                   size={22}
-                  className="text-green-600"
+                  className="text-green-600 dark:text-green-400"
                 />
 
               </div>
 
-              <span className="text-xl font-bold text-green-600">
+              <span className="truncate text-base font-bold text-green-600 dark:text-green-400 sm:text-xl">
                 Tenant Portal
               </span>
             </button>
 
           </div>
 
-          {/* ================================================= */}
-          {/* ================= TOP NAV LINKS ================= */}
-          {/* ================================================= */}
+          {/* DESKTOP NAVIGATION */}
 
-          <nav className="hidden lg:flex items-center gap-1">
-
-            {/* DASHBOARD */}
+          <nav
+            className="hidden items-center gap-1 lg:flex"
+            aria-label="Tenant navigation"
+          >
 
             <button
               type="button"
@@ -607,19 +654,15 @@ function TenantNavbar() {
                   "/tenant-dashboard"
                 )
               }
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive(
-                  "/tenant-dashboard"
-                )
-                  ? "bg-green-50 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isActive("/tenant-dashboard")
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
               }`}
             >
               Dashboard
             </button>
 
-            {/* PAYMENTS */}
-
             <button
               type="button"
               onClick={() =>
@@ -627,19 +670,15 @@ function TenantNavbar() {
                   "/tenant-payments"
                 )
               }
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive(
-                  "/tenant-payments"
-                )
-                  ? "bg-green-50 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isActive("/tenant-payments")
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
               }`}
             >
               Payments
             </button>
 
-            {/* DOCUMENTS */}
-
             <button
               type="button"
               onClick={() =>
@@ -647,19 +686,15 @@ function TenantNavbar() {
                   "/tenant-documents"
                 )
               }
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive(
-                  "/tenant-documents"
-                )
-                  ? "bg-green-50 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isActive("/tenant-documents")
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
               }`}
             >
               Documents
             </button>
 
-            {/* NOTICES */}
-
             <button
               type="button"
               onClick={() =>
@@ -667,19 +702,15 @@ function TenantNavbar() {
                   "/tenant-notices"
                 )
               }
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive(
-                  "/tenant-notices"
-                )
-                  ? "bg-green-50 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isActive("/tenant-notices")
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
               }`}
             >
               Notices
             </button>
 
-            {/* MAINTENANCE */}
-
             <button
               type="button"
               onClick={() =>
@@ -687,12 +718,10 @@ function TenantNavbar() {
                   "/tenant-maintenance"
                 )
               }
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive(
-                  "/tenant-maintenance"
-                )
-                  ? "bg-green-50 text-green-600"
-                  : "text-gray-700 hover:bg-gray-100"
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isActive("/tenant-maintenance")
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
               }`}
             >
               Maintenance
@@ -700,11 +729,57 @@ function TenantNavbar() {
 
           </nav>
 
-          {/* ================================================= */}
-          {/* ================= PROFILE ======================== */}
-          {/* ================================================= */}
+          {/* RIGHT SIDE: THEME + PROFILE */}
 
-          <div className="flex items-center">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+
+            {/* ================================================= */}
+            {/* LIGHT / DARK MODE TOGGLE */}
+            {/* ================================================= */}
+
+            <div className="group relative">
+
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="rounded-lg p-2 text-gray-700 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 dark:text-gray-200 dark:hover:bg-gray-800"
+                aria-label={
+                  isDarkMode
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
+                }
+                title={
+                  isDarkMode
+                    ? "Light Mode"
+                    : "Dark Mode"
+                }
+              >
+
+                {isDarkMode ? (
+                  <Sun
+                    size={21}
+                    className="text-yellow-400"
+                  />
+                ) : (
+                  <Moon
+                    size={21}
+                    className="text-gray-700"
+                  />
+                )}
+
+              </button>
+
+              <span className="pointer-events-none absolute right-0 top-full z-[100] mt-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
+                {isDarkMode
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"}
+              </span>
+
+            </div>
+
+            {/* ================================================= */}
+            {/* PROFILE DROPDOWN */}
+            {/* ================================================= */}
 
             <div
               ref={profileRef}
@@ -715,35 +790,36 @@ function TenantNavbar() {
                 type="button"
                 onClick={() =>
                   setIsProfileOpen(
-                    (prev) => !prev
+                    (previous) => !previous
                   )
                 }
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
+                className={`flex items-center gap-2 rounded-lg px-2 py-2 transition sm:px-3 ${
                   isProfileOpen
-                    ? "bg-green-50 text-green-600"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-green-50 text-green-600 dark:bg-gray-800 dark:text-green-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
                 }`}
                 aria-label="Open tenant profile"
+                aria-expanded={isProfileOpen}
               >
 
-                <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
 
                   <User
                     size={20}
-                    className="text-green-600"
+                    className="text-green-600 dark:text-green-400"
                   />
 
                 </div>
 
-                <div className="hidden md:block text-left">
+                <div className="hidden min-w-0 text-left md:block">
 
-                  <p className="text-sm font-semibold text-gray-800">
+                  <p className="max-w-32 truncate text-sm font-semibold text-gray-800 dark:text-gray-100">
                     {tenant
                       ? tenant.name
                       : "Tenant"}
                   </p>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     My Account
                   </p>
 
@@ -751,7 +827,7 @@ function TenantNavbar() {
 
                 <ChevronDown
                   size={17}
-                  className={`hidden sm:block transition-transform ${
+                  className={`hidden transition-transform sm:block ${
                     isProfileOpen
                       ? "rotate-180"
                       : ""
@@ -763,32 +839,32 @@ function TenantNavbar() {
               {/* PROFILE MENU */}
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border overflow-hidden z-50">
+                <div className="absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
 
                   {/* PROFILE HEADER */}
 
-                  <div className="p-4 border-b bg-gray-50">
+                  <div className="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
 
                     <div className="flex items-center gap-3">
 
-                      <div className="w-11 h-11 rounded-full bg-green-100 flex items-center justify-center">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
 
                         <User
                           size={22}
-                          className="text-green-600"
+                          className="text-green-600 dark:text-green-400"
                         />
 
                       </div>
 
                       <div className="min-w-0">
 
-                        <p className="font-semibold text-gray-800 truncate">
+                        <p className="truncate font-semibold text-gray-800 dark:text-gray-100">
                           {tenant
                             ? tenant.name
                             : "Tenant"}
                         </p>
 
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           Tenant Account
                         </p>
 
@@ -802,13 +878,11 @@ function TenantNavbar() {
 
                   <button
                     type="button"
-                    onClick={
-                      handleMyDetails
-                    }
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
+                    onClick={handleMyDetails}
+                    className={`flex w-full items-center gap-3 px-4 py-3 text-left transition ${
                       isDetailsActive()
-                        ? "bg-green-50 text-green-600"
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800"
                     }`}
                   >
                     <User size={18} />
@@ -822,13 +896,11 @@ function TenantNavbar() {
 
                   <button
                     type="button"
-                    onClick={
-                      handleChangePassword
-                    }
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition ${
+                    onClick={handleChangePassword}
+                    className={`flex w-full items-center gap-3 px-4 py-3 text-left transition ${
                       isChangePasswordActive()
-                        ? "bg-green-50 text-green-600"
-                        : "text-gray-700 hover:bg-gray-50"
+                        ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                        : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-800"
                     }`}
                   >
                     <Settings size={18} />
@@ -838,16 +910,14 @@ function TenantNavbar() {
                     </span>
                   </button>
 
-                  <div className="border-t" />
+                  <div className="border-t border-gray-100 dark:border-gray-700" />
 
                   {/* LOGOUT */}
 
                   <button
                     type="button"
-                    onClick={
-                      handleLogout
-                    }
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
                   >
                     <LogOut size={18} />
 
@@ -860,60 +930,64 @@ function TenantNavbar() {
               )}
 
             </div>
+
           </div>
 
         </div>
+
       </header>
 
       {/* ===================================================== */}
-      {/* ================= BACKGROUND OVERLAY ================= */}
+      {/* BACKGROUND OVERLAY */}
       {/* ===================================================== */}
 
       <div
-        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 touch-none ${
+        className={`fixed inset-0 z-40 touch-none bg-black/40 transition-opacity duration-300 ${
           isOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
         }`}
         onClick={closeSidebar}
         aria-hidden="true"
       />
 
       {/* ===================================================== */}
-      {/* ================= TENANT SIDEBAR ===================== */}
+      {/* TENANT SIDEBAR */}
       {/* ===================================================== */}
 
       <aside
-  className={`fixed left-0 top-0 h-screen w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-    isOpen
-      ? "translate-x-0"
-      : "-translate-x-full"
-  }`}
-  onMouseLeave={handleSidebarLeave}
->
+        id="tenant-sidebar"
+        className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-[min(18rem,85vw)] flex-col border-r border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:border-gray-700 dark:bg-gray-900 ${
+          isOpen
+            ? "translate-x-0"
+            : "-translate-x-full"
+        }`}
+        onMouseLeave={handleSidebarLeave}
+        aria-label="Tenant navigation sidebar"
+      >
 
-        {/* ================= SIDEBAR HEADER ================= */}
+        {/* SIDEBAR HEADER */}
 
-        <div className="h-20 border-b px-5 flex items-center justify-between">
+        <div className="flex h-20 shrink-0 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-700 sm:px-5">
 
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
 
-            <div className="p-2 bg-green-50 rounded-lg">
+            <div className="shrink-0 rounded-lg bg-green-50 p-2 dark:bg-green-900/30">
 
               <Home
                 size={22}
-                className="text-green-600"
+                className="text-green-600 dark:text-green-400"
               />
 
             </div>
 
-            <div>
+            <div className="min-w-0">
 
-              <h2 className="text-xl font-bold text-green-600">
+              <h2 className="truncate text-lg font-bold text-green-600 dark:text-green-400 sm:text-xl">
                 Tenant Portal
               </h2>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Tenant Panel
               </p>
 
@@ -921,75 +995,56 @@ function TenantNavbar() {
 
           </div>
 
-          {/* ================================================= */}
-          {/* CLOSE BUTTON + TOOLTIP */}
-          {/* ================================================= */}
+          {/* CLOSE BUTTON + CLOSE TOOLTIP */}
 
-          <div className="relative group">
+          <div className="group relative shrink-0">
 
             <button
               type="button"
               onClick={closeSidebar}
-              className="p-2 rounded-lg hover:bg-gray-100 transition"
-              aria-label="Close tenant menu"
+              className="rounded-lg p-2 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 dark:hover:bg-gray-800"
+              aria-label="Close tenant sidebar"
+              
             >
               <X
                 size={22}
-                className="text-gray-700"
+                className="text-gray-700 dark:text-gray-200"
               />
             </button>
 
-            {/* CLOSE SIDEBAR TOOLTIP */}
-
-            <div className="pointer-events-none absolute right-0 top-full mt-2 z-[90] opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-
-              <div className="relative whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-lg">
-
-                Close sidebar
-
-                <span className="absolute -top-1 right-3 h-2 w-2 rotate-45 bg-gray-900" />
-
-              </div>
-
-            </div>
+            <span className="pointer-events-none absolute right-0 top-full z-[100] mt-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+              Close Sidebar
+            </span>
 
           </div>
 
         </div>
+                {/* ================================================= */}
+        {/* SIDEBAR MENU */}
+        {/* ================================================= */}
 
-        {/* ================= SIDEBAR MENU ================= */}
+        <div className="h-[calc(100%-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain p-3">
 
-        <div className="p-3 overflow-y-auto h-[calc(100vh-5rem)] overscroll-contain overflow-x-hidden">
-
-          {/* ================================================= */}
           {/* DASHBOARD */}
-          {/* ================================================= */}
 
           <button
             type="button"
             onMouseEnter={(event) =>
-              handleSidebarHover(
-                "Dashboard",
-                event
-              )
+              handleSidebarHover("Dashboard", event)
             }
             onFocus={(event) =>
-              handleSidebarHover(
-                "Dashboard",
-                event
-              )
+              handleSidebarHover("Dashboard", event)
             }
+            onBlur={handleSidebarLeave}
             onClick={() =>
               handleSidebarNavigation(
                 "/tenant-dashboard"
               )
             }
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              isActive(
-                "/tenant-dashboard"
-              )
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isActive("/tenant-dashboard")
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <Home size={22} />
@@ -999,29 +1054,22 @@ function TenantNavbar() {
             </span>
           </button>
 
-          {/* ================================================= */}
           {/* MY DETAILS */}
-          {/* ================================================= */}
 
           <button
             type="button"
             onMouseEnter={(event) =>
-              handleSidebarHover(
-                "My Details",
-                event
-              )
+              handleSidebarHover("My Details", event)
             }
             onFocus={(event) =>
-              handleSidebarHover(
-                "My Details",
-                event
-              )
+              handleSidebarHover("My Details", event)
             }
+            onBlur={handleSidebarLeave}
             onClick={handleMyDetails}
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isDetailsActive()
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <User size={22} />
@@ -1031,35 +1079,26 @@ function TenantNavbar() {
             </span>
           </button>
 
-          {/* ================================================= */}
           {/* PAYMENTS */}
-          {/* ================================================= */}
 
           <button
             type="button"
             onMouseEnter={(event) =>
-              handleSidebarHover(
-                "Payments",
-                event
-              )
+              handleSidebarHover("Payments", event)
             }
             onFocus={(event) =>
-              handleSidebarHover(
-                "Payments",
-                event
-              )
+              handleSidebarHover("Payments", event)
             }
+            onBlur={handleSidebarLeave}
             onClick={() =>
               handleSidebarNavigation(
                 "/tenant-payments"
               )
             }
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              isActive(
-                "/tenant-payments"
-              )
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isActive("/tenant-payments")
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <CreditCard size={22} />
@@ -1069,35 +1108,26 @@ function TenantNavbar() {
             </span>
           </button>
 
-          {/* ================================================= */}
           {/* DOCUMENTS */}
-          {/* ================================================= */}
 
           <button
             type="button"
             onMouseEnter={(event) =>
-              handleSidebarHover(
-                "Documents",
-                event
-              )
+              handleSidebarHover("Documents", event)
             }
             onFocus={(event) =>
-              handleSidebarHover(
-                "Documents",
-                event
-              )
+              handleSidebarHover("Documents", event)
             }
+            onBlur={handleSidebarLeave}
             onClick={() =>
               handleSidebarNavigation(
                 "/tenant-documents"
               )
             }
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              isActive(
-                "/tenant-documents"
-              )
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isActive("/tenant-documents")
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <FileText size={22} />
@@ -1107,35 +1137,26 @@ function TenantNavbar() {
             </span>
           </button>
 
-          {/* ================================================= */}
           {/* NOTICES */}
-          {/* ================================================= */}
 
           <button
             type="button"
             onMouseEnter={(event) =>
-              handleSidebarHover(
-                "Notices",
-                event
-              )
+              handleSidebarHover("Notices", event)
             }
             onFocus={(event) =>
-              handleSidebarHover(
-                "Notices",
-                event
-              )
+              handleSidebarHover("Notices", event)
             }
+            onBlur={handleSidebarLeave}
             onClick={() =>
               handleSidebarNavigation(
                 "/tenant-notices"
               )
             }
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              isActive(
-                "/tenant-notices"
-              )
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isActive("/tenant-notices")
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <Bell size={22} />
@@ -1145,9 +1166,7 @@ function TenantNavbar() {
             </span>
           </button>
 
-          {/* ================================================= */}
-          {/* MAINTENANCE */}
-          {/* ================================================= */}
+          {/* MAINTENANCE & COMPLAINTS */}
 
           <button
             type="button"
@@ -1163,36 +1182,35 @@ function TenantNavbar() {
                 event
               )
             }
+            onBlur={handleSidebarLeave}
             onClick={() =>
               handleSidebarNavigation(
                 "/tenant-maintenance"
               )
             }
-            className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition text-left mb-2 ${
-              isActive(
-                "/tenant-maintenance"
-              )
-                ? "bg-green-50 text-green-600"
-                : "text-gray-700 hover:bg-gray-100"
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isActive("/tenant-maintenance")
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             <Wrench size={22} />
 
             <span className="text-base font-medium">
-              Maintenance & Complaints
+              Maintenance &amp; Complaints
             </span>
           </button>
 
-          {/* ================= DIVIDER ================= */}
+          {/* DIVIDER */}
 
-          <div className="border-t my-4" />
+          <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
 
-          {/* ================= LOGOUT ================= */}
+          {/* LOGOUT */}
 
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-4 px-4 py-4 rounded-xl text-left text-red-600 hover:bg-red-50 transition"
+            className="flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400 dark:hover:bg-red-950/30"
           >
             <LogOut size={22} />
 
@@ -1206,80 +1224,57 @@ function TenantNavbar() {
       </aside>
 
       {/* ===================================================== */}
-      {/* FIXED TENANT SIDEBAR INFORMATION CARD */}
+      {/* SIDEBAR HOVER INFORMATION CARD */}
       {/* ===================================================== */}
-      {/*
-        The card is outside the sidebar so it cannot
-        be clipped by overflow-x-hidden.
-      */}
 
-      {isOpen &&
-        currentHoverInfo && (
-          <div
-            className="fixed z-[80] pointer-events-none"
-            style={{
-              top:
-                `${hoverCardPosition.top}px`,
+      {isOpen && currentHoverInfo && (
+        <div
+          className="pointer-events-none fixed z-[80] hidden -translate-y-1/2 md:block"
+          style={{
+            top: `${hoverCardPosition.top}px`,
+            left: `${hoverCardPosition.left}px`,
+          }}
+        >
 
-              left:
-                `${hoverCardPosition.left}px`,
+          <div className="relative w-[280px] rounded-xl border border-green-100 bg-white px-4 py-3 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
 
-              transform:
-                "translateY(-50%)",
-            }}
-          >
+            {/* CARD TITLE */}
 
-            {/* ================================================= */}
-            {/* WHITE + GREEN INFORMATION CARD */}
-            {/* ================================================= */}
+            <p className="mb-2 text-sm font-semibold text-green-600 dark:text-green-400">
+              {currentHoverInfo.title}
+            </p>
 
-            <div className="relative w-[280px] rounded-xl bg-white border border-green-100 px-4 py-3 text-gray-700 shadow-xl">
+            {/* DIVIDER */}
 
-              {/* CARD TITLE */}
+            <div className="mb-2 h-px bg-green-50 dark:bg-gray-700" />
 
-              <p className="text-sm font-semibold text-green-600 mb-2">
-                {currentHoverInfo.title}
-              </p>
+            {/* INFORMATION ITEMS */}
 
-              {/* DIVIDER */}
+            <div className="space-y-1.5">
 
-              <div className="h-px bg-green-50 mb-2" />
+              {currentHoverInfo.items.map(
+                (text, index) => (
+                  <div
+                    key={`${currentHoverInfo.title}-${index}`}
+                    className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300"
+                  >
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
 
-              {/* CARD INFORMATION */}
-
-              <div className="space-y-1.5">
-
-                {currentHoverInfo.items.map(
-                  (text, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-2 text-xs text-gray-600"
-                    >
-
-                      {/* GREEN BULLET */}
-
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-
-                      <span>
-                        {text}
-                      </span>
-
-                    </div>
-                  )
-                )}
-
-              </div>
-
-              {/* ================================================= */}
-              {/* INFORMATION CARD ARROW */}
-              {/* ================================================= */}
-
-              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white" />
+                    <span>{text}</span>
+                  </div>
+                )
+              )}
 
             </div>
 
+            {/* CARD ARROW */}
+
+            <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
+
           </div>
-        )}
+
+        </div>
+      )}
 
     </>
   );
