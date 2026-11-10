@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   User,
   Building2,
@@ -13,135 +14,175 @@ import {
   AlertCircle,
   ArrowRight,
 } from "lucide-react";
+
 import TenantNavbar from "./TenantNavbar";
 
 const LATE_PENALTY_PER_DAY = 50;
 
+// =========================================================
+// TEMPORARY DEMO DATA
+// Replace this with API data when backend is implemented.
+// =========================================================
+
+const DEMO_TENANTS = {
+  "1": {
+    id: "1",
+    name: "Rahul Sharma",
+    phone: "9876543210",
+    property: "Green View Apartments",
+    location: "Bhopal",
+    room: "101",
+    monthlyRent: 5000,
+    paymentStatus: "Paid",
+    joiningDate: "2026-01-10",
+    rentDueDay: 10,
+  },
+
+  "2": {
+    id: "2",
+    name: "Aman Kumar",
+    phone: "9876543211",
+    property: "Green View Apartments",
+    location: "Bhopal",
+    room: "102",
+    monthlyRent: 6000,
+    paymentStatus: "Paid",
+    joiningDate: "2026-02-05",
+    rentDueDay: 5,
+  },
+
+  "3": {
+    id: "3",
+    name: "Neha Sharma",
+    phone: "9876543212",
+    property: "Shyam Residency",
+    location: "Bhopal",
+    room: "203",
+    monthlyRent: 5500,
+    paymentStatus: "Due",
+    joiningDate: "2026-03-15",
+    rentDueDay: 15,
+  },
+};
+
+// =========================================================
+// TEMPORARY DEMO PAYMENT HISTORY
+// This is not actual payment information.
+// =========================================================
+
+const getDemoPayments = (monthlyRent, rentDueDay) => [
+  {
+    id: 1,
+    month: "August 2026",
+    amount: Number(monthlyRent),
+    date: `August ${rentDueDay}, 2026`,
+    status: "Paid",
+  },
+  {
+    id: 2,
+    month: "July 2026",
+    amount: Number(monthlyRent),
+    date: `July ${rentDueDay}, 2026`,
+    status: "Paid",
+  },
+  {
+    id: 3,
+    month: "June 2026",
+    amount: Number(monthlyRent),
+    date: `June ${rentDueDay}, 2026`,
+    status: "Paid",
+  },
+];
+
+// =========================================================
+// REUSABLE CURRENCY FORMATTER
+// =========================================================
+
+const formatCurrency = (amount) =>
+  Number(amount || 0).toLocaleString("en-IN", {
+    maximumFractionDigits: 0,
+  });
+
+// =========================================================
+// TENANT DASHBOARD COMPONENT
+// =========================================================
+
 function TenantDashboard() {
   const navigate = useNavigate();
 
-  // ================= MOCK TENANT DATA =================
-
-  const tenants = {
-    "1": {
-      id: "1",
-      name: "Rahul Sharma",
-      phone: "9876543210",
-      property: "Green View Apartments",
-      location: "Bhopal",
-      room: "101",
-      monthlyRent: 5000,
-      paymentStatus: "Paid",
-      joiningDate: "2026-01-10",
-      rentDueDay: 10,
-    },
-
-    "2": {
-      id: "2",
-      name: "Aman Kumar",
-      phone: "9876543211",
-      property: "Green View Apartments",
-      location: "Bhopal",
-      room: "102",
-      monthlyRent: 6000,
-      paymentStatus: "Paid",
-      joiningDate: "2026-02-05",
-      rentDueDay: 5,
-    },
-
-    "3": {
-      id: "3",
-      name: "Neha Sharma",
-      phone: "9876543212",
-      property: "Shyam Residency",
-      location: "Bhopal",
-      room: "203",
-      monthlyRent: 5500,
-      paymentStatus: "Due",
-      joiningDate: "2026-03-15",
-      rentDueDay: 15,
-    },
-  };
-
-  // ================= GET LOGGED-IN TENANT =================
+  // =======================================================
+  // GET LOGGED-IN TENANT SESSION
+  // =======================================================
 
   const tenantId = localStorage.getItem("tenantId");
 
-  const tenant = tenants[tenantId];
+  // The tenant records remain temporary demo data until
+  // the backend and database are connected.
+  const tenant = tenantId ? DEMO_TENANTS[tenantId] : null;
 
-  // ================= INVALID TENANT =================
-
-  if (!tenant) {
-    return (
-      <div className="min-h-screen bg-gray-100">
-        <TenantNavbar />
-
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Tenant Session Not Found
-            </h2>
-
-            <p className="text-gray-500 mt-2">
-              Please login again to access your dashboard.
-            </p>
-
-            <button
-              onClick={() => navigate("/tenant-login")}
-              className="mt-5 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
-            >
-              Go to Tenant Login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ================= RENT PAYMENT CALCULATION =================
+  // =======================================================
+  // RENT PAYMENT CALCULATION
+  // =======================================================
 
   const paymentInfo = useMemo(() => {
+    if (!tenant) {
+      return null;
+    }
+
+    const monthlyRent = Number(tenant.monthlyRent);
+    const dueDay = Number(tenant.rentDueDay);
+
+    if (!Number.isFinite(monthlyRent) || monthlyRent < 0) {
+      return {
+        status: "Unavailable",
+        daysUntilDue: 0,
+        daysLate: 0,
+        penalty: 0,
+        total: 0,
+        dueDate: null,
+        dueDateText: "Unavailable",
+      };
+    }
+
+    if (
+      !Number.isInteger(dueDay) ||
+      dueDay < 1 ||
+      dueDay > 31
+    ) {
+      return {
+        status: "Not Configured",
+        daysUntilDue: 0,
+        daysLate: 0,
+        penalty: 0,
+        total: monthlyRent,
+        dueDate: null,
+        dueDateText: "Not configured",
+      };
+    }
+
     const today = new Date();
 
     const year = today.getFullYear();
     const month = today.getMonth();
     const todayDate = today.getDate();
 
-    const dueDay = Number(tenant.rentDueDay);
-
-    if (!dueDay) {
-      return {
-        status: "Not Configured",
-        daysUntilDue: 0,
-        daysLate: 0,
-        penalty: 0,
-        total: Number(tenant.monthlyRent),
-        dueDate: null,
-        dueDateText: "Not configured",
-      };
-    }
-
-    // Last day of current month
     const lastDayOfMonth = new Date(
       year,
       month + 1,
       0
     ).getDate();
 
-    // Prevent invalid dates such as February 31
     const actualDueDay = Math.min(
       dueDay,
       lastDayOfMonth
     );
 
-    // Current month's due date
     const dueDate = new Date(
       year,
       month,
       actualDueDay
     );
 
-    // Date without time
     const todayOnly = new Date(
       year,
       month,
@@ -149,10 +190,9 @@ function TenantDashboard() {
     );
 
     const differenceInMilliseconds =
-      todayOnly.getTime() -
-      dueDate.getTime();
+      todayOnly.getTime() - dueDate.getTime();
 
-    const differenceInDays = Math.floor(
+    const differenceInDays = Math.round(
       differenceInMilliseconds /
         (1000 * 60 * 60 * 24)
     );
@@ -174,15 +214,16 @@ function TenantDashboard() {
         daysLate * LATE_PENALTY_PER_DAY;
     }
 
-    const total =
-      Number(tenant.monthlyRent) + penalty;
+    const total = monthlyRent + penalty;
 
-    const dueDateText =
-      dueDate.toLocaleDateString("en-IN", {
+    const dueDateText = dueDate.toLocaleDateString(
+      "en-IN",
+      {
         day: "numeric",
         month: "long",
         year: "numeric",
-      });
+      }
+    );
 
     return {
       status,
@@ -195,713 +236,646 @@ function TenantDashboard() {
     };
   }, [tenant]);
 
-  // ================= RECENT PAYMENTS =================
+  // =======================================================
+  // RECENT PAYMENTS
+  // =======================================================
 
-const recentPayments = [
-  {
-    id: 1,
-    month: "August 2026",
-    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-    date: `August ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
+  const recentPayments = useMemo(() => {
+    if (!tenant) {
+      return [];
+    }
 
-  {
-    id: 2,
-    month: "July 2026",
-    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-    date: `July ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
+    return getDemoPayments(
+      tenant.monthlyRent,
+      tenant.rentDueDay
+    );
+  }, [tenant]);
 
-  {
-    id: 3,
-    month: "June 2026",
-    amount: `₹${Number(tenant.monthlyRent).toLocaleString("en-IN")}`,
-    date: `June ${tenant.rentDueDay}, 2026`,
-    status: "Paid",
-  },
-];
-
-  // ================= STATUS HELPERS =================
+  // =======================================================
+  // STATUS STYLING
+  // =======================================================
 
   const getStatusColor = () => {
-    if (paymentInfo.status === "Overdue") {
-      return "text-red-600";
+    if (paymentInfo?.status === "Overdue") {
+      return "text-red-600 dark:text-red-400";
     }
 
-    if (paymentInfo.status === "Due Today") {
-      return "text-yellow-600";
+    if (paymentInfo?.status === "Due Today") {
+      return "text-yellow-600 dark:text-yellow-400";
     }
 
-    return "text-green-600";
+    if (paymentInfo?.status === "Not Configured") {
+      return "text-gray-600 dark:text-gray-300";
+    }
+
+    return "text-green-600 dark:text-green-400";
   };
 
   const getStatusIconBackground = () => {
-    if (paymentInfo.status === "Overdue") {
-      return "bg-red-50";
+    if (paymentInfo?.status === "Overdue") {
+      return "bg-red-50 dark:bg-red-950/40";
     }
 
-    if (paymentInfo.status === "Due Today") {
-      return "bg-yellow-50";
+    if (paymentInfo?.status === "Due Today") {
+      return "bg-yellow-50 dark:bg-yellow-950/40";
     }
 
-    return "bg-green-50";
+    return "bg-green-50 dark:bg-green-950/40";
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100">
+  // =======================================================
+  // INVALID TENANT SESSION
+  // =======================================================
 
-      {/* ================= TENANT NAVBAR ================= */}
+  if (!tenant) {
+    return (
+      <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+        <TenantNavbar />
+
+        <main className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-10">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-8">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/40">
+              <AlertCircle
+                size={30}
+                className="text-red-600 dark:text-red-400"
+              />
+            </div>
+
+            <h2 className="mt-5 text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
+              Tenant Session Not Found
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+              Your tenant session is missing or invalid.
+              Please log in again to access your dashboard.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => navigate("/tenant-login")}
+              className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 sm:w-auto"
+            >
+              Go to Tenant Login
+              <ArrowRight size={17} />
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // =======================================================
+  // COMMON CARD STYLES
+  // =======================================================
+
+  const cardClass =
+    "min-w-0 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900";
+
+  const mutedText =
+    "text-gray-500 dark:text-gray-400";
+
+  const headingText =
+    "font-bold text-gray-900 dark:text-white";
+
+  // =======================================================
+  // DASHBOARD UI
+  // =======================================================
+
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
 
       <TenantNavbar />
 
+      <main className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-5 sm:py-6 lg:px-6">
 
-      {/* ================= MAIN CONTENT ================= */}
+        {/* WELCOME SECTION */}
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6">
-
-        {/* ================= WELCOME SECTION ================= */}
-
-        <div className="mb-6">
-
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+        <section className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
             Welcome, {tenant.name}
-          </h2>
+          </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className={`mt-2 text-sm sm:text-base ${mutedText}`}>
             Here is an overview of your rental information.
           </p>
-
-        </div>
-
-
-        {/* ================= RENT DUE ALERT ================= */}
+        </section>
+              {/* ===================================================
+            RENT DUE ALERT
+        =================================================== */}
 
         {paymentInfo.status === "Upcoming" && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-              <div className="flex items-start gap-3">
-
-                <div className="p-3 bg-blue-100 rounded-lg">
+          <section className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/30 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="shrink-0 rounded-lg bg-blue-100 p-3 dark:bg-blue-900/50">
                   <Calendar
                     size={22}
-                    className="text-blue-600"
+                    className="text-blue-600 dark:text-blue-400"
                   />
                 </div>
 
-                <div>
-
-                  <h3 className="font-bold text-blue-800">
+                <div className="min-w-0">
+                  <h3 className="font-bold text-blue-800 dark:text-blue-300">
                     Rent Due in {paymentInfo.daysUntilDue}{" "}
-                    {paymentInfo.daysUntilDue === 1
-                      ? "day"
-                      : "days"}
+                    {paymentInfo.daysUntilDue === 1 ? "day" : "days"}
                   </h3>
 
-                  <p className="text-sm text-blue-700 mt-1">
-                    Your rent of ₹
-                    {Number(
-                      tenant.monthlyRent
-                    ).toLocaleString("en-IN")}{" "}
-                    is due on{" "}
-                    {paymentInfo.dueDateText}.
+                  <p className="mt-1 text-sm leading-6 text-blue-700 dark:text-blue-200">
+                    Your rent of ₹{formatCurrency(tenant.monthlyRent)} is
+                    due on {paymentInfo.dueDateText}.
                   </p>
-
                 </div>
-
               </div>
 
               <button
-                onClick={() =>
-                  navigate("/tenant-payments")
-                }
-                className="flex items-center justify-center gap-2 border border-blue-300 text-blue-700 px-5 py-2.5 rounded-lg hover:bg-blue-100 transition"
+                type="button"
+                onClick={() => navigate("/tenant-payments")}
+                className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg border border-blue-300 px-5 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-100 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/40 sm:w-auto"
               >
                 View Payment
                 <ArrowRight size={17} />
               </button>
-
             </div>
-
-          </div>
+          </section>
         )}
 
-
-        {/* ================= DUE TODAY ALERT ================= */}
+        {/* ===================================================
+            DUE TODAY ALERT
+        =================================================== */}
 
         {paymentInfo.status === "Due Today" && (
-          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-xl p-5">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-              <div className="flex items-start gap-3">
-
-                <div className="p-3 bg-yellow-100 rounded-lg">
+          <section className="mb-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950/30 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="shrink-0 rounded-lg bg-yellow-100 p-3 dark:bg-yellow-900/50">
                   <Clock
                     size={22}
-                    className="text-yellow-600"
+                    className="text-yellow-600 dark:text-yellow-400"
                   />
                 </div>
 
                 <div>
-
-                  <h3 className="font-bold text-yellow-800">
+                  <h3 className="font-bold text-yellow-800 dark:text-yellow-300">
                     Rent Due Today
                   </h3>
 
-                  <p className="text-sm text-yellow-700 mt-1">
-                    Your rent of ₹
-                    {Number(
-                      tenant.monthlyRent
-                    ).toLocaleString("en-IN")}{" "}
-                    is due today.
+                  <p className="mt-1 text-sm leading-6 text-yellow-700 dark:text-yellow-200">
+                    Your rent of ₹{formatCurrency(tenant.monthlyRent)} is
+                    due today.
                   </p>
-
                 </div>
-
               </div>
 
               <button
-                onClick={() =>
-                  navigate("/tenant-payments")
-                }
-                className="flex items-center justify-center gap-2 bg-yellow-600 text-white px-5 py-2.5 rounded-lg hover:bg-yellow-700 transition"
+                type="button"
+                onClick={() => navigate("/tenant-payments")}
+                className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-yellow-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-yellow-700 sm:w-auto"
               >
                 Pay Now
                 <ArrowRight size={17} />
               </button>
-
             </div>
-
-          </div>
+          </section>
         )}
 
-
-        {/* ================= OVERDUE ALERT ================= */}
+        {/* ===================================================
+            OVERDUE ALERT
+        =================================================== */}
 
         {paymentInfo.status === "Overdue" && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-5">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-              <div className="flex items-start gap-3">
-
-                <div className="p-3 bg-red-100 rounded-lg">
+          <section className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/30 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="shrink-0 rounded-lg bg-red-100 p-3 dark:bg-red-900/50">
                   <AlertCircle
                     size={22}
-                    className="text-red-600"
+                    className="text-red-600 dark:text-red-400"
                   />
                 </div>
 
                 <div>
-
-                  <h3 className="font-bold text-red-800">
+                  <h3 className="font-bold text-red-800 dark:text-red-300">
                     Rent Overdue by {paymentInfo.daysLate}{" "}
-                    {paymentInfo.daysLate === 1
-                      ? "day"
-                      : "days"}
+                    {paymentInfo.daysLate === 1 ? "day" : "days"}
                   </h3>
 
-                  <p className="text-sm text-red-700 mt-1">
-                    Late penalty: ₹
-                    {paymentInfo.penalty.toLocaleString(
-                      "en-IN"
-                    )}
+                  <p className="mt-1 text-sm text-red-700 dark:text-red-200">
+                    Late penalty: ₹{formatCurrency(paymentInfo.penalty)}
                   </p>
 
-                  <p className="text-sm text-red-700 mt-1">
-                    Total payable: ₹
-                    {paymentInfo.total.toLocaleString(
-                      "en-IN"
-                    )}
+                  <p className="mt-1 text-sm font-semibold text-red-700 dark:text-red-200">
+                    Total payable: ₹{formatCurrency(paymentInfo.total)}
                   </p>
-
                 </div>
-
               </div>
 
               <button
-                onClick={() =>
-                  navigate("/tenant-payments")
-                }
-                className="flex items-center justify-center gap-2 bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition"
+                type="button"
+                onClick={() => navigate("/tenant-payments")}
+                className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 sm:w-auto"
               >
                 Pay Now
                 <ArrowRight size={17} />
               </button>
-
             </div>
-
-          </div>
+          </section>
         )}
 
+        {/* ===================================================
+            TENANT INFORMATION
+        =================================================== */}
 
-        {/* ================= TENANT INFORMATION ================= */}
-
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-
-          <div className="flex items-center gap-4">
-
-            <div className="p-4 bg-green-50 rounded-xl">
-
+        <section className={`${cardClass} mb-6 p-4 sm:p-6`}>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="shrink-0 rounded-xl bg-green-50 p-3 dark:bg-green-950/40 sm:p-4">
               <User
-                size={32}
-                className="text-green-600"
+                size={30}
+                className="text-green-600 dark:text-green-400"
               />
-
             </div>
 
-            <div>
-
-              <h3 className="text-xl font-bold text-gray-800">
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
                 {tenant.name}
-              </h3>
+              </h2>
 
-              <p className="text-gray-500">
+              <p className={`mt-1 text-sm ${mutedText}`}>
                 Tenant
               </p>
-
             </div>
-
           </div>
 
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* PROPERTY */}
 
-            <div className="bg-gray-50 rounded-xl p-4">
-
-              <div className="flex items-center gap-2 text-gray-500">
-
+            <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/70">
+              <div className={`flex items-center gap-2 text-sm ${mutedText}`}>
                 <Building2 size={18} />
-
-                <span className="text-sm">
-                  Property
-                </span>
-
+                Property
               </div>
 
-              <p className="font-bold mt-2 text-gray-800">
+              <p className="mt-2 break-words font-bold text-gray-900 dark:text-white">
                 {tenant.property}
               </p>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className={`mt-1 text-sm ${mutedText}`}>
                 {tenant.location}
               </p>
-
             </div>
-
 
             {/* ROOM */}
 
-            <div className="bg-gray-50 rounded-xl p-4">
-
-              <div className="flex items-center gap-2 text-gray-500">
-
+            <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/70">
+              <div className={`flex items-center gap-2 text-sm ${mutedText}`}>
                 <DoorOpen size={18} />
-
-                <span className="text-sm">
-                  Room
-                </span>
-
+                Room
               </div>
 
-              <p className="font-bold mt-2 text-gray-800">
+              <p className="mt-2 font-bold text-gray-900 dark:text-white">
                 Room {tenant.room}
               </p>
-
             </div>
-
 
             {/* MONTHLY RENT */}
 
-            <div className="bg-gray-50 rounded-xl p-4">
-
-              <div className="flex items-center gap-2 text-gray-500">
-
+            <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/70">
+              <div className={`flex items-center gap-2 text-sm ${mutedText}`}>
                 <IndianRupee size={18} />
-
-                <span className="text-sm">
-                  Monthly Rent
-                </span>
-
+                Monthly Rent
               </div>
 
-              <p className="font-bold mt-2 text-gray-800">
-                ₹
-                {Number(
-                  tenant.monthlyRent
-                ).toLocaleString("en-IN")}
+              <p className="mt-2 font-bold text-gray-900 dark:text-white">
+                ₹{formatCurrency(tenant.monthlyRent)}
               </p>
-
             </div>
 
           </div>
+        </section>
 
-        </div>
+        {/* ===================================================
+            RENT PAYMENT STATUS
+        =================================================== */}
 
-
-        {/* ================= RENT PAYMENT STATUS ================= */}
-
-        <div className="mb-6">
-
-          <h3 className="text-xl font-bold text-gray-800 mb-4">
+        <section className="mb-6">
+          <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
             Rent Payment Status
-          </h3>
+          </h2>
 
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* MONTHLY RENT */}
 
-            <div className="bg-white rounded-xl shadow-sm border p-5">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-sm text-gray-500">
+            <div className={`${cardClass} p-5`}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className={`text-sm ${mutedText}`}>
                     Monthly Rent
                   </p>
 
-                  <p className="text-2xl font-bold text-gray-800 mt-2">
-                    ₹
-                    {Number(
-                      tenant.monthlyRent
-                    ).toLocaleString("en-IN")}
+                  <p className="mt-2 break-words text-2xl font-bold text-gray-900 dark:text-white">
+                    ₹{formatCurrency(tenant.monthlyRent)}
                   </p>
-
                 </div>
 
-                <div className="p-3 bg-blue-50 rounded-xl">
-
+                <div className="shrink-0 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/40">
                   <IndianRupee
                     size={24}
-                    className="text-blue-600"
+                    className="text-blue-600 dark:text-blue-400"
                   />
-
                 </div>
-
               </div>
-
             </div>
-
 
             {/* CURRENT STATUS */}
 
-            <div className="bg-white rounded-xl shadow-sm border p-5">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-sm text-gray-500">
+            <div className={`${cardClass} p-5`}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className={`text-sm ${mutedText}`}>
                     Current Status
                   </p>
 
-                  <p
-                    className={`text-2xl font-bold mt-2 ${getStatusColor()}`}
-                  >
+                  <p className={`mt-2 break-words text-xl font-bold sm:text-2xl ${getStatusColor()}`}>
                     {paymentInfo.status}
                   </p>
-
                 </div>
 
-                <div
-                  className={`p-3 rounded-xl ${getStatusIconBackground()}`}
-                >
-
+                <div className={`shrink-0 rounded-xl p-3 ${getStatusIconBackground()}`}>
                   {paymentInfo.status === "Overdue" ? (
                     <AlertCircle
                       size={24}
-                      className="text-red-600"
+                      className="text-red-600 dark:text-red-400"
                     />
                   ) : paymentInfo.status === "Due Today" ? (
                     <Clock
                       size={24}
-                      className="text-yellow-600"
+                      className="text-yellow-600 dark:text-yellow-400"
                     />
                   ) : (
                     <CheckCircle
                       size={24}
-                      className="text-green-600"
+                      className="text-green-600 dark:text-green-400"
                     />
                   )}
-
                 </div>
-
               </div>
-
             </div>
 
+            {/* RENT DUE DATE */}
 
-            {/* NEXT DUE DATE */}
-
-            <div className="bg-white rounded-xl shadow-sm border p-5">
-
-              <div className="flex items-center justify-between">
-
-                <div>
-
-                  <p className="text-sm text-gray-500">
+            <div className={`${cardClass} p-5`}>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className={`text-sm ${mutedText}`}>
                     Rent Due Date
                   </p>
 
-                  <p className="text-lg font-bold text-gray-800 mt-2">
+                  <p className="mt-2 break-words text-lg font-bold text-gray-900 dark:text-white">
                     {paymentInfo.dueDateText}
                   </p>
-
                 </div>
 
-                <div className="p-3 bg-yellow-50 rounded-xl">
-
+                <div className="shrink-0 rounded-xl bg-yellow-50 p-3 dark:bg-yellow-950/40">
                   <Calendar
                     size={24}
-                    className="text-yellow-600"
+                    className="text-yellow-600 dark:text-yellow-400"
                   />
-
                 </div>
-
               </div>
-
             </div>
 
           </div>
+        </section>
 
-        </div>
-
-
-        {/* ================= OVERDUE PAYMENT SUMMARY ================= */}
+        {/* ===================================================
+            OVERDUE PAYMENT SUMMARY
+        =================================================== */}
 
         {paymentInfo.status === "Overdue" && (
-          <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-              <div>
-
-                <h3 className="text-xl font-bold text-gray-800">
+          <section className={`${cardClass} mb-6 p-5 sm:p-6`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                   Overdue Payment
-                </h3>
+                </h2>
 
-                <p className="text-gray-500 mt-1">
-                  Your late payment penalty is increasing by ₹50
-                  for every additional overdue day.
+                <p className={`mt-2 max-w-2xl text-sm leading-6 ${mutedText}`}>
+                  Your estimated late payment penalty is increasing by
+                  ₹{LATE_PENALTY_PER_DAY} for every additional overdue day.
                 </p>
-
               </div>
 
-              <div className="text-left md:text-right">
-
-                <p className="text-sm text-gray-500">
-                  Total Payable
+              <div className="shrink-0 sm:text-right">
+                <p className={`text-sm ${mutedText}`}>
+                  Estimated Total Payable
                 </p>
 
-                <p className="text-3xl font-bold text-red-600">
-                  ₹
-                  {paymentInfo.total.toLocaleString(
-                    "en-IN"
-                  )}
+                <p className="mt-1 text-2xl font-bold text-red-600 dark:text-red-400 sm:text-3xl">
+                  ₹{formatCurrency(paymentInfo.total)}
                 </p>
-
               </div>
-
             </div>
+          </section>
+        )}  
+                {/* ===================================================
+            QUICK ACTIONS
+        =================================================== */}
 
-          </div>
-        )}
-
-
-        {/* ================= QUICK ACTIONS ================= */}
-
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-
-          <h3 className="text-xl font-bold text-gray-800 mb-4">
+        <section className={`${cardClass} mb-6 p-4 sm:p-6`}>
+          <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
             Quick Actions
-          </h3>
+          </h2>
 
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* VIEW PAYMENTS */}
 
             <button
-              onClick={() =>
-                navigate("/tenant-payments")
-              }
-              className="flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
+              type="button"
+              onClick={() => navigate("/tenant-payments")}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
             >
-
               <CreditCard size={18} />
-
               View Payments
-
             </button>
 
-
-            {/* VIEW MY DETAILS */}
+            {/* VIEW TENANT DETAILS */}
 
             <button
+              type="button"
               onClick={() =>
                 navigate(
                   `/tenant-details/${tenant.id}?view=tenant`
                 )
               }
-              className="flex items-center justify-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
             >
-
               <User size={18} />
-
               View My Details
-
             </button>
 
-
-            {/* MY DOCUMENTS */}
+            {/* VIEW DOCUMENTS */}
 
             <button
-              onClick={() =>
-                navigate("/tenant-documents")
-              }
-              className="flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
+              type="button"
+              onClick={() => navigate("/tenant-documents")}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
             >
-
               <FileText size={18} />
-
               My Documents
-
             </button>
 
           </div>
+        </section>
 
-        </div>
+        {/* ===================================================
+            RECENT PAYMENTS
+        =================================================== */}
 
-
-        {/* ================= RECENT PAYMENTS ================= */}
-
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-
-          <div className="p-6 border-b">
-
-            <h3 className="text-xl font-bold text-gray-800">
+        <section className={`${cardClass} mb-6 overflow-hidden`}>
+          <div className="border-b border-gray-200 p-4 dark:border-gray-800 sm:p-6">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white sm:text-xl">
               Recent Payments
-            </h3>
+            </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className={`mt-1 text-sm ${mutedText}`}>
               Your latest rental payment history.
             </p>
-
           </div>
 
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
 
-          <div className="divide-y">
+            {recentPayments.length > 0 ? (
+              recentPayments.map((payment) => (
+                <div
+                  key={payment.id}
+                  className="flex flex-col gap-3 p-4 transition hover:bg-gray-50 dark:hover:bg-gray-800/50 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 dark:text-white">
+                      {payment.month}
+                    </p>
 
-            {recentPayments.map((payment) => (
+                    <p className={`mt-1 text-sm ${mutedText}`}>
+                      {payment.date}
+                    </p>
+                  </div>
 
-              <div
-                key={payment.id}
-                className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-              >
+                  <div className="flex items-center justify-between gap-3 sm:justify-end sm:gap-5">
+                    <p className="font-bold text-gray-900 dark:text-white">
+                      ₹{formatCurrency(payment.amount)}
+                    </p>
 
-                <div>
+                    <span
+                      className={`inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold sm:text-sm ${
+                        payment.status === "Paid"
+                          ? "bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400"
+                          : "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/50 dark:text-yellow-400"
+                      }`}
+                    >
+                      {payment.status === "Paid" ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <Clock size={14} />
+                      )}
 
-                  <p className="font-semibold text-gray-800">
-                    {payment.month}
-                  </p>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    {payment.date}
-                  </p>
-
+                      {payment.status}
+                    </span>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="p-8 text-center">
+                <CreditCard
+                  size={30}
+                  className="mx-auto text-gray-400"
+                />
 
+                <p className="mt-3 font-semibold text-gray-700 dark:text-gray-200">
+                  No payment records available
+                </p>
 
-                <div className="flex items-center gap-4">
-
-                  <p className="font-bold text-gray-800">
-                    {payment.amount}
-                  </p>
-
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm">
-
-                    <CheckCircle size={14} />
-
-                    {payment.status}
-
-                  </span>
-
-                </div>
-
+                <p className={`mt-1 text-sm ${mutedText}`}>
+                  Your payment history will appear here.
+                </p>
               </div>
-
-            ))}
-
-          </div>
-
-        </div>
-
-
-        {/* ================= PAYMENT REMINDER ================= */}
-
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-5 flex items-start gap-3">
-
-          <Clock
-            size={22}
-            className="text-yellow-600 mt-0.5"
-          />
-
-          <div>
-
-            <h4 className="font-bold text-yellow-800">
-              Payment Reminder
-            </h4>
-
-            {paymentInfo.status === "Upcoming" && (
-              <p className="text-sm text-yellow-700 mt-1">
-                Your next rent payment of ₹
-                {Number(
-                  tenant.monthlyRent
-                ).toLocaleString("en-IN")}{" "}
-                is due on{" "}
-                {paymentInfo.dueDateText}.
-              </p>
-            )}
-
-            {paymentInfo.status === "Due Today" && (
-              <p className="text-sm text-yellow-700 mt-1">
-                Your rent payment of ₹
-                {Number(
-                  tenant.monthlyRent
-                ).toLocaleString("en-IN")}{" "}
-                is due today. Please make your payment.
-              </p>
-            )}
-
-            {paymentInfo.status === "Overdue" && (
-              <p className="text-sm text-red-700 mt-1">
-                Your rent is overdue by{" "}
-                {paymentInfo.daysLate}{" "}
-                {paymentInfo.daysLate === 1
-                  ? "day"
-                  : "days"}
-                . Current late penalty is ₹
-                {paymentInfo.penalty.toLocaleString(
-                  "en-IN"
-                )}
-                .
-              </p>
             )}
 
           </div>
+        </section>
 
-        </div>
+        {/* ===================================================
+            PAYMENT REMINDER
+        =================================================== */}
+
+        <section className="mb-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950/30 sm:p-5">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 rounded-lg bg-yellow-100 p-2.5 dark:bg-yellow-900/50">
+              <Clock
+                size={22}
+                className="text-yellow-600 dark:text-yellow-400"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <h2 className="font-bold text-yellow-800 dark:text-yellow-300">
+                Payment Reminder
+              </h2>
+
+              {paymentInfo.status === "Upcoming" && (
+                <p className="mt-1 text-sm leading-6 text-yellow-700 dark:text-yellow-200">
+                  Your next rent payment of ₹
+                  {formatCurrency(tenant.monthlyRent)} is due on{" "}
+                  {paymentInfo.dueDateText}.
+                </p>
+              )}
+
+              {paymentInfo.status === "Due Today" && (
+                <p className="mt-1 text-sm leading-6 text-yellow-700 dark:text-yellow-200">
+                  Your rent payment of ₹
+                  {formatCurrency(tenant.monthlyRent)} is due today.
+                  Please make your payment.
+                </p>
+              )}
+
+              {paymentInfo.status === "Overdue" && (
+                <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-300">
+                  Your rent is overdue by {paymentInfo.daysLate}{" "}
+                  {paymentInfo.daysLate === 1 ? "day" : "days"}.
+                  The estimated late penalty is ₹
+                  {formatCurrency(paymentInfo.penalty)}.
+                </p>
+              )}
+
+              {paymentInfo.status === "Not Configured" && (
+                <p className="mt-1 text-sm leading-6 text-yellow-700 dark:text-yellow-200">
+                  Your rent due date has not been configured.
+                  Please contact the property owner.
+                </p>
+              )}
+
+              {paymentInfo.status === "Unavailable" && (
+                <p className="mt-1 text-sm leading-6 text-yellow-700 dark:text-yellow-200">
+                  Rent information is currently unavailable.
+                  Please contact the property owner.
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================
+            DEMO DATA NOTICE
+        =================================================== */}
+
+        <p className="pb-3 text-center text-xs text-gray-400 dark:text-gray-500">
+          Dashboard information currently uses temporary demo data.
+          Live rental and payment records will be connected through
+          the backend.
+        </p>
 
       </main>
-
     </div>
   );
 }
