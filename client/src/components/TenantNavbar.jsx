@@ -82,6 +82,8 @@ function TenantNavbar() {
 
   const navigationTimerRef = useRef(null);
 
+  const hoverCardTimerRef = useRef(null);
+
   // =========================================================
   // TENANT DATA
   // =========================================================
@@ -237,6 +239,20 @@ function TenantNavbar() {
   };
 
   // =========================================================
+  // CLEAR HOVER CARD TIMER
+  // =========================================================
+
+  const clearHoverCardTimer = () => {
+    if (hoverCardTimerRef.current) {
+      clearTimeout(
+        hoverCardTimerRef.current
+      );
+
+      hoverCardTimerRef.current = null;
+    }
+  };
+
+  // =========================================================
   // CLOSE SIDEBAR AFTER NAVIGATION
   // =========================================================
 
@@ -249,6 +265,8 @@ function TenantNavbar() {
 
         setHoveredSidebarItem(null);
 
+        clearHoverCardTimer();
+
         navigationTimerRef.current = null;
       }, 300);
   };
@@ -259,6 +277,8 @@ function TenantNavbar() {
 
   const closeSidebar = () => {
     clearNavigationTimer();
+
+    clearHoverCardTimer();
 
     setIsOpen(false);
 
@@ -271,6 +291,8 @@ function TenantNavbar() {
 
   const handleLogout = () => {
     clearNavigationTimer();
+
+    clearHoverCardTimer();
 
     localStorage.removeItem("tenantId");
 
@@ -339,6 +361,8 @@ function TenantNavbar() {
       return;
     }
 
+    clearHoverCardTimer();
+
     const rect =
       event.currentTarget.getBoundingClientRect();
 
@@ -346,17 +370,13 @@ function TenantNavbar() {
 
     const leftPosition = Math.min(
       rect.right + 12,
-      window.innerWidth -
-        cardWidth -
-        12
+      window.innerWidth - cardWidth - 12
     );
 
     setHoveredSidebarItem(itemName);
 
     setHoverCardPosition({
-      top:
-        rect.top +
-        rect.height / 2,
+      top: rect.top + rect.height / 2,
 
       left: Math.max(
         12,
@@ -370,6 +390,39 @@ function TenantNavbar() {
   // =========================================================
 
   const handleSidebarLeave = () => {
+    clearHoverCardTimer();
+
+    hoverCardTimerRef.current =
+      setTimeout(() => {
+        setHoveredSidebarItem(null);
+
+        hoverCardTimerRef.current = null;
+      }, 450);
+  };
+
+  // =========================================================
+  // HOVER CARD MOUSE ENTER
+  // =========================================================
+
+  const handleHoverCardEnter = () => {
+    clearHoverCardTimer();
+  };
+
+  // =========================================================
+  // HOVER CARD MOUSE LEAVE
+  // =========================================================
+
+  const handleHoverCardLeave = () => {
+    handleSidebarLeave();
+  };
+
+  // =========================================================
+  // LOGOUT HOVER HANDLER
+  // =========================================================
+
+  const handleLogoutHover = () => {
+    clearHoverCardTimer();
+
     setHoveredSidebarItem(null);
   };
 
@@ -521,12 +574,14 @@ function TenantNavbar() {
   }, [isOpen]);
 
   // =========================================================
-  // CLEANUP TIMER
+  // CLEANUP TIMERS
   // =========================================================
 
   useEffect(() => {
     return () => {
       clearNavigationTimer();
+
+      clearHoverCardTimer();
     };
   }, []);
 
@@ -589,18 +644,17 @@ function TenantNavbar() {
                 type="button"
                 onClick={() => {
                   clearNavigationTimer();
+                  clearHoverCardTimer();
 
                   scrollPositionRef.current =
                     window.scrollY;
 
                   setIsOpen(true);
-
                   setIsProfileOpen(false);
                 }}
                 className="rounded-lg p-2 transition hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:hover:bg-gray-800"
                 aria-label="Open tenant sidebar"
                 aria-expanded={isOpen}
-                
               >
                 <Menu
                   size={24}
@@ -650,9 +704,7 @@ function TenantNavbar() {
             <button
               type="button"
               onClick={() =>
-                navigateFromNavbar(
-                  "/tenant-dashboard"
-                )
+                navigateFromNavbar("/tenant-dashboard")
               }
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-dashboard")
@@ -666,9 +718,7 @@ function TenantNavbar() {
             <button
               type="button"
               onClick={() =>
-                navigateFromNavbar(
-                  "/tenant-payments"
-                )
+                navigateFromNavbar("/tenant-payments")
               }
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-payments")
@@ -682,9 +732,7 @@ function TenantNavbar() {
             <button
               type="button"
               onClick={() =>
-                navigateFromNavbar(
-                  "/tenant-documents"
-                )
+                navigateFromNavbar("/tenant-documents")
               }
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-documents")
@@ -698,9 +746,7 @@ function TenantNavbar() {
             <button
               type="button"
               onClick={() =>
-                navigateFromNavbar(
-                  "/tenant-notices"
-                )
+                navigateFromNavbar("/tenant-notices")
               }
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-notices")
@@ -714,9 +760,7 @@ function TenantNavbar() {
             <button
               type="button"
               onClick={() =>
-                navigateFromNavbar(
-                  "/tenant-maintenance"
-                )
+                navigateFromNavbar("/tenant-maintenance")
               }
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-maintenance")
@@ -733,9 +777,7 @@ function TenantNavbar() {
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
 
-            {/* ================================================= */}
-            {/* LIGHT / DARK MODE TOGGLE */}
-            {/* ================================================= */}
+            {/* LIGHT / DARK MODE */}
 
             <div className="group relative">
 
@@ -748,13 +790,7 @@ function TenantNavbar() {
                     ? "Switch to light mode"
                     : "Switch to dark mode"
                 }
-                title={
-                  isDarkMode
-                    ? "Light Mode"
-                    : "Dark Mode"
-                }
               >
-
                 {isDarkMode ? (
                   <Sun
                     size={21}
@@ -766,7 +802,6 @@ function TenantNavbar() {
                     className="text-gray-700"
                   />
                 )}
-
               </button>
 
               <span className="pointer-events-none absolute right-0 top-full z-[100] mt-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
@@ -777,9 +812,7 @@ function TenantNavbar() {
 
             </div>
 
-            {/* ================================================= */}
             {/* PROFILE DROPDOWN */}
-            {/* ================================================= */}
 
             <div
               ref={profileRef}
@@ -828,9 +861,7 @@ function TenantNavbar() {
                 <ChevronDown
                   size={17}
                   className={`hidden transition-transform sm:block ${
-                    isProfileOpen
-                      ? "rotate-180"
-                      : ""
+                    isProfileOpen ? "rotate-180" : ""
                   }`}
                 />
 
@@ -934,12 +965,9 @@ function TenantNavbar() {
           </div>
 
         </div>
-
       </header>
 
-      {/* ===================================================== */}
       {/* BACKGROUND OVERLAY */}
-      {/* ===================================================== */}
 
       <div
         className={`fixed inset-0 z-40 touch-none bg-black/40 transition-opacity duration-300 ${
@@ -951,9 +979,7 @@ function TenantNavbar() {
         aria-hidden="true"
       />
 
-      {/* ===================================================== */}
       {/* TENANT SIDEBAR */}
-      {/* ===================================================== */}
 
       <aside
         id="tenant-sidebar"
@@ -962,6 +988,7 @@ function TenantNavbar() {
             ? "translate-x-0"
             : "-translate-x-full"
         }`}
+        onMouseEnter={clearHoverCardTimer}
         onMouseLeave={handleSidebarLeave}
         aria-label="Tenant navigation sidebar"
       >
@@ -1004,7 +1031,6 @@ function TenantNavbar() {
               onClick={closeSidebar}
               className="rounded-lg p-2 transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 dark:hover:bg-gray-800"
               aria-label="Close tenant sidebar"
-              
             >
               <X
                 size={22}
@@ -1032,6 +1058,7 @@ function TenantNavbar() {
             onMouseEnter={(event) =>
               handleSidebarHover("Dashboard", event)
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover("Dashboard", event)
             }
@@ -1061,6 +1088,7 @@ function TenantNavbar() {
             onMouseEnter={(event) =>
               handleSidebarHover("My Details", event)
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover("My Details", event)
             }
@@ -1086,6 +1114,7 @@ function TenantNavbar() {
             onMouseEnter={(event) =>
               handleSidebarHover("Payments", event)
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover("Payments", event)
             }
@@ -1115,6 +1144,7 @@ function TenantNavbar() {
             onMouseEnter={(event) =>
               handleSidebarHover("Documents", event)
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover("Documents", event)
             }
@@ -1144,6 +1174,7 @@ function TenantNavbar() {
             onMouseEnter={(event) =>
               handleSidebarHover("Notices", event)
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover("Notices", event)
             }
@@ -1176,6 +1207,7 @@ function TenantNavbar() {
                 event
               )
             }
+            onMouseLeave={handleSidebarLeave}
             onFocus={(event) =>
               handleSidebarHover(
                 "Maintenance & Complaints",
@@ -1209,6 +1241,8 @@ function TenantNavbar() {
 
           <button
             type="button"
+            onMouseEnter={handleLogoutHover}
+            onFocus={handleLogoutHover}
             onClick={handleLogout}
             className="flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left text-red-600 transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 dark:text-red-400 dark:hover:bg-red-950/30"
           >
@@ -1220,7 +1254,6 @@ function TenantNavbar() {
           </button>
 
         </div>
-
       </aside>
 
       {/* ===================================================== */}
@@ -1229,13 +1262,14 @@ function TenantNavbar() {
 
       {isOpen && currentHoverInfo && (
         <div
-          className="pointer-events-none fixed z-[80] hidden -translate-y-1/2 md:block"
+          className="pointer-events-auto fixed z-[80] hidden -translate-y-1/2 md:block"
           style={{
             top: `${hoverCardPosition.top}px`,
             left: `${hoverCardPosition.left}px`,
           }}
+          onMouseEnter={handleHoverCardEnter}
+          onMouseLeave={handleHoverCardLeave}
         >
-
           <div className="relative w-[280px] rounded-xl border border-green-100 bg-white px-4 py-3 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
 
             {/* CARD TITLE */}
@@ -1251,7 +1285,6 @@ function TenantNavbar() {
             {/* INFORMATION ITEMS */}
 
             <div className="space-y-1.5">
-
               {currentHoverInfo.items.map(
                 (text, index) => (
                   <div
@@ -1264,7 +1297,6 @@ function TenantNavbar() {
                   </div>
                 )
               )}
-
             </div>
 
             {/* CARD ARROW */}
@@ -1272,7 +1304,6 @@ function TenantNavbar() {
             <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
 
           </div>
-
         </div>
       )}
 
