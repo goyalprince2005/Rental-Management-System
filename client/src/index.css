@@ -1,7 +1,13 @@
 @import "tailwindcss";
 
 /* =========================================================
-   GLOBAL THEME VARIABLES
+   TAILWIND CLASS-BASED DARK MODE
+========================================================= */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================
+   GLOBAL THEME VARIABLES - LIGHT MODE
 ========================================================= */
 
 :root {
@@ -81,7 +87,9 @@ body {
 }
 
 
-/* React application root */
+/* =========================================================
+   REACT APPLICATION ROOT
+========================================================= */
 
 #root {
     min-height: 100vh;
