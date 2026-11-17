@@ -289,7 +289,7 @@ function TenantDashboard() {
 
   if (!tenant) {
     return (
-      <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+      <div className="min-h-screen overflow-x-hidden bg-slate-50 text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100">
         <TenantNavbar />
 
         <main className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4 py-10">
@@ -329,7 +329,7 @@ function TenantDashboard() {
   // =======================================================
 
   const cardClass =
-    "min-w-0 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900";
+    "min-w-0 rounded-xl border border-gray-200 bg-white shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800";
 
   const mutedText =
     "text-gray-500 dark:text-gray-400";
@@ -342,7 +342,7 @@ function TenantDashboard() {
   // =======================================================
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-900 transition-colors dark:bg-gray-950 dark:text-gray-100">
+    <div className="min-h-screen overflow-x-hidden bg-slate-50 text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100">
 
       <TenantNavbar />
 
@@ -359,7 +359,8 @@ function TenantDashboard() {
             Here is an overview of your rental information.
           </p>
         </section>
-              {/* ===================================================
+
+        {/* ===================================================
             RENT DUE ALERT
         =================================================== */}
 
@@ -552,8 +553,7 @@ function TenantDashboard() {
 
           </div>
         </section>
-
-        {/* ===================================================
+                {/* ===================================================
             RENT PAYMENT STATUS
         =================================================== */}
 
@@ -677,8 +677,9 @@ function TenantDashboard() {
               </div>
             </div>
           </section>
-        )}  
-                {/* ===================================================
+        )}
+
+        {/* ===================================================
             QUICK ACTIONS
         =================================================== */}
 
@@ -804,8 +805,7 @@ function TenantDashboard() {
 
           </div>
         </section>
-
-        {/* ===================================================
+                {/* ===================================================
             PAYMENT REMINDER
         =================================================== */}
 
