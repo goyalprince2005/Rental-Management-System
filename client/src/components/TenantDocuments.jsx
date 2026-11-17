@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -112,25 +113,25 @@ function TenantDocuments() {
 
   if (!tenant) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-slate-50 text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100">
 
         <TenantNavbar />
 
-        <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
+        <div className="flex min-h-[calc(100vh-64px)] items-center justify-center p-4">
 
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center">
+          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
               Tenant Session Not Found
             </h2>
 
-            <p className="text-gray-500 mt-2">
+            <p className="mt-2 text-gray-500 dark:text-gray-400">
               Please login again to view your documents.
             </p>
 
             <button
               onClick={() => navigate("/tenant-login")}
-              className="mt-5 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
+              className="mt-5 rounded-lg bg-green-600 px-5 py-2 text-white transition hover:bg-green-700"
             >
               Go to Tenant Login
             </button>
@@ -157,55 +158,55 @@ function TenantDocuments() {
     );
   };
 
+  // ================= MAIN UI =================
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-50 text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100">
 
       {/* ================= TENANT NAVBAR ================= */}
 
       <TenantNavbar />
 
-
       {/* ================= MAIN CONTENT ================= */}
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6">
+      <main className="mx-auto max-w-7xl p-4 transition-colors duration-200 md:p-6">
 
         {/* ================= PAGE HEADING ================= */}
 
         <div className="mb-6">
 
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white md:text-3xl">
             My Documents
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="mt-1 text-gray-500 dark:text-gray-400">
             View your rental and personal documents.
           </p>
 
         </div>
 
-
         {/* ================= TENANT INFORMATION ================= */}
 
-        <div className="bg-white rounded-xl shadow-sm border p-5 mb-6">
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
           <div className="flex items-center gap-4">
 
-            <div className="p-3 bg-green-50 rounded-xl">
+            <div className="rounded-xl bg-green-50 p-3 dark:bg-green-900/30">
 
               <FileText
                 size={28}
-                className="text-green-600"
+                className="text-green-600 dark:text-green-400"
               />
 
             </div>
 
             <div>
 
-              <h2 className="text-lg font-bold text-gray-800">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-white">
                 {tenant.name}
               </h2>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Your uploaded and verified documents
               </p>
 
@@ -215,31 +216,33 @@ function TenantDocuments() {
 
         </div>
 
-
         {/* ================= DOCUMENT SUMMARY ================= */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <div className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-3">
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          {/* TOTAL DOCUMENTS */}
 
-            <p className="text-sm text-gray-500">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Total Documents
             </p>
 
-            <p className="text-2xl font-bold text-gray-800 mt-2">
+            <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white">
               {tenant.documents.length}
             </p>
 
           </div>
 
+          {/* VERIFIED */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Verified
             </p>
 
-            <p className="text-2xl font-bold text-green-600 mt-2">
+            <p className="mt-2 text-2xl font-bold text-green-600 dark:text-green-400">
               {
                 tenant.documents.filter(
                   (document) => document.status === "Verified"
@@ -249,14 +252,15 @@ function TenantDocuments() {
 
           </div>
 
+          {/* PENDING */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Pending
             </p>
 
-            <p className="text-2xl font-bold text-yellow-600 mt-2">
+            <p className="mt-2 text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {
                 tenant.documents.filter(
                   (document) => document.status === "Pending"
@@ -268,57 +272,55 @@ function TenantDocuments() {
 
         </div>
 
-
         {/* ================= DOCUMENT LIST ================= */}
 
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-          <div className="p-6 border-b">
+          <div className="border-b border-gray-200 p-6 dark:border-gray-700">
 
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white">
               Document Details
             </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Documents associated with your rental account.
             </p>
 
           </div>
 
-
-          <div className="divide-y">
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
 
             {tenant.documents.map((document) => (
 
               <div
                 key={document.id}
-                className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                className="flex flex-col gap-4 p-5 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/30 md:flex-row md:items-center md:justify-between"
               >
 
                 {/* ================= DOCUMENT INFO ================= */}
 
                 <div className="flex items-center gap-4">
 
-                  <div className="p-3 bg-green-50 rounded-xl">
+                  <div className="rounded-xl bg-green-50 p-3 dark:bg-green-900/30">
 
                     <FileText
                       size={24}
-                      className="text-green-600"
+                      className="text-green-600 dark:text-green-400"
                     />
 
                   </div>
 
                   <div>
 
-                    <h3 className="font-bold text-gray-800">
+                    <h3 className="font-bold text-gray-800 dark:text-white">
                       {document.name}
                     </h3>
 
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                       {document.type}
                     </p>
 
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
                       Added: {document.issueDate}
                     </p>
 
@@ -326,16 +328,17 @@ function TenantDocuments() {
 
                 </div>
 
-
                 {/* ================= STATUS + ACTIONS ================= */}
 
                 <div className="flex flex-wrap items-center gap-3">
 
+                  {/* DOCUMENT STATUS */}
+
                   <span
-                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm ${
+                    className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm ${
                       document.status === "Verified"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                        : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
                     }`}
                   >
 
@@ -349,10 +352,11 @@ function TenantDocuments() {
 
                   </span>
 
+                  {/* VIEW BUTTON */}
 
                   <button
                     onClick={() => handleView(document)}
-                    className="flex items-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                    className="flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
                   >
 
                     <Eye size={17} />
@@ -361,10 +365,11 @@ function TenantDocuments() {
 
                   </button>
 
+                  {/* DOWNLOAD BUTTON */}
 
                   <button
                     onClick={() => handleDownload(document)}
-                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                    className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white transition hover:bg-green-700"
                   >
 
                     <Download size={17} />
@@ -390,3 +395,4 @@ function TenantDocuments() {
 }
 
 export default TenantDocuments;
+
