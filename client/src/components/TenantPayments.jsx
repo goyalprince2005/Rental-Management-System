@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,15 +19,6 @@ import TenantNavbar from "./TenantNavbar";
  * =========================================================
  * MOCK TENANT DATA
  * =========================================================
- *
- * rentDueDay is tenant-specific.
- *
- * Rahul -> 10th
- * Aman  -> 5th
- * Neha  -> 15th
- *
- * Later this information will come from MongoDB through
- * the backend API.
  */
 
 const tenants = {
@@ -77,7 +69,6 @@ const tenants = {
  */
 
 const LATE_PENALTY_PER_DAY = 50;
-
 const UPI_ID = "rentalowner@upi";
 
 /*
@@ -93,8 +84,6 @@ function TenantPayments() {
    * =======================================================
    * LOGGED-IN TENANT
    * =======================================================
-   *
-   * TenantLogin stores tenantId in localStorage.
    */
 
   const tenantId = localStorage.getItem("tenantId");
@@ -105,17 +94,6 @@ function TenantPayments() {
    * =======================================================
    * RECENT PAYMENTS
    * =======================================================
-   *
-   * Mock payment history for the logged-in tenant.
-   *
-   * IMPORTANT:
-   * This must be inside the component because it uses
-   * the tenant variable defined above.
-   *
-   * The amount and payment date use the tenant's own
-   * rent and rent due day.
-   *
-   * Later this information will come from the backend/database.
    */
 
   const recentPayments = [
@@ -126,7 +104,6 @@ function TenantPayments() {
       date: `August ${tenant.rentDueDay}, 2026`,
       status: "Paid",
     },
-
     {
       id: 2,
       month: "July 2026",
@@ -134,7 +111,6 @@ function TenantPayments() {
       date: `July ${tenant.rentDueDay}, 2026`,
       status: "Paid",
     },
-
     {
       id: 3,
       month: "June 2026",
@@ -148,12 +124,6 @@ function TenantPayments() {
    * =======================================================
    * CURRENT DATE STATE
    * =======================================================
-   *
-   * This allows the page to automatically recalculate
-   * the payment status while the page is open.
-   *
-   * Without this, the component would only calculate
-   * the date when the page initially loads.
    */
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -162,12 +132,6 @@ function TenantPayments() {
    * =======================================================
    * AUTOMATIC DATE UPDATE
    * =======================================================
-   *
-   * Check the current date every minute.
-   *
-   * This means if the due date arrives while the tenant
-   * keeps this page open, the payment status and QR
-   * can update automatically.
    */
 
   useEffect(() => {
@@ -191,15 +155,7 @@ function TenantPayments() {
     const month = today.getMonth();
     const todayDate = today.getDate();
 
-    /*
-     * Tenant-specific due day.
-     */
-
     const dueDay = Number(tenant.rentDueDay);
-
-    /*
-     * If due day is not configured.
-     */
 
     if (!dueDay) {
       return {
@@ -214,15 +170,7 @@ function TenantPayments() {
     }
 
     /*
-     * =====================================================
-     * LAST DAY OF CURRENT MONTH
-     * =====================================================
-     *
-     * Example:
-     * If due day = 31
-     * February does not have 31 days.
-     *
-     * Therefore we use the last available day.
+     * Last day of current month.
      */
 
     const lastDayOfMonth = new Date(
@@ -251,10 +199,7 @@ function TenantPayments() {
     );
 
     /*
-     * Create date containing only year/month/day.
-     *
-     * This prevents time differences from affecting
-     * the number of late days.
+     * Compare dates without time.
      */
 
     const todayOnly = new Date(
@@ -262,10 +207,6 @@ function TenantPayments() {
       month,
       todayDate
     );
-
-    /*
-     * Difference between today and due date.
-     */
 
     const differenceInMilliseconds =
       todayOnly.getTime() -
@@ -281,71 +222,47 @@ function TenantPayments() {
      */
 
     let status = "Upcoming";
-
     let statusLabel = "Rent Upcoming";
-
     let daysLate = 0;
-
     let penalty = 0;
 
     /*
-     * =====================================================
-     * PAYMENT STATUS
-     * =====================================================
-     *
-     * Before due date:
-     *     Upcoming
-     *
-     * On due date:
-     *     Due Today
-     *
-     * After due date:
-     *     Overdue
+     * Determine payment status.
      */
 
     if (differenceInDays < 0) {
       status = "Upcoming";
-
       statusLabel = "Rent Upcoming";
     } else if (differenceInDays === 0) {
       status = "Due Today";
-
       statusLabel = "Rent Due Today";
     } else {
       status = "Overdue";
-
       statusLabel = "Rent Overdue";
 
       daysLate = differenceInDays;
 
       penalty =
-        daysLate *
-        LATE_PENALTY_PER_DAY;
+        daysLate * LATE_PENALTY_PER_DAY;
     }
 
     /*
-     * =====================================================
-     * TOTAL PAYABLE
-     * =====================================================
+     * Total payable amount.
      */
 
     const total =
-      Number(tenant.rent) +
-      penalty;
+      Number(tenant.rent) + penalty;
 
     /*
-     * Format due date for UI.
+     * Format due date.
      */
 
     const dueDateText =
-      dueDate.toLocaleDateString(
-        "en-IN",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }
-      );
+      dueDate.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
 
     return {
       status,
@@ -362,12 +279,6 @@ function TenantPayments() {
    * =======================================================
    * QR VISIBILITY
    * =======================================================
-   *
-   * QR appears only when:
-   *
-   * Due Today
-   * OR
-   * Overdue
    */
 
   const showQRCode =
@@ -378,10 +289,6 @@ function TenantPayments() {
    * =======================================================
    * UPI PAYMENT URL
    * =======================================================
-   *
-   * The amount automatically changes according to:
-   *
-   * Rent + Late Penalty
    */
 
   const upiPaymentUrl = showQRCode
@@ -414,52 +321,51 @@ function TenantPayments() {
     if (paymentInfo.status === "Overdue") {
       return {
         container:
-          "bg-red-50 border-red-200",
+          "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900",
 
         icon:
-          "bg-red-100 text-red-600",
+          "bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400",
 
         text:
-          "text-red-700",
+          "text-red-700 dark:text-red-300",
 
         badge:
-          "bg-red-100 text-red-700",
+          "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400",
       };
     }
 
     if (paymentInfo.status === "Due Today") {
       return {
         container:
-          "bg-yellow-50 border-yellow-200",
+          "bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-900",
 
         icon:
-          "bg-yellow-100 text-yellow-600",
+          "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-400",
 
         text:
-          "text-yellow-700",
+          "text-yellow-700 dark:text-yellow-300",
 
         badge:
-          "bg-yellow-100 text-yellow-700",
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-950/50 dark:text-yellow-400",
       };
     }
 
     return {
       container:
-        "bg-blue-50 border-blue-200",
+        "bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900",
 
       icon:
-        "bg-blue-100 text-blue-600",
+        "bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400",
 
       text:
-        "text-blue-700",
+        "text-blue-700 dark:text-blue-300",
 
       badge:
-        "bg-blue-100 text-blue-700",
+        "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400",
     };
   };
 
-  const statusStyles =
-    getStatusStyles();
+  const statusStyles = getStatusStyles();
 
   /*
    * =======================================================
@@ -468,74 +374,63 @@ function TenantPayments() {
    */
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50 text-gray-900 transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100">
 
-      {/* =================================================
-          TENANT NAVBAR
-      ================================================= */}
+      {/* TENANT NAVBAR */}
 
       <TenantNavbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* =================================================
-            BACK BUTTON
-        ================================================= */}
+        {/* BACK BUTTON */}
 
         <button
-          onClick={() =>
-            navigate("/tenant-dashboard")
-          }
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          onClick={() => navigate("/tenant-dashboard")}
+          className="mb-6 flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
         >
           <ArrowLeft size={18} />
-
           Back to Dashboard
         </button>
 
-        {/* =================================================
-            PAGE HEADER
-        ================================================= */}
+        {/* PAGE HEADER */}
 
         <div className="mb-8">
 
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             My Payments
           </h1>
 
-          <p className="text-gray-600 mt-2">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             View your rent, due date, late charges and payment details.
           </p>
 
         </div>
 
-        {/* =================================================
-            TENANT INFORMATION
-        ================================================= */}
+        {/* TENANT INFORMATION */}
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
             <div>
 
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {tenant.name}
               </h2>
 
-              <p className="text-gray-500 mt-1">
+              <p className="mt-1 text-gray-500 dark:text-gray-400">
                 {tenant.property} • Room {tenant.room}
               </p>
 
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
 
               <span className="font-medium">
                 Monthly Rent:
               </span>
 
-              <span className="flex items-center font-semibold text-gray-900">
+              <span className="flex items-center font-semibold text-gray-900 dark:text-white">
 
                 <IndianRupee size={16} />
 
@@ -549,20 +444,18 @@ function TenantPayments() {
 
         </div>
 
-        {/* =================================================
-            RENT STATUS
-        ================================================= */}
+        {/* RENT STATUS */}
 
         <div
-          className={`border rounded-2xl p-6 mb-6 ${statusStyles.container}`}
+          className={`mb-6 rounded-2xl border p-6 transition-colors duration-200 ${statusStyles.container}`}
         >
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
             <div className="flex items-start gap-4">
 
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusStyles.icon}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl ${statusStyles.icon}`}
               >
 
                 {paymentInfo.status === "Overdue" ? (
@@ -578,12 +471,12 @@ function TenantPayments() {
               <div>
 
                 <p
-                  className={`font-semibold text-lg ${statusStyles.text}`}
+                  className={`text-lg font-semibold ${statusStyles.text}`}
                 >
                   {paymentInfo.statusLabel}
                 </p>
 
-                <p className="text-gray-600 mt-1">
+                <p className="mt-1 text-gray-600 dark:text-gray-300">
 
                   Due date:{" "}
 
@@ -594,19 +487,19 @@ function TenantPayments() {
                 </p>
 
                 {paymentInfo.status === "Upcoming" && (
-                  <p className="text-gray-500 text-sm mt-1">
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Your rent will be payable on your scheduled due date.
                   </p>
                 )}
 
                 {paymentInfo.status === "Due Today" && (
-                  <p className="text-yellow-700 text-sm mt-1">
+                  <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
                     Your rent is due today. The payment QR code is now available.
                   </p>
                 )}
 
                 {paymentInfo.status === "Overdue" && (
-                  <p className="text-red-700 text-sm mt-1">
+                  <p className="mt-1 text-sm text-red-700 dark:text-red-300">
                     Your rent is{" "}
                     {paymentInfo.daysLate}{" "}
                     {paymentInfo.daysLate === 1
@@ -623,7 +516,7 @@ function TenantPayments() {
             <div>
 
               <span
-                className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${statusStyles.badge}`}
+                className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold ${statusStyles.badge}`}
               >
                 {paymentInfo.status}
               </span>
@@ -634,23 +527,21 @@ function TenantPayments() {
 
         </div>
 
-        {/* =================================================
-            PAYMENT CALCULATION
-        ================================================= */}
+        {/* PAYMENT CALCULATION */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
 
           {/* MONTHLY RENT */}
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
 
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-gray-400">
                 Monthly Rent
               </p>
 
-              <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
 
                 <IndianRupee size={20} />
 
@@ -658,7 +549,7 @@ function TenantPayments() {
 
             </div>
 
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
 
               ₹
               {Number(tenant.rent).toLocaleString("en-IN")}
@@ -669,15 +560,15 @@ function TenantPayments() {
 
           {/* LATE PENALTY */}
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
 
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-gray-400">
                 Late Penalty
               </p>
 
-              <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600 dark:bg-red-900/40 dark:text-red-400">
 
                 <AlertCircle size={20} />
 
@@ -685,7 +576,7 @@ function TenantPayments() {
 
             </div>
 
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
 
               ₹
               {paymentInfo.penalty.toLocaleString("en-IN")}
@@ -693,7 +584,7 @@ function TenantPayments() {
             </p>
 
             {paymentInfo.daysLate > 0 && (
-              <p className="text-sm text-red-600 mt-2">
+              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
 
                 ₹{LATE_PENALTY_PER_DAY} ×{" "}
                 {paymentInfo.daysLate}{" "}
@@ -708,15 +599,15 @@ function TenantPayments() {
 
           {/* TOTAL */}
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
 
-              <p className="text-gray-500">
+              <p className="text-gray-500 dark:text-gray-400">
                 Total Payable
               </p>
 
-              <div className="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50 text-green-600 dark:bg-green-900/40 dark:text-green-400">
 
                 <CreditCard size={20} />
 
@@ -724,7 +615,7 @@ function TenantPayments() {
 
             </div>
 
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
 
               ₹
               {paymentInfo.total.toLocaleString("en-IN")}
@@ -735,26 +626,24 @@ function TenantPayments() {
 
         </div>
 
-        {/* =================================================
-            PAYMENT REQUIRED
-        ================================================= */}
+        {/* PAYMENT REQUIRED */}
 
         {showQRCode && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+          <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
               <div>
 
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Payment Required
                 </h2>
 
-                <p className="text-gray-600 mt-1">
+                <p className="mt-1 text-gray-600 dark:text-gray-400">
 
                   Current payable amount:
 
-                  <span className="font-semibold text-gray-900 ml-1">
+                  <span className="ml-1 font-semibold text-gray-900 dark:text-white">
 
                     ₹
                     {paymentInfo.total.toLocaleString("en-IN")}
@@ -767,7 +656,7 @@ function TenantPayments() {
 
               <button
                 onClick={handlePayNow}
-                className="flex items-center justify-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-xl hover:bg-gray-800 transition"
+                className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-6 py-3 text-white transition hover:bg-gray-800 dark:bg-blue-600 dark:hover:bg-blue-500"
               >
 
                 <CreditCard size={18} />
@@ -781,21 +670,19 @@ function TenantPayments() {
           </div>
         )}
 
-        {/* =================================================
-            QR PAYMENT SECTION
-        ================================================= */}
+        {/* QR PAYMENT SECTION */}
 
         {showQRCode && (
           <div
             id="payment-qr-section"
-            className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm mb-8"
+            className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800"
           >
 
             <div className="text-center">
 
-              <div className="flex justify-center mb-4">
+              <div className="mb-4 flex justify-center">
 
-                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200">
 
                   <QrCode size={26} />
 
@@ -803,19 +690,21 @@ function TenantPayments() {
 
               </div>
 
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Scan & Pay
               </h2>
 
-              <p className="text-gray-600 mt-2">
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
                 Scan this QR code using your UPI app to pay your current rent.
               </p>
 
               {/* QR CODE */}
 
-              <div className="flex justify-center mt-6">
+              <div className="mt-6 flex justify-center">
 
-                <div className="p-5 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                {/* Keep QR background white for scanning readability. */}
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
 
                   <QRCodeSVG
                     value={upiPaymentUrl}
@@ -832,11 +721,11 @@ function TenantPayments() {
 
               <div className="mt-6">
 
-                <p className="text-gray-500 text-sm">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Amount to Pay
                 </p>
 
-                <p className="text-3xl font-bold text-gray-900 mt-1">
+                <p className="mt-1 text-3xl font-bold text-gray-900 dark:text-white">
 
                   ₹
                   {paymentInfo.total.toLocaleString("en-IN")}
@@ -847,15 +736,15 @@ function TenantPayments() {
 
               {/* PAYMENT BREAKDOWN */}
 
-              <div className="max-w-md mx-auto mt-6 bg-gray-50 rounded-xl p-4 text-left">
+              <div className="mx-auto mt-6 max-w-md rounded-xl bg-gray-50 p-4 text-left dark:bg-gray-700/60">
 
                 <div className="flex justify-between py-2">
 
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-300">
                     Monthly Rent
                   </span>
 
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-gray-900 dark:text-white">
 
                     ₹
                     {Number(tenant.rent).toLocaleString("en-IN")}
@@ -866,11 +755,11 @@ function TenantPayments() {
 
                 <div className="flex justify-between py-2">
 
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-300">
                     Late Penalty
                   </span>
 
-                  <span className="font-medium text-red-600">
+                  <span className="font-medium text-red-600 dark:text-red-400">
 
                     ₹
                     {paymentInfo.penalty.toLocaleString("en-IN")}
@@ -879,13 +768,13 @@ function TenantPayments() {
 
                 </div>
 
-                <div className="border-t border-gray-200 mt-2 pt-3 flex justify-between">
+                <div className="mt-2 flex justify-between border-t border-gray-200 pt-3 dark:border-gray-600">
 
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-gray-900 dark:text-white">
                     Total
                   </span>
 
-                  <span className="font-bold text-gray-900">
+                  <span className="font-bold text-gray-900 dark:text-white">
 
                     ₹
                     {paymentInfo.total.toLocaleString("en-IN")}
@@ -898,11 +787,11 @@ function TenantPayments() {
 
               {/* UPI ID */}
 
-              <p className="text-sm text-gray-500 mt-5">
+              <p className="mt-5 text-sm text-gray-500 dark:text-gray-400">
                 UPI ID: {UPI_ID}
               </p>
 
-              <div className="flex justify-center items-center gap-2 text-green-600 text-sm mt-4">
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-green-600 dark:text-green-400">
 
                 <CheckCircle2 size={16} />
 
@@ -915,29 +804,27 @@ function TenantPayments() {
           </div>
         )}
 
-        {/* =================================================
-            UPCOMING PAYMENT
-        ================================================= */}
+        {/* UPCOMING PAYMENT */}
 
         {paymentInfo.status === "Upcoming" && (
-          <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm mb-8">
+          <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
             <div className="text-center">
 
               <CalendarDays
                 size={40}
-                className="mx-auto text-blue-500 mb-4"
+                className="mx-auto mb-4 text-blue-500 dark:text-blue-400"
               />
 
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Payment Not Due Yet
               </h2>
 
-              <p className="text-gray-600 mt-2">
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
 
                 Your rent is due on{" "}
 
-                <span className="font-semibold text-gray-900">
+                <span className="font-semibold text-gray-900 dark:text-white">
                   {paymentInfo.dueDateText}
                 </span>
 
@@ -945,7 +832,7 @@ function TenantPayments() {
 
               </p>
 
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 The payment QR code will automatically become available when your rent is due.
               </p>
 
@@ -954,40 +841,38 @@ function TenantPayments() {
           </div>
         )}
 
-        {/* =================================================
-            RECENT PAYMENTS
-        ================================================= */}
+        {/* RECENT PAYMENTS */}
 
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-800">
 
-          <div className="p-6 border-b border-gray-200">
+          <div className="border-b border-gray-200 p-6 dark:border-gray-700">
 
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Recent Payments
             </h2>
 
-            <p className="text-gray-500 text-sm mt-1">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Your recent rent payment history.
             </p>
 
           </div>
 
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
 
             {recentPayments.map((payment) => (
 
               <div
                 key={payment.id}
-                className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+                className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
               >
 
                 <div>
 
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 dark:text-white">
                     {payment.month}
                   </p>
 
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Paid on {payment.date}
                   </p>
 
@@ -995,14 +880,14 @@ function TenantPayments() {
 
                 <div className="flex items-center gap-5">
 
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-gray-900 dark:text-white">
 
                     ₹
                     {payment.amount.toLocaleString("en-IN")}
 
                   </p>
 
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
+                  <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400">
 
                     <CheckCircle2 size={14} />
 
