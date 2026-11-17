@@ -52,10 +52,10 @@ import TenantMaintenance from "./components/TenantMaintenance";
 import TenantChangePassword from "./components/TenantChangePassword";
 
 // =========================================================
-// TENANT THEME AND LAYOUT
+// TENANT LAYOUT
+// Theme provider is already mounted globally in main.jsx.
 // =========================================================
 
-import { TenantThemeProvider } from "./context/TenantThemeContext";
 import TenantLayout from "./components/TenantLayout";
 
 // =========================================================
@@ -65,22 +65,10 @@ import TenantLayout from "./components/TenantLayout";
 function TenantDetailsRoute() {
   const [searchParams] = useSearchParams();
 
-  const isTenantView =
-    searchParams.get("view") === "tenant";
-
-  // Owner view: keep the original Owner Portal page.
-  if (!isTenantView) {
-    return <TenantDetails />;
-  }
-
-  // Tenant view: apply the Tenant theme.
-  return (
-    <TenantThemeProvider>
-      <TenantLayout>
-        <TenantDetails />
-      </TenantLayout>
-    </TenantThemeProvider>
-  );
+  // Both owner and tenant views use the same component.
+  // Tenant view is identified by the URL query parameter.
+  // The global theme provider is available to both.
+  return <TenantDetails />;
 }
 
 // =========================================================
@@ -88,11 +76,7 @@ function TenantDetailsRoute() {
 // =========================================================
 
 function TenantPortalLayout() {
-  return (
-    <TenantThemeProvider>
-      <TenantLayout />
-    </TenantThemeProvider>
-  );
+  return <TenantLayout />;
 }
 
 // =========================================================
