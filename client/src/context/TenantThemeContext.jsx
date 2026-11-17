@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useCallback,
@@ -62,6 +61,21 @@ export function TenantThemeProvider({ children }) {
   // =======================================================
 
   const isDarkMode = theme === "dark";
+
+  // =======================================================
+  // APPLY THEME GLOBALLY TO HTML ROOT
+  // =======================================================
+
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Apply or remove Tailwind's dark mode class.
+    root.classList.toggle("dark", isDarkMode);
+
+    // Apply browser-native light/dark appearance.
+    root.style.colorScheme = theme;
+
+  }, [isDarkMode, theme]);
 
   // =======================================================
   // SAVE THEME PREFERENCE
