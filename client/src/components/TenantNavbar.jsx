@@ -1,3 +1,4 @@
+
 import React, {
   useEffect,
   useRef,
@@ -24,6 +25,8 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+
+import { useTenantTheme } from "../context/TenantThemeContext";
 
 function TenantNavbar() {
   const navigate = useNavigate();
@@ -52,25 +55,13 @@ function TenantNavbar() {
   });
 
   // =========================================================
-  // THEME STATE
+  // TENANT THEME CONTEXT
   // =========================================================
 
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => {
-      const savedTheme =
-        localStorage.getItem(
-          "rentalManagementTheme"
-        );
-
-      if (savedTheme) {
-        return savedTheme === "dark";
-      }
-
-      return document.documentElement.classList.contains(
-        "dark"
-      );
-    }
-  );
+  const {
+    isDarkMode,
+    toggleTheme,
+  } = useTenantTheme();
 
   // =========================================================
   // REFS
@@ -182,46 +173,6 @@ function TenantNavbar() {
         "Previous complaints",
       ],
     },
-  };
-
-  // =========================================================
-  // APPLY THEME
-  // =========================================================
-
-  useEffect(() => {
-    const root = document.documentElement;
-
-    if (isDarkMode) {
-      root.classList.add("dark");
-
-      localStorage.setItem(
-        "rentalManagementTheme",
-        "dark"
-      );
-    } else {
-      root.classList.remove("dark");
-
-      localStorage.setItem(
-        "rentalManagementTheme",
-        "light"
-      );
-    }
-
-    window.dispatchEvent(
-      new CustomEvent("themeChanged", {
-        detail: {
-          theme: isDarkMode ? "dark" : "light",
-        },
-      })
-    );
-  }, [isDarkMode]);
-
-  // =========================================================
-  // TOGGLE THEME
-  // =========================================================
-
-  const toggleTheme = () => {
-    setIsDarkMode((previous) => !previous);
   };
 
   // =========================================================
@@ -622,7 +573,8 @@ function TenantNavbar() {
     hoveredSidebarItem
       ? sidebarInfo[hoveredSidebarItem]
       : null;
-        return (
+
+  return (
     <>
       {/* ===================================================== */}
       {/* TOP NAVBAR */}
@@ -1045,7 +997,8 @@ function TenantNavbar() {
           </div>
 
         </div>
-                {/* ================================================= */}
+
+        {/* ================================================= */}
         {/* SIDEBAR MENU */}
         {/* ================================================= */}
 
