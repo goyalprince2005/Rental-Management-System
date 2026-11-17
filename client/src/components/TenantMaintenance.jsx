@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import {
@@ -484,16 +483,16 @@ function TenantMaintenance() {
   const getStatusStyle = (status) => {
     switch (status) {
       case "Resolved":
-        return "bg-green-100 text-green-700";
+        return "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300";
 
       case "In Progress":
-        return "bg-blue-100 text-blue-700";
+        return "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300";
 
       case "Rejected":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300";
 
       default:
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300";
     }
   };
 
@@ -504,16 +503,16 @@ function TenantMaintenance() {
   const getPriorityStyle = (value) => {
     switch (value) {
       case "Urgent":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300";
 
       case "High":
-        return "bg-orange-100 text-orange-700";
+        return "bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300";
 
       case "Medium":
-        return "bg-blue-100 text-blue-700";
+        return "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300";
 
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200";
     }
   };
 
@@ -529,12 +528,14 @@ function TenantMaintenance() {
     setSelectedComplaint(null);
   };
 
+  
+
   // =========================================================
   // RENDER
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
 
       {/* Remaining JSX continues in Part 2 */}
 
@@ -556,19 +557,19 @@ function TenantMaintenance() {
 
         <div className="mb-6 flex items-center gap-3">
 
-          <div className="rounded-xl bg-green-50 p-3">
+          <div className="rounded-xl bg-green-50 dark:bg-green-950/30 p-3">
             <Wrench
               size={28}
-              className="text-green-600"
+              className="text-green-600 dark:text-green-400"
             />
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 md:text-3xl">
+            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 md:text-3xl">
               Maintenance & Complaints
             </h1>
 
-            <p className="mt-1 text-gray-500">
+            <p className="mt-1 text-gray-500 dark:text-gray-400">
               Report a problem or track your maintenance requests.
             </p>
           </div>
@@ -580,7 +581,7 @@ function TenantMaintenance() {
         ================================================= */}
 
         {successMessage && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/30 p-4 text-green-800 dark:text-green-200">
 
             <CheckCircle
               size={21}
@@ -600,7 +601,7 @@ function TenantMaintenance() {
             <button
               type="button"
               onClick={() => setSuccessMessage("")}
-              className="ml-auto text-green-700 hover:text-green-900"
+              className="ml-auto text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-200"
               aria-label="Dismiss success message"
             >
               <X size={18} />
@@ -617,23 +618,23 @@ function TenantMaintenance() {
 
           {/* TOTAL */}
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm">
             <div className="flex items-center justify-between">
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Complaints
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-gray-800">
+                <p className="mt-2 text-3xl font-bold text-gray-800 dark:text-gray-100">
                   {totalComplaints}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-gray-100 p-3">
+              <div className="rounded-xl bg-gray-100 dark:bg-gray-800 p-3">
                 <FileText
                   size={23}
-                  className="text-gray-600"
+                  className="text-gray-600 dark:text-gray-300"
                 />
               </div>
 
@@ -642,23 +643,23 @@ function TenantMaintenance() {
 
           {/* PENDING */}
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm">
             <div className="flex items-center justify-between">
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Pending
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-yellow-600">
+                <p className="mt-2 text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                   {pendingComplaints}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-yellow-50 p-3">
+              <div className="rounded-xl bg-yellow-50 dark:bg-yellow-950/30 p-3">
                 <Clock
                   size={23}
-                  className="text-yellow-600"
+                  className="text-yellow-600 dark:text-yellow-400"
                 />
               </div>
 
@@ -667,23 +668,23 @@ function TenantMaintenance() {
 
           {/* IN PROGRESS */}
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm">
             <div className="flex items-center justify-between">
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   In Progress
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-blue-600">
+                <p className="mt-2 text-3xl font-bold text-blue-600 dark:text-blue-400">
                   {inProgressComplaints}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-blue-50 p-3">
+              <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 p-3">
                 <Wrench
                   size={23}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
@@ -692,23 +693,23 @@ function TenantMaintenance() {
 
           {/* RESOLVED */}
 
-          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm">
             <div className="flex items-center justify-between">
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Resolved
                 </p>
 
-                <p className="mt-2 text-3xl font-bold text-green-600">
+                <p className="mt-2 text-3xl font-bold text-green-600 dark:text-green-400">
                   {resolvedComplaints}
                 </p>
               </div>
 
-              <div className="rounded-xl bg-green-50 p-3">
+              <div className="rounded-xl bg-green-50 dark:bg-green-950/30 p-3">
                 <CheckCircle
                   size={23}
-                  className="text-green-600"
+                  className="text-green-600 dark:text-green-400"
                 />
               </div>
 
@@ -721,14 +722,14 @@ function TenantMaintenance() {
             REPORT A PROBLEM
         ================================================= */}
 
-        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+        <div className="mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm md:p-6">
 
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               Report a Problem
             </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Provide the details below so the Owner can understand your issue.
             </p>
           </div>
@@ -743,10 +744,10 @@ function TenantMaintenance() {
             <div>
               <label
                 htmlFor="complaint-title"
-                className="mb-2 block text-sm font-semibold text-gray-700"
+                className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200"
               >
                 Complaint Title
-                <span className="text-red-500"> *</span>
+                <span className="text-red-500 dark:text-red-400"> *</span>
               </label>
 
               <input
@@ -763,23 +764,23 @@ function TenantMaintenance() {
                   }));
                 }}
                 placeholder="e.g. Bathroom water leakage"
-                className={`w-full rounded-lg border px-4 py-3 text-gray-800 outline-none transition focus:ring-2 focus:ring-green-500 ${
+                className={`w-full rounded-lg border px-4 py-3 text-gray-800 dark:text-gray-100 outline-none transition focus:ring-2 focus:ring-green-500 ${
                   errors.title
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
               />
 
               <div className="mt-1 flex justify-between gap-2">
                 {errors.title ? (
-                  <p className="text-sm text-red-500">
+                  <p className="text-sm text-red-500 dark:text-red-400">
                     {errors.title}
                   </p>
                 ) : (
                   <span />
                 )}
 
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
                   {title.length}/100
                 </p>
               </div>
@@ -790,10 +791,10 @@ function TenantMaintenance() {
             <div>
               <label
                 htmlFor="complaint-category"
-                className="mb-2 block text-sm font-semibold text-gray-700"
+                className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200"
               >
                 Complaint Category
-                <span className="text-red-500"> *</span>
+                <span className="text-red-500 dark:text-red-400"> *</span>
               </label>
 
               <select
@@ -807,10 +808,10 @@ function TenantMaintenance() {
                     category: "",
                   }));
                 }}
-                className={`w-full rounded-lg border bg-white px-4 py-3 text-gray-800 outline-none transition focus:ring-2 focus:ring-green-500 ${
+                className={`w-full rounded-lg border bg-white dark:bg-gray-900 px-4 py-3 text-gray-800 dark:text-gray-100 outline-none transition focus:ring-2 focus:ring-green-500 ${
                   errors.category
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
               >
                 <option value="">
@@ -851,7 +852,7 @@ function TenantMaintenance() {
               </select>
 
               {errors.category && (
-                <p className="mt-2 text-sm text-red-500">
+                <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                   {errors.category}
                 </p>
               )}
@@ -862,10 +863,10 @@ function TenantMaintenance() {
             <div>
               <label
                 htmlFor="complaint-priority"
-                className="mb-2 block text-sm font-semibold text-gray-700"
+                className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200"
               >
                 Complaint Priority
-                <span className="text-red-500"> *</span>
+                <span className="text-red-500 dark:text-red-400"> *</span>
               </label>
 
               <select
@@ -874,7 +875,7 @@ function TenantMaintenance() {
                 onChange={(event) =>
                   setPriority(event.target.value)
                 }
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-800 outline-none transition focus:ring-2 focus:ring-green-500"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-3 text-gray-800 dark:text-gray-100 outline-none transition focus:ring-2 focus:ring-green-500"
               >
                 <option value="Low">
                   Low - Can wait
@@ -893,7 +894,7 @@ function TenantMaintenance() {
                 </option>
               </select>
 
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Select the urgency level of your problem.
               </p>
             </div>
@@ -903,10 +904,10 @@ function TenantMaintenance() {
             <div>
               <label
                 htmlFor="complaint-description"
-                className="mb-2 block text-sm font-semibold text-gray-700"
+                className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200"
               >
                 Problem Description
-                <span className="text-red-500"> *</span>
+                <span className="text-red-500 dark:text-red-400"> *</span>
               </label>
 
               <textarea
@@ -923,25 +924,25 @@ function TenantMaintenance() {
                 }}
                 placeholder="Describe your problem in detail..."
                 rows={5}
-                className={`w-full resize-none rounded-lg border px-4 py-3 text-gray-800 outline-none transition focus:ring-2 focus:ring-green-500 ${
+                className={`w-full resize-none rounded-lg border px-4 py-3 text-gray-800 dark:text-gray-100 outline-none transition focus:ring-2 focus:ring-green-500 ${
                   errors.description
                     ? "border-red-500"
-                    : "border-gray-300"
+                    : "border-gray-300 dark:border-gray-600"
                 }`}
               />
 
               <div className="mt-1 flex justify-between gap-2">
                 {errors.description ? (
-                  <p className="text-sm text-red-500">
+                  <p className="text-sm text-red-500 dark:text-red-400">
                     {errors.description}
                   </p>
                 ) : (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     Minimum 10 characters.
                   </span>
                 )}
 
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
                   {description.length}/1000
                 </p>
               </div>
@@ -950,27 +951,27 @@ function TenantMaintenance() {
             {/* IMAGE ATTACHMENTS */}
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200">
                 Attach Photographs
-                <span className="ml-1 font-normal text-gray-400">
+                <span className="ml-1 font-normal text-gray-400 dark:text-gray-500">
                   (Optional)
                 </span>
               </label>
 
               <label
                 htmlFor="complaint-images"
-                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-7 text-center transition hover:border-green-500 hover:bg-green-50"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 px-4 py-7 text-center transition hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-950/40"
               >
                 <ImagePlus
                   size={32}
-                  className="mb-2 text-green-600"
+                  className="mb-2 text-green-600 dark:text-green-400"
                 />
 
-                <span className="font-semibold text-gray-700">
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
                   Click to upload photographs
                 </span>
 
-                <span className="mt-1 text-xs text-gray-500">
+                <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   Images only · Maximum 5 images · 5 MB each
                 </span>
               </label>
@@ -986,7 +987,7 @@ function TenantMaintenance() {
               />
 
               {attachmentError && (
-                <p className="mt-2 text-sm text-red-500">
+                <p className="mt-2 text-sm text-red-500 dark:text-red-400">
                   {attachmentError}
                 </p>
               )}
@@ -995,7 +996,7 @@ function TenantMaintenance() {
 
               {attachments.length > 0 && (
                 <div className="mt-4">
-                  <p className="mb-3 text-sm font-semibold text-gray-700">
+                  <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-200">
                     Selected Images ({attachments.length}/5)
                   </p>
 
@@ -1003,7 +1004,7 @@ function TenantMaintenance() {
                     {attachments.map((attachment) => (
                       <div
                         key={attachment.id}
-                        className="relative overflow-hidden rounded-xl border border-gray-200 bg-white"
+                        className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
                       >
                         <img
                           src={attachment.previewUrl}
@@ -1016,13 +1017,13 @@ function TenantMaintenance() {
                           onClick={() =>
                             removeAttachment(attachment.id)
                           }
-                          className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white shadow-md transition hover:bg-red-700"
+                          className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white dark:text-white shadow-md transition hover:bg-red-700"
                           aria-label={`Remove ${attachment.name}`}
                         >
                           <Trash2 size={14} />
                         </button>
 
-                        <p className="truncate px-2 py-2 text-xs text-gray-600">
+                        <p className="truncate px-2 py-2 text-xs text-gray-600 dark:text-gray-300">
                           {attachment.name}
                         </p>
                       </div>
@@ -1034,12 +1035,12 @@ function TenantMaintenance() {
 
             {/* FORM ACTIONS */}
 
-            <div className="flex flex-col gap-3 border-t border-gray-100 pt-5 sm:flex-row">
+            <div className="flex flex-col gap-3 border-t border-gray-100 dark:border-gray-800 pt-5 sm:flex-row">
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={isSubmitting}
+                className="flex items-center justify-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white dark:text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Send size={18} />
 
@@ -1051,7 +1052,7 @@ function TenantMaintenance() {
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 transition hover:bg-gray-50"
+                className="rounded-lg border border-gray-300 dark:border-gray-600 px-6 py-3 font-medium text-gray-700 dark:text-gray-200 transition hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 Clear Form
               </button>
@@ -1065,21 +1066,21 @@ function TenantMaintenance() {
             MY COMPLAINTS
         ================================================= */}
 
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:p-6">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-sm md:p-6">
 
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                 My Complaints
               </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Track the progress of your submitted complaints.
               </p>
             </div>
 
-            <span className="w-fit rounded-full bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700">
+            <span className="w-fit rounded-full bg-green-50 dark:bg-green-950/30 px-3 py-1.5 text-sm font-medium text-green-700 dark:text-green-300">
               {totalComplaints} Total
             </span>
 
@@ -1091,14 +1092,14 @@ function TenantMaintenance() {
 
               <Wrench
                 size={42}
-                className="mx-auto text-gray-400"
+                className="mx-auto text-gray-400 dark:text-gray-500"
               />
 
-              <h3 className="mt-3 font-semibold text-gray-700">
+              <h3 className="mt-3 font-semibold text-gray-700 dark:text-gray-200">
                 No complaints yet
               </h3>
 
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Your submitted complaints will appear here.
               </p>
 
@@ -1112,7 +1113,7 @@ function TenantMaintenance() {
 
                 <div
                   key={complaint.id}
-                  className="rounded-xl border border-gray-200 p-4 transition hover:border-green-200 hover:shadow-sm md:p-5"
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 p-4 transition hover:border-green-200 dark:hover:border-green-700 hover:shadow-sm md:p-5"
                 >
 
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -1123,7 +1124,7 @@ function TenantMaintenance() {
 
                       <div className="flex flex-wrap items-center gap-2">
 
-                        <h3 className="text-lg font-bold text-gray-800">
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                           {complaint.title}
                         </h3>
 
@@ -1135,15 +1136,15 @@ function TenantMaintenance() {
 
                       </div>
 
-                      <p className="mt-2 text-sm text-gray-500">
+                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         {complaint.category}
                       </p>
 
-                      <p className="mt-2 break-words text-sm leading-6 text-gray-600">
+                      <p className="mt-2 break-words text-sm leading-6 text-gray-600 dark:text-gray-300">
                         {complaint.description}
                       </p>
 
-                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-400">
+                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-400 dark:text-gray-500">
 
                         <span className="flex items-center gap-1">
                           <FileText size={14} />
@@ -1182,7 +1183,7 @@ function TenantMaintenance() {
                         onClick={() =>
                           openComplaintDetails(complaint)
                         }
-                        className="inline-flex items-center gap-2 rounded-lg border border-green-600 px-4 py-2 text-sm font-medium text-green-700 transition hover:bg-green-50"
+                        className="inline-flex items-center gap-2 rounded-lg border border-green-600 dark:border-green-500 px-4 py-2 text-sm font-medium text-green-700 dark:text-green-300 transition hover:bg-green-50 dark:hover:bg-green-950/40"
                       >
                         <Eye size={16} />
                         View Details
@@ -1195,14 +1196,14 @@ function TenantMaintenance() {
                   {/* OWNER RESPONSE PREVIEW */}
 
                   {complaint.ownerResponse && (
-                    <div className="mt-4 rounded-lg border border-blue-100 bg-blue-50 p-3">
+                    <div className="mt-4 rounded-lg border border-blue-100 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 p-3">
 
-                      <div className="flex items-center gap-2 text-sm font-semibold text-blue-800">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-blue-800 dark:text-blue-200">
                         <MessageSquare size={16} />
                         Owner Response
                       </div>
 
-                      <p className="mt-2 text-sm text-blue-900">
+                      <p className="mt-2 text-sm text-blue-900 dark:text-blue-100">
                         {complaint.ownerResponse}
                       </p>
 
@@ -1230,20 +1231,20 @@ function TenantMaintenance() {
           >
 
             <div
-              className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white dark:bg-gray-900 shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
 
               {/* MODAL HEADER */}
 
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-5">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5">
 
                 <div>
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                     Complaint Details
                   </h2>
 
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {selectedComplaint.id}
                   </p>
                 </div>
@@ -1251,7 +1252,7 @@ function TenantMaintenance() {
                 <button
                   type="button"
                   onClick={closeComplaintDetails}
-                  className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                  className="rounded-lg p-2 text-gray-500 dark:text-gray-400 transition hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-100"
                   aria-label="Close complaint details"
                 >
                   <X size={23} />
@@ -1268,7 +1269,7 @@ function TenantMaintenance() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
 
-                    <h3 className="text-xl font-bold text-gray-800">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                       {selectedComplaint.title}
                     </h3>
 
@@ -1280,7 +1281,7 @@ function TenantMaintenance() {
 
                   </div>
 
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     {selectedComplaint.category}
                   </p>
                 </div>
@@ -1289,19 +1290,19 @@ function TenantMaintenance() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                       <Calendar size={16} />
                       Submitted Date
                     </div>
 
-                    <p className="mt-2 font-semibold text-gray-800">
+                    <p className="mt-2 font-semibold text-gray-800 dark:text-gray-100">
                       {formatDateTime(selectedComplaint.date)}
                     </p>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                       <AlertCircle size={16} />
                       Priority
                     </div>
@@ -1313,24 +1314,24 @@ function TenantMaintenance() {
                     </span>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                       <Building2 size={16} />
                       Property
                     </div>
 
-                    <p className="mt-2 font-semibold text-gray-800">
+                    <p className="mt-2 font-semibold text-gray-800 dark:text-gray-100">
                       {selectedComplaint.property}
                     </p>
                   </div>
 
-                  <div className="rounded-xl bg-gray-50 p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                       <DoorOpen size={16} />
                       Room
                     </div>
 
-                    <p className="mt-2 font-semibold text-gray-800">
+                    <p className="mt-2 font-semibold text-gray-800 dark:text-gray-100">
                       {selectedComplaint.room}
                     </p>
                   </div>
@@ -1340,12 +1341,12 @@ function TenantMaintenance() {
                 {/* DESCRIPTION */}
 
                 <div>
-                  <h3 className="mb-2 font-bold text-gray-800">
+                  <h3 className="mb-2 font-bold text-gray-800 dark:text-gray-100">
                     Problem Description
                   </h3>
 
-                  <div className="rounded-xl border border-gray-200 p-4">
-                    <p className="whitespace-pre-wrap break-words text-sm leading-7 text-gray-600">
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                    <p className="whitespace-pre-wrap break-words text-sm leading-7 text-gray-600 dark:text-gray-300">
                       {selectedComplaint.description}
                     </p>
                   </div>
@@ -1354,7 +1355,7 @@ function TenantMaintenance() {
                 {/* ATTACHMENTS */}
 
                 <div>
-                  <h3 className="mb-3 flex items-center gap-2 font-bold text-gray-800">
+                  <h3 className="mb-3 flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100">
                     <Paperclip size={18} />
                     Attached Photographs
                   </h3>
@@ -1369,7 +1370,7 @@ function TenantMaintenance() {
                             href={attachment.previewUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="group overflow-hidden rounded-xl border border-gray-200"
+                            className="group overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700"
                           >
                             <img
                               src={attachment.previewUrl}
@@ -1377,7 +1378,7 @@ function TenantMaintenance() {
                               className="h-36 w-full object-cover transition duration-300 group-hover:scale-105"
                             />
 
-                            <p className="truncate px-3 py-2 text-xs text-gray-600">
+                            <p className="truncate px-3 py-2 text-xs text-gray-600 dark:text-gray-300">
                               {attachment.name}
                             </p>
                           </a>
@@ -1387,13 +1388,13 @@ function TenantMaintenance() {
 
                   ) : (
 
-                    <div className="rounded-xl border border-dashed border-gray-300 p-5 text-center">
+                    <div className="rounded-xl border border-dashed border-gray-300 dark:border-gray-600 p-5 text-center">
                       <ImagePlus
                         size={26}
-                        className="mx-auto text-gray-400"
+                        className="mx-auto text-gray-400 dark:text-gray-500"
                       />
 
-                      <p className="mt-2 text-sm text-gray-500">
+                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         No photographs attached.
                       </p>
                     </div>
@@ -1404,25 +1405,25 @@ function TenantMaintenance() {
                 {/* OWNER RESPONSE */}
 
                 <div>
-                  <h3 className="mb-3 flex items-center gap-2 font-bold text-gray-800">
+                  <h3 className="mb-3 flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100">
                     <MessageSquare size={18} />
                     Owner Response
                   </h3>
 
                   {selectedComplaint.ownerResponse ? (
 
-                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                    <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/30 p-4">
 
-                      <div className="flex items-center gap-2 font-semibold text-blue-800">
+                      <div className="flex items-center gap-2 font-semibold text-blue-800 dark:text-blue-200">
                         <User size={17} />
                         Property Owner
                       </div>
 
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-blue-900">
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-blue-900 dark:text-blue-100">
                         {selectedComplaint.ownerResponse}
                       </p>
 
-                      <p className="mt-3 text-xs text-blue-700">
+                      <p className="mt-3 text-xs text-blue-700 dark:text-blue-300">
                         Responded on{" "}
                         {formatDateTime(
                           selectedComplaint.responseDate
@@ -1433,14 +1434,14 @@ function TenantMaintenance() {
 
                   ) : (
 
-                    <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+                    <div className="rounded-xl border border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950/30 p-4">
 
-                      <div className="flex items-center gap-2 font-semibold text-yellow-800">
+                      <div className="flex items-center gap-2 font-semibold text-yellow-800 dark:text-yellow-200">
                         <Clock size={18} />
                         Awaiting Owner Response
                       </div>
 
-                      <p className="mt-2 text-sm text-yellow-700">
+                      <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                         Your complaint has been recorded. The Owner has not responded yet.
                       </p>
 
@@ -1452,7 +1453,7 @@ function TenantMaintenance() {
                 {/* COMPLAINT HISTORY */}
 
                 <div>
-                  <h3 className="mb-4 flex items-center gap-2 font-bold text-gray-800">
+                  <h3 className="mb-4 flex items-center gap-2 font-bold text-gray-800 dark:text-gray-100">
                     <History size={19} />
                     Complaint Activity History
                   </h3>
@@ -1475,19 +1476,19 @@ function TenantMaintenance() {
 
                               <div className={`z-10 flex h-8 w-8 items-center justify-center rounded-full ${
                                 historyItem.status === "Resolved"
-                                  ? "bg-green-100 text-green-600"
+                                  ? "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400"
                                   : historyItem.status === "In Progress"
-                                  ? "bg-blue-100 text-blue-600"
+                                  ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
                                   : historyItem.status === "Rejected"
-                                  ? "bg-red-100 text-red-600"
-                                  : "bg-yellow-100 text-yellow-600"
+                                  ? "bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400"
+                                  : "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400"
                               }`}>
                                 {getStatusIcon(historyItem.status)}
                               </div>
 
                               {index !==
                                 selectedComplaint.history.length - 1 && (
-                                <div className="absolute top-8 h-full w-px bg-gray-200" />
+                                <div className="absolute top-8 h-full w-px bg-gray-200 dark:bg-gray-700" />
                               )}
 
                             </div>
@@ -1498,17 +1499,17 @@ function TenantMaintenance() {
 
                               <div className="flex flex-wrap items-center gap-2">
 
-                                <p className="font-semibold text-gray-800">
+                                <p className="font-semibold text-gray-800 dark:text-gray-100">
                                   {historyItem.status}
                                 </p>
 
-                                <span className="text-xs text-gray-400">
+                                <span className="text-xs text-gray-400 dark:text-gray-500">
                                   {formatDateTime(historyItem.date)}
                                 </span>
 
                               </div>
 
-                              <p className="mt-1 text-sm leading-6 text-gray-600">
+                              <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
                                 {historyItem.message}
                               </p>
 
@@ -1523,7 +1524,7 @@ function TenantMaintenance() {
 
                   ) : (
 
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       No activity history available.
                     </p>
 
@@ -1533,12 +1534,12 @@ function TenantMaintenance() {
 
                 {/* CLOSE BUTTON */}
 
-                <div className="border-t border-gray-200 pt-5">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
 
                   <button
                     type="button"
                     onClick={closeComplaintDetails}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-5 py-3 font-medium text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 px-5 py-3 font-medium text-gray-700 dark:text-gray-200 transition hover:bg-gray-50 dark:hover:bg-gray-800 sm:w-auto"
                   >
                     <ArrowLeft size={17} />
                     Back to Complaints
