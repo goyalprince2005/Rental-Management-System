@@ -1,4 +1,3 @@
-
 import React, { useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
@@ -494,8 +493,7 @@ function TenantDetails() {
       status: tenant.status || "Active",
     };
   }, [tenant, id, rooms, properties]);
-
-  // -------------------------------------------------------
+    // -------------------------------------------------------
   // NAVIGATION HELPERS
   // -------------------------------------------------------
 
@@ -517,7 +515,7 @@ function TenantDetails() {
       .toLowerCase();
 
     if (status === "active" || status === "occupied") {
-      return "bg-green-100 text-green-700";
+      return "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300";
     }
 
     if (
@@ -525,17 +523,17 @@ function TenantDetails() {
       status === "pending" ||
       status === "overdue"
     ) {
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300";
     }
 
     if (
       status === "inactive" ||
       status === "vacated"
     ) {
-      return "bg-gray-100 text-gray-700";
+      return "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200";
     }
 
-    return "bg-gray-100 text-gray-700";
+    return "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200";
   };
 
   // =========================================================
@@ -544,20 +542,20 @@ function TenantDetails() {
 
   if (!tenantDetails) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
         {isTenantView ? <TenantNavbar /> : <Navbar />}
 
         <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
-          <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md w-full">
-            <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
-              <User size={30} className="text-red-500" />
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-sm text-center max-w-md w-full">
+            <div className="mx-auto w-16 h-16 bg-red-50 dark:bg-red-950/30 rounded-full flex items-center justify-center">
+              <User size={30} className="text-red-500 dark:text-red-400" />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-800 mt-5">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-5">
               Tenant Not Found
             </h2>
 
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
               No saved tenant or assigned room matches this record.
             </p>
 
@@ -581,7 +579,7 @@ function TenantDetails() {
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
       {/* NAVBAR */}
 
       {isTenantView ? <TenantNavbar /> : <Navbar />}
@@ -592,11 +590,11 @@ function TenantDetails() {
         {/* PAGE HEADER */}
 
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
             {isTenantView ? "My Details" : tenantDetails.name}
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             {isTenantView
               ? "View your rental and personal information."
               : "Complete information about this tenant."}
@@ -605,21 +603,21 @@ function TenantDetails() {
 
         {/* TENANT CARD */}
 
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* HEADER */}
 
-          <div className="p-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-4 bg-blue-50 rounded-xl">
-                <User size={32} className="text-blue-600" />
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
+                <User size={32} className="text-blue-600 dark:text-blue-400" />
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {tenantDetails.name}
                 </h2>
 
-                <p className="text-gray-500 mt-1">
+                <p className="text-gray-500 dark:text-gray-400 mt-1">
                   Tenant ID: {tenantDetails.id}
                 </p>
               </div>
@@ -635,72 +633,72 @@ function TenantDetails() {
           {/* TENANT INFORMATION */}
 
           <div className="p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
               Tenant Information
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* PHONE */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Phone size={18} />
                   <p className="text-sm">Phone</p>
                 </div>
 
-                <p className="font-bold mt-2 break-words">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2 break-words">
                   {tenantDetails.phone}
                 </p>
               </div>
 
               {/* PROPERTY */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Building2 size={18} />
                   <p className="text-sm">Property</p>
                 </div>
 
-                <p className="font-bold mt-2 break-words">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2 break-words">
                   {tenantDetails.property}
                 </p>
               </div>
 
               {/* ROOM */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <DoorOpen size={18} />
                   <p className="text-sm">Room</p>
                 </div>
 
-                <p className="font-bold mt-2">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2">
                   Room {tenantDetails.room}
                 </p>
               </div>
 
               {/* RENT */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <IndianRupee size={18} />
                   <p className="text-sm">Monthly Rent</p>
                 </div>
 
-                <p className="font-bold mt-2">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2">
                   {formatCurrency(tenantDetails.rent)}
                 </p>
               </div>
 
               {/* RENT DUE DAY */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Clock size={18} />
                   <p className="text-sm">Rent Due Day</p>
                 </div>
 
-                <p className="font-bold mt-2">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2">
                   {tenantDetails.rentDueDay}
                   {getOrdinal(tenantDetails.rentDueDay)} of every month
                 </p>
@@ -708,13 +706,13 @@ function TenantDetails() {
 
               {/* JOINING DATE */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Calendar size={18} />
                   <p className="text-sm">Joining Date</p>
                 </div>
 
-                <p className="font-bold mt-2 break-words">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2 break-words">
                   {tenantDetails.joiningDate
                     ? String(tenantDetails.joiningDate).slice(0, 10)
                     : "Not specified"}
@@ -723,13 +721,13 @@ function TenantDetails() {
 
               {/* LOCATION */}
 
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Building2 size={18} />
                   <p className="text-sm">Location</p>
                 </div>
 
-                <p className="font-bold mt-2 break-words">
+                <p className="font-bold text-gray-800 dark:text-gray-100 mt-2 break-words">
                   {tenantDetails.location}
                 </p>
               </div>
@@ -738,25 +736,25 @@ function TenantDetails() {
             {/* PROPERTY INFORMATION */}
 
             <div className="mt-8">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
                 Property Information
               </h3>
 
-              <div className="border rounded-xl p-5">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-blue-50 rounded-lg">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
                     <Building2
                       size={24}
-                      className="text-blue-600"
+                      className="text-blue-600 dark:text-blue-400"
                     />
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-lg">
+                    <h4 className="font-bold text-lg text-gray-800 dark:text-gray-100">
                       {tenantDetails.property}
                     </h4>
 
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       📍 {tenantDetails.location}
                     </p>
                   </div>
@@ -764,36 +762,35 @@ function TenantDetails() {
               </div>
             </div>
 
-           
-{/* ACTION BUTTONS */}
+            {/* ACTION BUTTONS */}
 
-<div className="flex flex-col sm:flex-row gap-3 mt-8">
-  {/* BACK BUTTON */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-8">
+              {/* BACK BUTTON */}
 
-  <button
-    type="button"
-    onClick={() => navigate(getBackPath())}
-    className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition"
-  >
-    <ArrowLeft size={18} />
+              <button
+                type="button"
+                onClick={() => navigate(getBackPath())}
+                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-5 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              >
+                <ArrowLeft size={18} />
 
-    {isTenantView
-      ? "Back to Dashboard"
-      : "Back to Tenants"}
-  </button>
+                {isTenantView
+                  ? "Back to Dashboard"
+                  : "Back to Tenants"}
+              </button>
 
-  {/* OWNER-ONLY EDIT BUTTON */}
+              {/* OWNER-ONLY EDIT BUTTON */}
 
-  {!isTenantView && (
-    <button
-      type="button"
-      onClick={() => navigate(getEditPath())}
-      className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
-    >
-      Edit Tenant
-    </button>
-  )}
-</div>
+              {!isTenantView && (
+                <button
+                  type="button"
+                  onClick={() => navigate(getEditPath())}
+                  className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                >
+                  Edit Tenant
+                </button>
+              )}
+            </div>
 
           </div>
         </div>
