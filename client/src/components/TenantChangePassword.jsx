@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -73,7 +74,11 @@ function TenantChangePassword() {
       );
     }
 
-    if (!/[!@#$%^&*(),.?":{}|<>_\-\\[\]/;'`~+=]/.test(password)) {
+    const specialCharacters = "!@#$%^&*(),.?\":{}|<>_-\\[]/;'`~+=";
+
+    if (!password.split("").some((character) =>
+      specialCharacters.includes(character)
+    )) {
       passwordErrors.push(
         "Password must contain at least one special character."
       );
@@ -236,12 +241,11 @@ function TenantChangePassword() {
     placeholder,
     error,
     onChange,
+    autoComplete = "new-password",
   }) => {
     return (
       <div>
-
         <div className="relative">
-
           <input
             type={showPassword ? "text" : "password"}
             value={value}
@@ -250,12 +254,16 @@ function TenantChangePassword() {
               ((event) => setValue(event.target.value))
             }
             placeholder={placeholder}
-            autoComplete="new-password"
-            className={`w-full px-4 py-3 pr-12 border rounded-lg outline-none transition ${
-              error
-                ? "border-red-400 focus:ring-2 focus:ring-red-100"
-                : "border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-100"
-            }`}
+            autoComplete={autoComplete}
+            className={`w-full px-4 py-3 pr-12 border rounded-lg outline-none transition
+              bg-white dark:bg-gray-800
+              text-gray-800 dark:text-gray-100
+              placeholder-gray-400 dark:placeholder-gray-500
+              ${
+                error
+                  ? "border-red-400 focus:ring-2 focus:ring-red-100 dark:focus:ring-red-900/40"
+                  : "border-gray-300 dark:border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:focus:ring-green-900/40"
+              }`}
           />
 
           <button
@@ -263,7 +271,9 @@ function TenantChangePassword() {
             onClick={() =>
               setShowPassword((previous) => !previous)
             }
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2
+              text-gray-500 dark:text-gray-400
+              hover:text-gray-700 dark:hover:text-gray-200"
             aria-label="Toggle password visibility"
           >
             {showPassword ? (
@@ -272,7 +282,6 @@ function TenantChangePassword() {
               <Eye size={20} />
             )}
           </button>
-
         </div>
 
         {/* ================= ERROR MESSAGE ================= */}
@@ -281,7 +290,8 @@ function TenantChangePassword() {
           error.map((message, index) => (
             <p
               key={index}
-              className="flex items-center gap-1 text-sm text-red-600 mt-2"
+              className="flex items-center gap-1 text-sm
+                text-red-600 dark:text-red-400 mt-2"
             >
               <AlertCircle size={14} />
               {message}
@@ -289,24 +299,23 @@ function TenantChangePassword() {
           ))
         ) : (
           error && (
-            <p className="flex items-center gap-1 text-sm text-red-600 mt-2">
+            <p className="flex items-center gap-1 text-sm
+              text-red-600 dark:text-red-400 mt-2">
               <AlertCircle size={14} />
               {error}
             </p>
           )
         )}
-
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
 
       {/* ================= TENANT NAVBAR ================= */}
 
       <TenantNavbar />
-
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -315,39 +324,37 @@ function TenantChangePassword() {
         {/* ================= PAGE HEADING ================= */}
 
         <div className="mb-6">
-
           <div className="flex items-center gap-3">
 
-            <div className="p-3 bg-green-50 rounded-xl">
-
+            <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-xl">
               <Lock
                 size={28}
-                className="text-green-600"
+                className="text-green-600 dark:text-green-400"
               />
-
             </div>
 
             <div>
-
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              <h1 className="text-2xl md:text-3xl font-bold
+                text-gray-800 dark:text-gray-100">
                 Change Password
               </h1>
 
-              <p className="text-gray-500 mt-1">
+              <p className="text-gray-500 dark:text-gray-400 mt-1">
                 Update your tenant account password.
               </p>
-
             </div>
 
           </div>
-
         </div>
-
 
         {/* ================= SUCCESS MESSAGE ================= */}
 
         {successMessage && (
-          <div className="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 text-green-700 px-4 py-4 rounded-xl">
+          <div className="mb-6 flex items-center gap-3
+            bg-green-50 dark:bg-green-900/20
+            border border-green-200 dark:border-green-800
+            text-green-700 dark:text-green-300
+            px-4 py-4 rounded-xl">
 
             <CheckCircle size={20} />
 
@@ -358,11 +365,14 @@ function TenantChangePassword() {
           </div>
         )}
 
-
         {/* ================= GENERAL ERROR ================= */}
 
         {errors.general && (
-          <div className="mb-6 flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-xl">
+          <div className="mb-6 flex items-center gap-3
+            bg-red-50 dark:bg-red-900/20
+            border border-red-200 dark:border-red-800
+            text-red-700 dark:text-red-300
+            px-4 py-4 rounded-xl">
 
             <AlertCircle size={20} />
 
@@ -373,10 +383,12 @@ function TenantChangePassword() {
           </div>
         )}
 
-
         {/* ================= PASSWORD FORM ================= */}
 
-        <div className="bg-white rounded-xl shadow-sm border p-5 md:p-7">
+        <div className="bg-white dark:bg-gray-900
+          rounded-xl shadow-sm
+          border border-gray-200 dark:border-gray-800
+          p-5 md:p-7 transition-colors duration-300">
 
           <form onSubmit={handleSubmit}>
 
@@ -384,7 +396,8 @@ function TenantChangePassword() {
 
             <div className="mb-5">
 
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium
+                text-gray-700 dark:text-gray-300 mb-2">
                 Current Password
               </label>
 
@@ -400,12 +413,12 @@ function TenantChangePassword() {
 
             </div>
 
-
             {/* ================= NEW PASSWORD ================= */}
 
             <div className="mb-5">
 
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium
+                text-gray-700 dark:text-gray-300 mb-2">
                 New Password
               </label>
 
@@ -422,12 +435,12 @@ function TenantChangePassword() {
 
             </div>
 
-
             {/* ================= CONFIRM PASSWORD ================= */}
 
             <div className="mb-6">
 
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium
+                text-gray-700 dark:text-gray-300 mb-2">
                 Confirm New Password
               </label>
 
@@ -444,14 +457,15 @@ function TenantChangePassword() {
 
             </div>
 
-
             {/* ================= ACTIONS ================= */}
 
             <div className="flex flex-col sm:flex-row gap-3">
 
               <button
                 type="submit"
-                className="flex-1 bg-green-600 text-white px-5 py-3 rounded-lg font-medium hover:bg-green-700 transition"
+                className="flex-1 bg-green-600 text-white
+                  px-5 py-3 rounded-lg font-medium
+                  hover:bg-green-700 transition"
               >
                 Change Password
               </button>
@@ -459,13 +473,16 @@ function TenantChangePassword() {
               <button
                 type="button"
                 onClick={() => navigate("/tenant-dashboard")}
-                className="flex items-center justify-center gap-2 px-5 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                className="flex items-center justify-center gap-2
+                  px-5 py-3
+                  border border-gray-300 dark:border-gray-700
+                  rounded-lg
+                  text-gray-700 dark:text-gray-300
+                  hover:bg-gray-50 dark:hover:bg-gray-800
+                  transition"
               >
-
                 <ArrowLeft size={18} />
-
                 Cancel
-
               </button>
 
             </div>
