@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -100,7 +101,7 @@ function TenantForgotPassword() {
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex flex-col transition-colors duration-300">
 
       {/* ===================================================== */}
       {/* MAIN CONTENT */}
@@ -108,17 +109,22 @@ function TenantForgotPassword() {
 
       <main className="flex-1 flex items-center justify-center p-4">
 
-        <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
+        <div className="bg-white dark:bg-gray-900
+          text-gray-800 dark:text-gray-100
+          w-full max-w-md p-8 rounded-xl
+          shadow-lg border border-transparent dark:border-gray-800
+          transition-colors duration-300">
 
           {/* ================================================= */}
           {/* HEADING */}
           {/* ================================================= */}
 
-          <h1 className="text-3xl font-bold text-center">
+          <h1 className="text-3xl font-bold text-center
+            text-gray-800 dark:text-gray-100">
             Forgot Password
           </h1>
 
-          <p className="text-center text-gray-500 mt-2 mb-6">
+          <p className="text-center text-gray-500 dark:text-gray-400 mt-2 mb-6">
             Enter your registered mobile number to receive an OTP.
           </p>
 
@@ -139,7 +145,8 @@ function TenantForgotPassword() {
 
               <label
                 htmlFor="tenant-forgot-mobile"
-                className="block mb-2 font-medium"
+                className="block mb-2 font-medium
+                  text-gray-700 dark:text-gray-300"
               >
                 Mobile Number
               </label>
@@ -163,17 +170,23 @@ function TenantForgotPassword() {
                 maxLength={10}
                 inputMode="numeric"
                 autoComplete="tel"
-                className={`w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  mobileError
-                    ? "border-red-500"
-                    : "border-gray-300"
-                }`}
+                className={`w-full border rounded-lg px-4 py-2
+                  bg-white dark:bg-gray-800
+                  text-gray-800 dark:text-gray-100
+                  placeholder-gray-400 dark:placeholder-gray-500
+                  focus:outline-none focus:ring-2 focus:ring-green-500
+                  transition-colors duration-300
+                  ${
+                    mobileError
+                      ? "border-red-500 dark:border-red-400"
+                      : "border-gray-300 dark:border-gray-700"
+                  }`}
               />
 
               {/* ERROR */}
 
               {mobileError && (
-                <p className="text-red-500 text-sm mt-2">
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">
                   {mobileError}
                 </p>
               )}
@@ -186,7 +199,9 @@ function TenantForgotPassword() {
 
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition"
+              className="w-full bg-green-600 text-white
+                py-3 rounded-lg hover:bg-green-700
+                transition"
             >
               Send OTP
             </button>
@@ -201,7 +216,9 @@ function TenantForgotPassword() {
 
             <Link
               to="/tenant-login"
-              className="text-green-600 hover:underline"
+              className="text-green-600 dark:text-green-400
+                hover:text-green-700 dark:hover:text-green-300
+                hover:underline transition"
             >
               ← Back to Tenant Login
             </Link>
