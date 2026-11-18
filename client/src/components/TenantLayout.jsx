@@ -9,20 +9,14 @@ function TenantLayout({ children }) {
 
   return (
     <div
-      className={`tenant-theme min-h-screen transition-colors duration-200 ${
+      className={`tenant-theme min-h-screen transition-colors duration-300 ${
         isDarkMode
           ? "dark bg-gray-900 text-gray-100"
           : "bg-slate-50 text-gray-900"
       }`}
       data-theme={theme}
     >
-      <main
-        className={`min-h-screen transition-colors duration-200 ${
-          isDarkMode
-            ? "bg-gray-900 text-gray-100"
-            : "bg-slate-50 text-gray-900"
-        }`}
-      >
+      <main className="min-h-screen">
         {children || <Outlet />}
       </main>
     </div>
