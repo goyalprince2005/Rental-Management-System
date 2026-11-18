@@ -1,4 +1,3 @@
-
 import React, {
   useEffect,
   useRef,
@@ -38,41 +37,29 @@ function TenantNavbar() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const [isProfileOpen, setIsProfileOpen] =
-    useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const [
-    hoveredSidebarItem,
-    setHoveredSidebarItem,
-  ] = useState(null);
+  const [hoveredSidebarItem, setHoveredSidebarItem] =
+    useState(null);
 
-  const [
-    hoverCardPosition,
-    setHoverCardPosition,
-  ] = useState({
+  const [hoverCardPosition, setHoverCardPosition] = useState({
     top: 0,
     left: 0,
   });
 
   // =========================================================
-  // TENANT THEME CONTEXT
+  // SHARED TENANT THEME CONTEXT
   // =========================================================
 
-  const {
-    isDarkMode,
-    toggleTheme,
-  } = useTenantTheme();
+  const { isDarkMode, toggleTheme } = useTenantTheme();
 
   // =========================================================
   // REFS
   // =========================================================
 
   const profileRef = useRef(null);
-
   const scrollPositionRef = useRef(0);
-
   const navigationTimerRef = useRef(null);
-
   const hoverCardTimerRef = useRef(null);
 
   // =========================================================
@@ -83,11 +70,9 @@ function TenantNavbar() {
     "1": {
       name: "Rahul Sharma",
     },
-
     "2": {
       name: "Aman Kumar",
     },
-
     "3": {
       name: "Neha Sharma",
     },
@@ -97,9 +82,7 @@ function TenantNavbar() {
   // GET LOGGED-IN TENANT
   // =========================================================
 
-  const tenantId =
-    localStorage.getItem("tenantId");
-
+  const tenantId = localStorage.getItem("tenantId");
   const tenant = tenants[tenantId];
 
   // =========================================================
@@ -180,11 +163,8 @@ function TenantNavbar() {
   // =========================================================
 
   const clearNavigationTimer = () => {
-    if (navigationTimerRef.current) {
-      clearTimeout(
-        navigationTimerRef.current
-      );
-
+    if (navigationTimerRef.current !== null) {
+      window.clearTimeout(navigationTimerRef.current);
       navigationTimerRef.current = null;
     }
   };
@@ -194,11 +174,8 @@ function TenantNavbar() {
   // =========================================================
 
   const clearHoverCardTimer = () => {
-    if (hoverCardTimerRef.current) {
-      clearTimeout(
-        hoverCardTimerRef.current
-      );
-
+    if (hoverCardTimerRef.current !== null) {
+      window.clearTimeout(hoverCardTimerRef.current);
       hoverCardTimerRef.current = null;
     }
   };
@@ -210,16 +187,13 @@ function TenantNavbar() {
   const closeSidebarAfterNavigation = () => {
     clearNavigationTimer();
 
-    navigationTimerRef.current =
-      setTimeout(() => {
-        setIsOpen(false);
+    navigationTimerRef.current = window.setTimeout(() => {
+      setIsOpen(false);
+      setHoveredSidebarItem(null);
+      clearHoverCardTimer();
 
-        setHoveredSidebarItem(null);
-
-        clearHoverCardTimer();
-
-        navigationTimerRef.current = null;
-      }, 300);
+      navigationTimerRef.current = null;
+    }, 300);
   };
 
   // =========================================================
@@ -228,11 +202,9 @@ function TenantNavbar() {
 
   const closeSidebar = () => {
     clearNavigationTimer();
-
     clearHoverCardTimer();
 
     setIsOpen(false);
-
     setHoveredSidebarItem(null);
   };
 
@@ -242,15 +214,12 @@ function TenantNavbar() {
 
   const handleLogout = () => {
     clearNavigationTimer();
-
     clearHoverCardTimer();
 
     localStorage.removeItem("tenantId");
 
     setIsOpen(false);
-
     setIsProfileOpen(false);
-
     setHoveredSidebarItem(null);
 
     navigate("/tenant-login");
@@ -261,20 +230,16 @@ function TenantNavbar() {
   // =========================================================
 
   const handleMyDetails = () => {
-    const currentTenantId =
-      localStorage.getItem("tenantId");
+    const currentTenantId = localStorage.getItem("tenantId");
 
     if (!currentTenantId) {
       navigate("/tenant-login");
       return;
     }
 
-    navigate(
-      `/tenant-details/${currentTenantId}?view=tenant`
-    );
+    navigate(`/tenant-details/${currentTenantId}?view=tenant`);
 
     closeSidebarAfterNavigation();
-
     setIsProfileOpen(false);
   };
 
@@ -286,7 +251,6 @@ function TenantNavbar() {
     navigate("/tenant-change-password");
 
     closeSidebarAfterNavigation();
-
     setIsProfileOpen(false);
   };
 
@@ -296,7 +260,6 @@ function TenantNavbar() {
 
   const handleSidebarNavigation = (path) => {
     navigate(path);
-
     closeSidebarAfterNavigation();
   };
 
@@ -304,19 +267,14 @@ function TenantNavbar() {
   // SIDEBAR HOVER HANDLER
   // =========================================================
 
-  const handleSidebarHover = (
-    itemName,
-    event
-  ) => {
+  const handleSidebarHover = (itemName, event) => {
     if (window.innerWidth < 768) {
       return;
     }
 
     clearHoverCardTimer();
 
-    const rect =
-      event.currentTarget.getBoundingClientRect();
-
+    const rect = event.currentTarget.getBoundingClientRect();
     const cardWidth = 280;
 
     const leftPosition = Math.min(
@@ -328,11 +286,7 @@ function TenantNavbar() {
 
     setHoverCardPosition({
       top: rect.top + rect.height / 2,
-
-      left: Math.max(
-        12,
-        leftPosition
-      ),
+      left: Math.max(12, leftPosition),
     });
   };
 
@@ -343,12 +297,10 @@ function TenantNavbar() {
   const handleSidebarLeave = () => {
     clearHoverCardTimer();
 
-    hoverCardTimerRef.current =
-      setTimeout(() => {
-        setHoveredSidebarItem(null);
-
-        hoverCardTimerRef.current = null;
-      }, 450);
+    hoverCardTimerRef.current = window.setTimeout(() => {
+      setHoveredSidebarItem(null);
+      hoverCardTimerRef.current = null;
+    }, 450);
   };
 
   // =========================================================
@@ -373,7 +325,6 @@ function TenantNavbar() {
 
   const handleLogoutHover = () => {
     clearHoverCardTimer();
-
     setHoveredSidebarItem(null);
   };
 
@@ -385,34 +336,18 @@ function TenantNavbar() {
     const handleClickOutside = (event) => {
       if (
         profileRef.current &&
-        !profileRef.current.contains(
-          event.target
-        )
+        !profileRef.current.contains(event.target)
       ) {
         setIsProfileOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
-
-    document.addEventListener(
-      "touchstart",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-
-      document.removeEventListener(
-        "touchstart",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, []);
 
@@ -422,23 +357,22 @@ function TenantNavbar() {
 
   useEffect(() => {
     const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        closeSidebar();
-
-        setIsProfileOpen(false);
+      if (event.key !== "Escape") {
+        return;
       }
+
+      clearNavigationTimer();
+      clearHoverCardTimer();
+
+      setIsOpen(false);
+      setIsProfileOpen(false);
+      setHoveredSidebarItem(null);
     };
 
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
@@ -447,11 +381,8 @@ function TenantNavbar() {
   // =========================================================
 
   useEffect(() => {
-    const html =
-      document.documentElement;
-
-    const body =
-      document.body;
+    const html = document.documentElement;
+    const body = document.body;
 
     if (!isOpen) {
       return undefined;
@@ -468,59 +399,34 @@ function TenantNavbar() {
 
     const previousHtmlStyles = {
       overflow: html.style.overflow,
-      overscrollBehavior:
-        html.style.overscrollBehavior,
+      overscrollBehavior: html.style.overscrollBehavior,
     };
 
-    const savedScrollPosition =
-      scrollPositionRef.current;
+    const savedScrollPosition = scrollPositionRef.current;
 
     body.style.position = "fixed";
-
-    body.style.top =
-      `-${savedScrollPosition}px`;
-
+    body.style.top = `-${savedScrollPosition}px`;
     body.style.left = "0";
-
     body.style.right = "0";
-
     body.style.width = "100%";
-
     body.style.overflow = "hidden";
 
     html.style.overflow = "hidden";
-
     html.style.overscrollBehavior = "none";
 
     return () => {
-      body.style.position =
-        previousBodyStyles.position;
+      body.style.position = previousBodyStyles.position;
+      body.style.top = previousBodyStyles.top;
+      body.style.left = previousBodyStyles.left;
+      body.style.right = previousBodyStyles.right;
+      body.style.width = previousBodyStyles.width;
+      body.style.overflow = previousBodyStyles.overflow;
 
-      body.style.top =
-        previousBodyStyles.top;
-
-      body.style.left =
-        previousBodyStyles.left;
-
-      body.style.right =
-        previousBodyStyles.right;
-
-      body.style.width =
-        previousBodyStyles.width;
-
-      body.style.overflow =
-        previousBodyStyles.overflow;
-
-      html.style.overflow =
-        previousHtmlStyles.overflow;
-
+      html.style.overflow = previousHtmlStyles.overflow;
       html.style.overscrollBehavior =
         previousHtmlStyles.overscrollBehavior;
 
-      window.scrollTo(
-        0,
-        savedScrollPosition
-      );
+      window.scrollTo(0, savedScrollPosition);
     };
   }, [isOpen]);
 
@@ -531,7 +437,6 @@ function TenantNavbar() {
   useEffect(() => {
     return () => {
       clearNavigationTimer();
-
       clearHoverCardTimer();
     };
   }, []);
@@ -545,16 +450,11 @@ function TenantNavbar() {
   };
 
   const isDetailsActive = () => {
-    return location.pathname.startsWith(
-      "/tenant-details"
-    );
+    return location.pathname.startsWith("/tenant-details");
   };
 
   const isChangePasswordActive = () => {
-    return (
-      location.pathname ===
-      "/tenant-change-password"
-    );
+    return location.pathname === "/tenant-change-password";
   };
 
   // =========================================================
@@ -569,10 +469,9 @@ function TenantNavbar() {
   // CURRENT HOVER INFORMATION
   // =========================================================
 
-  const currentHoverInfo =
-    hoveredSidebarItem
-      ? sidebarInfo[hoveredSidebarItem]
-      : null;
+  const currentHoverInfo = hoveredSidebarItem
+    ? sidebarInfo[hoveredSidebarItem]
+    : null;
 
   return (
     <>
@@ -581,25 +480,20 @@ function TenantNavbar() {
       {/* ===================================================== */}
 
       <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
-
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-4 md:px-6">
-
           {/* LEFT SIDE */}
 
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-
             {/* HAMBURGER + OPEN SIDEBAR TOOLTIP */}
 
             <div className="group relative shrink-0">
-
               <button
                 type="button"
                 onClick={() => {
                   clearNavigationTimer();
                   clearHoverCardTimer();
 
-                  scrollPositionRef.current =
-                    window.scrollY;
+                  scrollPositionRef.current = window.scrollY;
 
                   setIsOpen(true);
                   setIsProfileOpen(false);
@@ -607,6 +501,7 @@ function TenantNavbar() {
                 className="rounded-lg p-2 transition hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-500 dark:hover:bg-gray-800"
                 aria-label="Open tenant sidebar"
                 aria-expanded={isOpen}
+                aria-controls="tenant-sidebar"
               >
                 <Menu
                   size={24}
@@ -617,33 +512,27 @@ function TenantNavbar() {
               <span className="pointer-events-none absolute left-[calc(50%+12px)] top-full z-[100] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                 Open Sidebar
               </span>
-
             </div>
 
             {/* LOGO */}
 
             <button
               type="button"
-              onClick={() =>
-                navigate("/tenant-dashboard")
-              }
+              onClick={() => navigate("/tenant-dashboard")}
               className="flex min-w-0 items-center gap-2 sm:gap-3"
               aria-label="Go to tenant dashboard"
             >
               <div className="shrink-0 rounded-lg bg-green-50 p-2 dark:bg-green-900/30">
-
                 <Home
                   size={22}
                   className="text-green-600 dark:text-green-400"
                 />
-
               </div>
 
               <span className="truncate text-base font-bold text-green-600 dark:text-green-400 sm:text-xl">
                 Tenant Portal
               </span>
             </button>
-
           </div>
 
           {/* DESKTOP NAVIGATION */}
@@ -652,12 +541,9 @@ function TenantNavbar() {
             className="hidden items-center gap-1 lg:flex"
             aria-label="Tenant navigation"
           >
-
             <button
               type="button"
-              onClick={() =>
-                navigateFromNavbar("/tenant-dashboard")
-              }
+              onClick={() => navigateFromNavbar("/tenant-dashboard")}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-dashboard")
                   ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
@@ -669,9 +555,7 @@ function TenantNavbar() {
 
             <button
               type="button"
-              onClick={() =>
-                navigateFromNavbar("/tenant-payments")
-              }
+              onClick={() => navigateFromNavbar("/tenant-payments")}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-payments")
                   ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
@@ -683,9 +567,7 @@ function TenantNavbar() {
 
             <button
               type="button"
-              onClick={() =>
-                navigateFromNavbar("/tenant-documents")
-              }
+              onClick={() => navigateFromNavbar("/tenant-documents")}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-documents")
                   ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
@@ -697,9 +579,7 @@ function TenantNavbar() {
 
             <button
               type="button"
-              onClick={() =>
-                navigateFromNavbar("/tenant-notices")
-              }
+              onClick={() => navigateFromNavbar("/tenant-notices")}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-notices")
                   ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
@@ -711,9 +591,7 @@ function TenantNavbar() {
 
             <button
               type="button"
-              onClick={() =>
-                navigateFromNavbar("/tenant-maintenance")
-              }
+              onClick={() => navigateFromNavbar("/tenant-maintenance")}
               className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                 isActive("/tenant-maintenance")
                   ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
@@ -722,17 +600,14 @@ function TenantNavbar() {
             >
               Maintenance
             </button>
-
           </nav>
 
           {/* RIGHT SIDE: THEME + PROFILE */}
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-
             {/* LIGHT / DARK MODE */}
 
             <div className="group relative">
-
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -761,7 +636,6 @@ function TenantNavbar() {
                   ? "Switch to Light Mode"
                   : "Switch to Dark Mode"}
               </span>
-
             </div>
 
             {/* PROFILE DROPDOWN */}
@@ -770,13 +644,10 @@ function TenantNavbar() {
               ref={profileRef}
               className="relative"
             >
-
               <button
                 type="button"
                 onClick={() =>
-                  setIsProfileOpen(
-                    (previous) => !previous
-                  )
+                  setIsProfileOpen((previous) => !previous)
                 }
                 className={`flex items-center gap-2 rounded-lg px-2 py-2 transition sm:px-3 ${
                   isProfileOpen
@@ -786,28 +657,21 @@ function TenantNavbar() {
                 aria-label="Open tenant profile"
                 aria-expanded={isProfileOpen}
               >
-
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
-
                   <User
                     size={20}
                     className="text-green-600 dark:text-green-400"
                   />
-
                 </div>
 
                 <div className="hidden min-w-0 text-left md:block">
-
                   <p className="max-w-32 truncate text-sm font-semibold text-gray-800 dark:text-gray-100">
-                    {tenant
-                      ? tenant.name
-                      : "Tenant"}
+                    {tenant ? tenant.name : "Tenant"}
                   </p>
 
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     My Account
                   </p>
-
                 </div>
 
                 <ChevronDown
@@ -816,45 +680,33 @@ function TenantNavbar() {
                     isProfileOpen ? "rotate-180" : ""
                   }`}
                 />
-
               </button>
 
               {/* PROFILE MENU */}
 
               {isProfileOpen && (
                 <div className="absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
-
                   {/* PROFILE HEADER */}
 
                   <div className="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-
                     <div className="flex items-center gap-3">
-
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
-
                         <User
                           size={22}
                           className="text-green-600 dark:text-green-400"
                         />
-
                       </div>
 
                       <div className="min-w-0">
-
                         <p className="truncate font-semibold text-gray-800 dark:text-gray-100">
-                          {tenant
-                            ? tenant.name
-                            : "Tenant"}
+                          {tenant ? tenant.name : "Tenant"}
                         </p>
 
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           Tenant Account
                         </p>
-
                       </div>
-
                     </div>
-
                   </div>
 
                   {/* MY DETAILS */}
@@ -908,18 +760,13 @@ function TenantNavbar() {
                       Logout
                     </span>
                   </button>
-
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
       </header>
-
-      {/* BACKGROUND OVERLAY */}
+            {/* BACKGROUND OVERLAY */}
 
       <div
         className={`fixed inset-0 z-40 touch-none bg-black/40 transition-opacity duration-300 ${
@@ -943,25 +790,20 @@ function TenantNavbar() {
         onMouseEnter={clearHoverCardTimer}
         onMouseLeave={handleSidebarLeave}
         aria-label="Tenant navigation sidebar"
+        aria-hidden={!isOpen}
       >
-
         {/* SIDEBAR HEADER */}
 
         <div className="flex h-20 shrink-0 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-700 sm:px-5">
-
           <div className="flex min-w-0 items-center gap-3">
-
             <div className="shrink-0 rounded-lg bg-green-50 p-2 dark:bg-green-900/30">
-
               <Home
                 size={22}
                 className="text-green-600 dark:text-green-400"
               />
-
             </div>
 
             <div className="min-w-0">
-
               <h2 className="truncate text-lg font-bold text-green-600 dark:text-green-400 sm:text-xl">
                 Tenant Portal
               </h2>
@@ -969,15 +811,12 @@ function TenantNavbar() {
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Tenant Panel
               </p>
-
             </div>
-
           </div>
 
           {/* CLOSE BUTTON + CLOSE TOOLTIP */}
 
           <div className="group relative shrink-0">
-
             <button
               type="button"
               onClick={closeSidebar}
@@ -993,17 +832,12 @@ function TenantNavbar() {
             <span className="pointer-events-none absolute right-0 top-full z-[100] mt-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
               Close Sidebar
             </span>
-
           </div>
-
         </div>
 
-        {/* ================================================= */}
         {/* SIDEBAR MENU */}
-        {/* ================================================= */}
 
         <div className="h-[calc(100%-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain p-3">
-
           {/* DASHBOARD */}
 
           <button
@@ -1017,9 +851,7 @@ function TenantNavbar() {
             }
             onBlur={handleSidebarLeave}
             onClick={() =>
-              handleSidebarNavigation(
-                "/tenant-dashboard"
-              )
+              handleSidebarNavigation("/tenant-dashboard")
             }
             className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isActive("/tenant-dashboard")
@@ -1073,9 +905,7 @@ function TenantNavbar() {
             }
             onBlur={handleSidebarLeave}
             onClick={() =>
-              handleSidebarNavigation(
-                "/tenant-payments"
-              )
+              handleSidebarNavigation("/tenant-payments")
             }
             className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isActive("/tenant-payments")
@@ -1103,9 +933,7 @@ function TenantNavbar() {
             }
             onBlur={handleSidebarLeave}
             onClick={() =>
-              handleSidebarNavigation(
-                "/tenant-documents"
-              )
+              handleSidebarNavigation("/tenant-documents")
             }
             className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isActive("/tenant-documents")
@@ -1133,9 +961,7 @@ function TenantNavbar() {
             }
             onBlur={handleSidebarLeave}
             onClick={() =>
-              handleSidebarNavigation(
-                "/tenant-notices"
-              )
+              handleSidebarNavigation("/tenant-notices")
             }
             className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isActive("/tenant-notices")
@@ -1169,9 +995,7 @@ function TenantNavbar() {
             }
             onBlur={handleSidebarLeave}
             onClick={() =>
-              handleSidebarNavigation(
-                "/tenant-maintenance"
-              )
+              handleSidebarNavigation("/tenant-maintenance")
             }
             className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
               isActive("/tenant-maintenance")
@@ -1205,11 +1029,9 @@ function TenantNavbar() {
               Logout
             </span>
           </button>
-
         </div>
       </aside>
-
-      {/* ===================================================== */}
+            {/* ===================================================== */}
       {/* SIDEBAR HOVER INFORMATION CARD */}
       {/* ===================================================== */}
 
@@ -1224,7 +1046,6 @@ function TenantNavbar() {
           onMouseLeave={handleHoverCardLeave}
         >
           <div className="relative w-[280px] rounded-xl border border-green-100 bg-white px-4 py-3 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
-
             {/* CARD TITLE */}
 
             <p className="mb-2 text-sm font-semibold text-green-600 dark:text-green-400">
@@ -1238,28 +1059,24 @@ function TenantNavbar() {
             {/* INFORMATION ITEMS */}
 
             <div className="space-y-1.5">
-              {currentHoverInfo.items.map(
-                (text, index) => (
-                  <div
-                    key={`${currentHoverInfo.title}-${index}`}
-                    className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+              {currentHoverInfo.items.map((text, index) => (
+                <div
+                  key={`${currentHoverInfo.title}-${index}`}
+                  className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
 
-                    <span>{text}</span>
-                  </div>
-                )
-              )}
+                  <span>{text}</span>
+                </div>
+              ))}
             </div>
 
             {/* CARD ARROW */}
 
             <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
-
           </div>
         </div>
       )}
-
     </>
   );
 }

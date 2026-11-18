@@ -1,8 +1,9 @@
+
 import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 
@@ -66,13 +67,10 @@ export function TenantThemeProvider({ children }) {
   // APPLY THEME GLOBALLY TO HTML ROOT
   // =======================================================
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
 
-    // Apply or remove Tailwind's dark mode class.
     root.classList.toggle("dark", isDarkMode);
-
-    // Apply browser-native light/dark appearance.
     root.style.colorScheme = theme;
 
   }, [isDarkMode, theme]);
@@ -81,7 +79,7 @@ export function TenantThemeProvider({ children }) {
   // SAVE THEME PREFERENCE
   // =======================================================
 
-  useEffect(() => {
+  React.useEffect(() => {
     try {
       localStorage.setItem(
         TENANT_THEME_STORAGE_KEY,
@@ -137,10 +135,6 @@ export function TenantThemeProvider({ children }) {
     toggleTheme,
   };
 
-  // =======================================================
-  // PROVIDER
-  // =======================================================
-
   return (
     <TenantThemeContext.Provider
       value={contextValue}
@@ -155,9 +149,7 @@ export function TenantThemeProvider({ children }) {
 // =========================================================
 
 export function useTenantTheme() {
-  const context = useContext(
-    TenantThemeContext
-  );
+  const context = useContext(TenantThemeContext);
 
   if (!context) {
     throw new Error(
