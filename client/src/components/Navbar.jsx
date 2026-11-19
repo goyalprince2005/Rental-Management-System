@@ -27,9 +27,17 @@ import {
   Moon,
 } from "lucide-react";
 
+import { useTenantTheme } from "../context/TenantThemeContext";
+
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // =========================================================
+  // SHARED THEME CONTEXT
+  // =========================================================
+
+  const { isDarkMode, toggleTheme } = useTenantTheme();
 
   // =========================================================
   // REFS
@@ -44,35 +52,6 @@ function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
-  // =========================================================
-  // DARK / LIGHT MODE
-  // =========================================================
-
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    try {
-      return localStorage.getItem("theme") === "dark";
-    } catch (error) {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode);
-
-    try {
-      localStorage.setItem(
-        "theme",
-        isDarkMode ? "dark" : "light"
-      );
-    } catch (error) {
-      console.error("Unable to save theme preference:", error);
-    }
-  }, [isDarkMode]);
-
-  const toggleTheme = () => {
-    setIsDarkMode((previous) => !previous);
-  };
 
   const [hoveredSidebarItem, setHoveredSidebarItem] =
     useState(null);
@@ -252,18 +231,26 @@ function Navbar() {
   };
 
   // =========================================================
-  // NAVIGATION
+  // HIDE HOVER CARD
   // =========================================================
 
-  const handleNavigation = (path) => {
-    setMenuOpen(false);
-    setProfileOpen(false);
+  const hideHoverCard = () => {
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
       ...previous,
       visible: false,
     }));
+  };
+
+  // =========================================================
+  // NAVIGATION
+  // =========================================================
+
+  const handleNavigation = (path) => {
+    setMenuOpen(false);
+    setProfileOpen(false);
+    hideHoverCard();
 
     navigate(path);
   };
@@ -274,12 +261,7 @@ function Navbar() {
 
   const closeMenu = () => {
     setMenuOpen(false);
-    setHoveredSidebarItem(null);
-
-    setHoverCardPosition((previous) => ({
-      ...previous,
-      visible: false,
-    }));
+    hideHoverCard();
   };
 
   // =========================================================
@@ -311,18 +293,12 @@ function Navbar() {
   };
 
   // =========================================================
-  // HOVER INFORMATION CARD POSITIONING
+  // SIDEBAR HOVER INFORMATION POSITIONING
   // =========================================================
 
   const handleSidebarHover = (itemName, event) => {
     if (window.innerWidth < 1024) {
-      setHoveredSidebarItem(null);
-
-      setHoverCardPosition((previous) => ({
-        ...previous,
-        visible: false,
-      }));
-
+      hideHoverCard();
       return;
     }
 
@@ -343,13 +319,7 @@ function Navbar() {
       window.innerWidth - left - viewportPadding;
 
     if (availableWidth < 220) {
-      setHoveredSidebarItem(null);
-
-      setHoverCardPosition((previous) => ({
-        ...previous,
-        visible: false,
-      }));
-
+      hideHoverCard();
       return;
     }
 
@@ -371,7 +341,7 @@ function Navbar() {
   };
 
   // =========================================================
-  // CALCULATE ACTUAL HOVER CARD POSITION
+  // CALCULATE HOVER CARD POSITION
   // =========================================================
 
   useLayoutEffect(() => {
@@ -417,41 +387,8 @@ function Navbar() {
     hoveredSidebarItem,
     hoverCardPosition.visible,
     hoverCardPosition.anchorCenter,
+    hoverCardPosition.top,
   ]);
-
-  // =========================================================
-  // SIDEBAR HOVER LEAVE
-  // =========================================================
-
-  const handleSidebarLeave = () => {
-    setHoveredSidebarItem(null);
-
-    setHoverCardPosition((previous) => ({
-      ...previous,
-      visible: false,
-    }));
-  };
-
-  // =========================================================
-  // SIDEBAR SCROLL
-  // =========================================================
-
-  const handleSidebarScroll = () => {
-    setHoveredSidebarItem(null);
-
-    setHoverCardPosition((previous) => ({
-      ...previous,
-      visible: false,
-    }));
-  };
-
-  // =========================================================
-  // CURRENT HOVER INFORMATION
-  // =========================================================
-
-  const currentHoverInfo = hoveredSidebarItem
-    ? sidebarInfo[hoveredSidebarItem]
-    : null;
 
   // =========================================================
   // CLOSE PROFILE WHEN CLICKING OUTSIDE
@@ -506,7 +443,8 @@ function Navbar() {
       document.documentElement.style.overflow =
         previousHtmlOverflow;
 
-      document.body.style.overflow = previousBodyOverflow;
+      document.body.style.overflow =
+        previousBodyOverflow;
 
       document.documentElement.style.overscrollBehavior =
         previousHtmlOverscroll;
@@ -525,7 +463,8 @@ function Navbar() {
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        closeMenu();
+        setMenuOpen(false);
+        hideHoverCard();
       }
     };
 
@@ -541,12 +480,7 @@ function Navbar() {
   // =========================================================
 
   useEffect(() => {
-    setHoveredSidebarItem(null);
-
-    setHoverCardPosition((previous) => ({
-      ...previous,
-      visible: false,
-    }));
+    hideHoverCard();
   }, [location.pathname]);
 
   // =========================================================
@@ -555,12 +489,7 @@ function Navbar() {
 
   useEffect(() => {
     const handleResize = () => {
-      setHoveredSidebarItem(null);
-
-      setHoverCardPosition((previous) => ({
-        ...previous,
-        visible: false,
-      }));
+      hideHoverCard();
     };
 
     window.addEventListener("resize", handleResize);
@@ -571,26 +500,28 @@ function Navbar() {
   }, []);
 
   // =========================================================
+  // CURRENT HOVER INFORMATION
+  // =========================================================
+
+  const currentHoverInfo = hoveredSidebarItem
+    ? sidebarInfo[hoveredSidebarItem]
+    : null;
+
+  // =========================================================
   // RENDER
   // =========================================================
 
   return (
     <>
-
-      {/* =====================================================
-          TOP NAVBAR
-      ===================================================== */}
+      {/* TOP NAVBAR */}
 
       <nav className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
-
         <div className="w-full px-3 sm:px-4 lg:px-5">
           <div className="flex h-16 w-full min-w-0 items-center gap-2">
 
-            {/* =================================================
-                LEFT SECTION
-            ================================================= */}
+            {/* LEFT SECTION */}
 
-           <div className="flex min-w-0 shrink-0 items-center gap-2">
+            <div className="flex min-w-0 shrink-0 items-center gap-2">
 
               {/* HAMBURGER */}
 
@@ -600,12 +531,7 @@ function Navbar() {
                   onClick={() => {
                     setMenuOpen(true);
                     setProfileOpen(false);
-                    setHoveredSidebarItem(null);
-
-                    setHoverCardPosition((previous) => ({
-                      ...previous,
-                      visible: false,
-                    }));
+                    hideHoverCard();
                   }}
                   className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 dark:text-gray-200 dark:hover:bg-gray-800"
                   aria-label="Open owner menu"
@@ -648,40 +574,37 @@ function Navbar() {
               </button>
             </div>
 
-            
-{/* DESKTOP NAVIGATION */}
+            {/* DESKTOP NAVIGATION */}
 
-<div className="hidden min-w-0 flex-1 items-center justify-center gap-1.5 min-[1200px]:flex">
-  {navItems.map((item) => {
-    const Icon = item.icon;
-    const active = isActive(item.path);
+            <div className="hidden min-w-0 flex-1 items-center justify-center gap-1.5 min-[1200px]:flex">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
 
-    return (
-      <button
-        type="button"
-        key={item.name}
-        onClick={() => handleNavigation(item.path)}
-      className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-medium transition xl:px-2.5 xl:text-sm ${
-          active
-            ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
-            : "text-gray-600 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
-        }`}
-        aria-current={active ? "page" : undefined}
-      >
-        <Icon size={16} />
-        <span>{item.name}</span>
-      </button>
-    );
-  })}
-</div>
+                return (
+                  <button
+                    type="button"
+                    key={item.name}
+                    onClick={() => handleNavigation(item.path)}
+                    className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-xs font-medium transition xl:px-2.5 xl:text-sm ${
+                      active
+                        ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                    }`}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <Icon size={16} />
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-            {/* =================================================
-                RIGHT SECTION
-            ================================================= */}
+            {/* RIGHT SECTION */}
 
             <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 
-              {/* DARK / LIGHT MODE TOGGLE */}
+              {/* SHARED DARK / LIGHT MODE TOGGLE */}
 
               <button
                 type="button"
@@ -708,7 +631,6 @@ function Navbar() {
               {/* PROFILE MENU */}
 
               <div ref={profileRef} className="relative shrink-0">
-
                 <button
                   type="button"
                   onClick={() =>
@@ -741,11 +663,8 @@ function Navbar() {
                 {profileOpen && (
                   <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
 
-                    {/* PROFILE HEADER */}
-
                     <div className="border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                       <div className="flex items-center gap-3">
-
                         <div className="rounded-full bg-blue-50 p-2 dark:bg-blue-950">
                           <UserCircle
                             size={24}
@@ -816,9 +735,7 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* =====================================================
-          OVERLAY
-      ===================================================== */}
+      {/* OVERLAY */}
 
       <button
         type="button"
@@ -832,12 +749,11 @@ function Navbar() {
         tabIndex={menuOpen ? 0 : -1}
       />
 
-      {/* =====================================================
-          SIDEBAR
-      ===================================================== */}
+      {/* SIDEBAR */}
 
       <aside
         id="owner-sidebar"
+        inert={!menuOpen}
         className={`fixed left-0 top-0 z-[60] flex h-screen w-64 max-w-[85vw] flex-col transform bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:bg-gray-900 sm:w-72 ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -845,14 +761,10 @@ function Navbar() {
         aria-hidden={!menuOpen}
       >
 
-        {/* =================================================
-            SIDEBAR HEADER
-        ================================================= */}
+        {/* SIDEBAR HEADER */}
 
         <div className="flex h-20 shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-3 dark:border-gray-700 sm:px-4">
-
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-
             <div className="shrink-0 rounded-lg bg-blue-50 p-2 dark:bg-blue-950">
               <Home
                 size={22}
@@ -886,8 +798,6 @@ function Navbar() {
               />
             </button>
 
-            {/* CLOSE TOOLTIP */}
-
             <div className="pointer-events-none absolute right-0 top-full z-[70] mt-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <div className="relative whitespace-nowrap rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs font-semibold text-white shadow-xl">
                 Close sidebar
@@ -896,17 +806,13 @@ function Navbar() {
           </div>
         </div>
 
-        {/* =================================================
-            SCROLLABLE MENU
-        ================================================= */}
+        {/* SCROLLABLE MENU */}
 
         <div
-          onScroll={handleSidebarScroll}
+          onScroll={hideHoverCard}
           className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-4"
         >
           <nav className="space-y-1">
-
-            {/* MAIN MENU */}
 
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -915,7 +821,7 @@ function Navbar() {
               return (
                 <div
                   key={item.name}
-                  onMouseLeave={handleSidebarLeave}
+                  onMouseLeave={hideHoverCard}
                 >
                   <button
                     type="button"
@@ -925,7 +831,7 @@ function Navbar() {
                     onFocus={(event) =>
                       handleSidebarHover(item.name, event)
                     }
-                    onBlur={handleSidebarLeave}
+                    onBlur={hideHoverCard}
                     onClick={() =>
                       handleNavigation(item.path)
                     }
@@ -948,7 +854,7 @@ function Navbar() {
 
             {/* SETTINGS */}
 
-            <div onMouseLeave={handleSidebarLeave}>
+            <div onMouseLeave={hideHoverCard}>
               <button
                 type="button"
                 onMouseEnter={(event) =>
@@ -957,7 +863,7 @@ function Navbar() {
                 onFocus={(event) =>
                   handleSidebarHover("Settings", event)
                 }
-                onBlur={handleSidebarLeave}
+                onBlur={hideHoverCard}
                 onClick={() =>
                   handleNavigation("/settings")
                 }
@@ -982,9 +888,7 @@ function Navbar() {
           </nav>
         </div>
 
-        {/* =================================================
-            LOGOUT - FIXED AT BOTTOM
-        ================================================= */}
+        {/* LOGOUT - FIXED AT BOTTOM */}
 
         <div className="shrink-0 border-t border-gray-200 bg-white px-3 py-3 dark:border-gray-700 dark:bg-gray-900 sm:px-4">
           <button
@@ -1001,9 +905,7 @@ function Navbar() {
         </div>
       </aside>
 
-      {/* =====================================================
-          HOVER INFORMATION CARD
-      ===================================================== */}
+      {/* HOVER INFORMATION CARD */}
 
       {menuOpen &&
         currentHoverInfo &&
@@ -1021,17 +923,11 @@ function Navbar() {
           >
             <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
 
-              {/* INFORMATION TITLE */}
-
               <p className="mb-2.5 text-sm font-bold leading-5 text-blue-600 dark:text-blue-400">
                 {currentHoverInfo.title}
               </p>
 
-              {/* DIVIDER */}
-
               <div className="mb-2.5 h-px bg-blue-100 dark:bg-gray-700" />
-
-              {/* INFORMATION ITEMS */}
 
               <div className="space-y-1.5">
                 {currentHoverInfo.items.map((text) => (
@@ -1045,8 +941,6 @@ function Navbar() {
                   </div>
                 ))}
               </div>
-
-              {/* CARD ARROW */}
 
               <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
             </div>
