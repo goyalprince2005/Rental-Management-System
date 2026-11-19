@@ -7,8 +7,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =========================================================
-   GLOBAL DEFAULT VARIABLES
-   Used by the Owner Portal and other application pages
+   SHARED LIGHT THEME
+   Used by BOTH Owner Portal and Tenant Portal
 ========================================================= */
 
 :root {
@@ -39,43 +39,11 @@
 
 
 /* =========================================================
-   TENANT PORTAL - LIGHT THEME
+   SHARED DARK THEME
+   Used by BOTH Owner Portal and Tenant Portal
 ========================================================= */
 
-.tenant-theme {
-    color-scheme: light;
-    /* Main surfaces */
-    --page-bg: #f8fafc;
-    --surface-bg: #ffffff;
-    --surface-secondary: #f1f5f9;
-    --sidebar-bg: #ffffff;
-    --navbar-bg: #ffffff;
-    /* Text */
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    /* Borders */
-    --border-color: #e5e7eb;
-    /* Form elements */
-    --input-bg: #ffffff;
-    --input-border: #d1d5db;
-    --input-text: #111827;
-    --placeholder-color: #9ca3af;
-    /* Interactive elements */
-    --hover-bg: #f1f5f9;
-    --active-bg: #eff6ff;
-    /* Shadows */
-    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    background-color: var(--page-bg);
-    color: var(--text-primary);
-}
-
-
-/* =========================================================
-   TENANT PORTAL - DARK THEME
-========================================================= */
-
-.tenant-theme.dark {
+:root.dark {
     color-scheme: dark;
     /* Main surfaces */
     --page-bg: #111827;
@@ -99,6 +67,57 @@
     --active-bg: #1e3a5f;
     /* Shadows */
     --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+
+/* =========================================================
+   TENANT PORTAL THEME COMPATIBILITY
+   Keeps the existing TenantLayout working
+========================================================= */
+
+.tenant-theme {
+    color-scheme: light;
+    --page-bg: #f8fafc;
+    --surface-bg: #ffffff;
+    --surface-secondary: #f1f5f9;
+    --sidebar-bg: #ffffff;
+    --navbar-bg: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+    --input-text: #111827;
+    --placeholder-color: #9ca3af;
+    --hover-bg: #f1f5f9;
+    --active-bg: #eff6ff;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    background-color: var(--page-bg);
+    color: var(--text-primary);
+}
+
+
+/* Tenant dark mode uses the same shared palette */
+
+.tenant-theme.dark {
+    color-scheme: dark;
+    --page-bg: #111827;
+    --surface-bg: #1f2937;
+    --surface-secondary: #273449;
+    --sidebar-bg: #1f2937;
+    --navbar-bg: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    --input-bg: #273449;
+    --input-border: #4b5563;
+    --input-text: #f9fafb;
+    --placeholder-color: #9ca3af;
+    --hover-bg: #374151;
+    --active-bg: #1e3a5f;
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
     background-color: var(--page-bg);
     color: var(--text-primary);
 }
@@ -112,6 +131,7 @@ html {
     margin: 0;
     scrollbar-gutter: stable;
     overscroll-behavior: none;
+    background-color: var(--page-bg);
 }
 
 body {
@@ -133,11 +153,12 @@ body {
 
 
 /* =========================================================
-   TENANT THEME TRANSITIONS
+   SHARED THEME TRANSITIONS
+   Both portals
 ========================================================= */
 
-.tenant-theme,
-.tenant-theme * {
+#root,
+#root * {
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
@@ -147,9 +168,10 @@ body {
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+    html,
     body,
-    .tenant-theme,
-    .tenant-theme * {
+    #root,
+    #root * {
         transition: none !important;
     }
 }

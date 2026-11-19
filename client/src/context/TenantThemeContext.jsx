@@ -3,46 +3,28 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
+  useEffect,
   useState,
 } from "react";
 
-// =========================================================
-// TENANT THEME CONFIGURATION
-// =========================================================
-
-const TENANT_THEME_STORAGE_KEY =
-  "rentalManagementTenantTheme";
-
+const TENANT_THEME_STORAGE_KEY = "rentalManagementTenantTheme";
 const DEFAULT_TENANT_THEME = "light";
-
-// =========================================================
-// CREATE TENANT THEME CONTEXT
-// =========================================================
 
 const TenantThemeContext = createContext(null);
 
 // =========================================================
-// GET INITIAL THEME
+// GET INITIAL TENANT THEME
 // =========================================================
 
 const getInitialTenantTheme = () => {
   try {
-    const savedTheme = localStorage.getItem(
-      TENANT_THEME_STORAGE_KEY
-    );
+    const savedTheme = localStorage.getItem(TENANT_THEME_STORAGE_KEY);
 
-    if (
-      savedTheme === "dark" ||
-      savedTheme === "light"
-    ) {
+    if (savedTheme === "dark" || savedTheme === "light") {
       return savedTheme;
     }
   } catch (error) {
-    console.error(
-      "Unable to read tenant theme preference:",
-      error
-    );
+    console.error("Unable to read tenant theme preference:", error);
   }
 
   return DEFAULT_TENANT_THEME;
@@ -53,43 +35,19 @@ const getInitialTenantTheme = () => {
 // =========================================================
 
 export function TenantThemeProvider({ children }) {
-  const [theme, setThemeState] = useState(
-    getInitialTenantTheme
-  );
-
-  // =======================================================
-  // DERIVED THEME STATE
-  // =======================================================
+  const [theme, setThemeState] = useState(getInitialTenantTheme);
 
   const isDarkMode = theme === "dark";
 
   // =======================================================
-  // APPLY THEME GLOBALLY TO HTML ROOT
+  // SAVE TENANT THEME IN LOCAL STORAGE
   // =======================================================
 
-  useLayoutEffect(() => {
-    const root = document.documentElement;
-
-    root.classList.toggle("dark", isDarkMode);
-    root.style.colorScheme = theme;
-
-  }, [isDarkMode, theme]);
-
-  // =======================================================
-  // SAVE THEME PREFERENCE
-  // =======================================================
-
-  React.useEffect(() => {
+  useEffect(() => {
     try {
-      localStorage.setItem(
-        TENANT_THEME_STORAGE_KEY,
-        theme
-      );
+      localStorage.setItem(TENANT_THEME_STORAGE_KEY, theme);
     } catch (error) {
-      console.error(
-        "Unable to save tenant theme preference:",
-        error
-      );
+      console.error("Unable to save tenant theme preference:", error);
     }
   }, [theme]);
 
@@ -98,14 +56,8 @@ export function TenantThemeProvider({ children }) {
   // =======================================================
 
   const setTheme = useCallback((nextTheme) => {
-    if (
-      nextTheme !== "light" &&
-      nextTheme !== "dark"
-    ) {
-      console.warn(
-        "Invalid tenant theme. Use 'light' or 'dark'."
-      );
-
+    if (nextTheme !== "dark" && nextTheme !== "light") {
+      console.warn("Invalid tenant theme. Use 'dark' or 'light'.");
       return;
     }
 
@@ -113,14 +65,12 @@ export function TenantThemeProvider({ children }) {
   }, []);
 
   // =======================================================
-  // TOGGLE LIGHT / DARK MODE
+  // TOGGLE THEME
   // =======================================================
 
   const toggleTheme = useCallback(() => {
     setThemeState((currentTheme) =>
-      currentTheme === "light"
-        ? "dark"
-        : "light"
+      currentTheme === "light" ? "dark" : "light"
     );
   }, []);
 
@@ -136,16 +86,14 @@ export function TenantThemeProvider({ children }) {
   };
 
   return (
-    <TenantThemeContext.Provider
-      value={contextValue}
-    >
+    <TenantThemeContext.Provider value={contextValue}>
       {children}
     </TenantThemeContext.Provider>
   );
 }
 
 // =========================================================
-// CUSTOM HOOK
+// CUSTOM TENANT THEME HOOK
 // =========================================================
 
 export function useTenantTheme() {
