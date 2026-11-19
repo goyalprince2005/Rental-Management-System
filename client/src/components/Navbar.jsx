@@ -27,17 +27,17 @@ import {
   Moon,
 } from "lucide-react";
 
-import { useTenantTheme } from "../context/TenantThemeContext";
+import { useOwnerTheme } from "../context/OwnerThemeContext";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   // =========================================================
-  // SHARED THEME CONTEXT
+  // OWNER THEME CONTEXT
   // =========================================================
 
-  const { isDarkMode, toggleTheme } = useTenantTheme();
+  const { isDarkMode, toggleTheme } = useOwnerTheme();
 
   // =========================================================
   // REFS
@@ -604,7 +604,7 @@ function Navbar() {
 
             <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
 
-              {/* SHARED DARK / LIGHT MODE TOGGLE */}
+              {/* OWNER DARK / LIGHT MODE TOGGLE */}
 
               <button
                 type="button"
@@ -887,6 +887,7 @@ function Navbar() {
             <div className="h-4" />
           </nav>
         </div>
+
 
         {/* LOGOUT - FIXED AT BOTTOM */}
 
