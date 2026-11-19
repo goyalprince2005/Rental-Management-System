@@ -1,9 +1,4 @@
-
-import {
-  Routes,
-  Route,
-  useSearchParams,
-} from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // =========================================================
 // AUTHENTICATION
@@ -52,27 +47,30 @@ import TenantMaintenance from "./components/TenantMaintenance";
 import TenantChangePassword from "./components/TenantChangePassword";
 
 // =========================================================
-// TENANT LAYOUT
-// Theme provider is already mounted globally in main.jsx.
+// THEME PROVIDERS AND LAYOUTS
 // =========================================================
 
 import TenantLayout from "./components/TenantLayout";
+import OwnerLayout from "./components/OwnerLayout";
+
+import { OwnerThemeProvider } from "./context/OwnerThemeContext";
 
 // =========================================================
-// SHARED TENANT DETAILS ROUTE
+// OWNER PORTAL LAYOUT
 // =========================================================
 
-function TenantDetailsRoute() {
-  const [searchParams] = useSearchParams();
-
-  // Both owner and tenant views use the same component.
-  // Tenant view is identified by the URL query parameter.
-  // The global theme provider is available to both.
-  return <TenantDetails />;
+function OwnerPortalLayout() {
+  return (
+    <OwnerThemeProvider>
+      <OwnerLayout />
+    </OwnerThemeProvider>
+  );
 }
 
 // =========================================================
 // TENANT PORTAL LAYOUT
+// TenantThemeProvider is temporarily mounted globally
+// through main.jsx. We will move it here in a later step.
 // =========================================================
 
 function TenantPortalLayout() {
@@ -139,80 +137,84 @@ function App() {
       {/* OWNER PORTAL */}
       {/* ================================================= */}
 
-      <Route
-        path="/owner-dashboard"
-        element={<Dashboard />}
-      />
+      <Route element={<OwnerPortalLayout />}>
 
-      <Route
-        path="/properties"
-        element={<Properties />}
-      />
+        <Route
+          path="/owner-dashboard"
+          element={<Dashboard />}
+        />
 
-      <Route
-        path="/property-details/:id"
-        element={<PropertyDetails />}
-      />
+        <Route
+          path="/properties"
+          element={<Properties />}
+        />
 
-      <Route
-        path="/rooms"
-        element={<Rooms />}
-      />
+        <Route
+          path="/property-details/:id"
+          element={<PropertyDetails />}
+        />
 
-      <Route
-        path="/room-details/:id"
-        element={<RoomDetails />}
-      />
+        <Route
+          path="/rooms"
+          element={<Rooms />}
+        />
 
-      <Route
-        path="/edit-room/:id"
-        element={<EditRoom />}
-      />
+        <Route
+          path="/room-details/:id"
+          element={<RoomDetails />}
+        />
 
-      <Route
-        path="/tenants"
-        element={<Tenants />}
-      />
+        <Route
+          path="/edit-room/:id"
+          element={<EditRoom />}
+        />
 
-      <Route
-        path="/tenant-details/:id"
-        element={<TenantDetailsRoute />}
-      />
+        <Route
+          path="/tenants"
+          element={<Tenants />}
+        />
 
-      <Route
-        path="/edit-tenant/:id"
-        element={<EditTenant />}
-      />
+        <Route
+          path="/tenant-details/:id"
+          element={<TenantDetails />}
+        />
 
-      <Route
-        path="/rent-bills"
-        element={<RentBills />}
-      />
+        <Route
+          path="/edit-tenant/:id"
+          element={<EditTenant />}
+        />
 
-      <Route
-        path="/payments"
-        element={<Payments />}
-      />
+        <Route
+          path="/rent-bills"
+          element={<RentBills />}
+        />
 
-      <Route
-        path="/documents"
-        element={<Documents />}
-      />
+        <Route
+          path="/payments"
+          element={<Payments />}
+        />
 
-      <Route
-        path="/reports"
-        element={<Reports />}
-      />
+        <Route
+          path="/documents"
+          element={<Documents />}
+        />
 
-      <Route
-        path="/settings"
-        element={<Settings />}
-      />
+        <Route
+          path="/reports"
+          element={<Reports />}
+        />
 
-      <Route
-        path="/owner-change-password"
-        element={<OwnerChangePassword />}
-      />
+        <Route
+          path="/settings"
+          element={<Settings />}
+        />
+
+        <Route
+          path="/owner-change-password"
+          element={<OwnerChangePassword />}
+        />
+
+      </Route>
 
       {/* ================================================= */}
       {/* TENANT PORTAL */}
