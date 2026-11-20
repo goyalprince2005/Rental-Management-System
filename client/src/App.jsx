@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 
 // =========================================================
@@ -34,6 +35,9 @@ import Payments from "./components/Payments";
 import Documents from "./components/Documents";
 import Reports from "./components/Reports";
 import Settings from "./components/Settings";
+
+// NEW: OWNER COMPLAINTS
+import OwnerComplaints from "./components/OwnerComplaints";
 
 // =========================================================
 // TENANT PORTAL
@@ -202,6 +206,13 @@ function App() {
         <Route
           path="/reports"
           element={<Reports />}
+        />
+
+        {/* OWNER COMPLAINTS */}
+
+        <Route
+          path="/owner-complaints"
+          element={<OwnerComplaints />}
         />
 
         <Route
