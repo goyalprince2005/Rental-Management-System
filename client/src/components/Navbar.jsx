@@ -19,6 +19,7 @@ import {
   CreditCard,
   FileText,
   BarChart3,
+  MessageSquare,
   Settings,
   LogOut,
   UserCircle,
@@ -66,7 +67,8 @@ function Navbar() {
   });
 
   // =========================================================
-  // NAVIGATION ITEMS
+  // TOP NAVBAR ITEMS
+  // Complaints is intentionally excluded from this array.
   // =========================================================
 
   const navItems = [
@@ -109,6 +111,20 @@ function Navbar() {
       name: "Reports",
       path: "/reports",
       icon: BarChart3,
+    },
+  ];
+
+  // =========================================================
+  // SIDEBAR ITEMS
+  // Complaints appears only in the Sidebar.
+  // =========================================================
+
+  const sidebarItems = [
+    ...navItems,
+    {
+      name: "Complaints",
+      path: "/owner-complaints",
+      icon: MessageSquare,
     },
   ];
 
@@ -209,6 +225,17 @@ function Navbar() {
         "Property information",
         "Room information",
         "Report summaries",
+      ],
+    },
+
+    Complaints: {
+      title: "Complaints Management",
+      items: [
+        "View tenant complaints",
+        "Check complaint details",
+        "Review tenant information",
+        "Update complaint status",
+        "Respond to tenant complaints",
       ],
     },
 
@@ -814,7 +841,7 @@ function Navbar() {
         >
           <nav className="space-y-1">
 
-            {navItems.map((item) => {
+            {sidebarItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
 
@@ -887,7 +914,6 @@ function Navbar() {
             <div className="h-4" />
           </nav>
         </div>
-
 
         {/* LOGOUT - FIXED AT BOTTOM */}
 

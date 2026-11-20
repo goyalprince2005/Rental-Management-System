@@ -1,4 +1,4 @@
-\
+
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import {
   CreditCard,
   FileText,
   BarChart3,
+  MessageSquare,
   Settings,
 } from "lucide-react";
 
@@ -76,6 +77,18 @@ function Sidebar() {
       path: "/reports",
       description: "View rental reports and statistics.",
     },
+
+    // =====================================================
+    // NEW: COMPLAINTS
+    // =====================================================
+
+    {
+      name: "Complaints",
+      icon: MessageSquare,
+      path: "/owner-complaints",
+      description: "View tenant complaints and manage responses.",
+    },
+
     {
       name: "Settings",
       icon: Settings,
