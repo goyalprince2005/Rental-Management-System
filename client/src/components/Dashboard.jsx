@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -13,32 +13,136 @@ import {
 
 import Navbar from "./Navbar";
 
+// =========================================================
+// COMPLAINT STORAGE
+// =========================================================
+
+const COMPLAINTS_STORAGE_KEY = "rentalManagementComplaints";
+
+// =========================================================
+// GET COMPLAINT STATISTICS
+// =========================================================
+
+const getComplaintStatistics = () => {
+  try {
+    const storedData = localStorage.getItem(
+      COMPLAINTS_STORAGE_KEY
+    );
+
+    const complaints = storedData
+      ? JSON.parse(storedData)
+      : [];
+
+    const validComplaints = Array.isArray(complaints)
+      ? complaints
+      : [];
+
+    return {
+      total: validComplaints.length,
+
+      pending: validComplaints.filter(
+        (complaint) => complaint.status === "Pending"
+      ).length,
+
+      inProgress: validComplaints.filter(
+        (complaint) => complaint.status === "In Progress"
+      ).length,
+
+      resolved: validComplaints.filter(
+        (complaint) => complaint.status === "Resolved"
+      ).length,
+    };
+  } catch (error) {
+    console.error(
+      "Unable to load complaint statistics:",
+      error
+    );
+
+    return {
+      total: 0,
+      pending: 0,
+      inProgress: 0,
+      resolved: 0,
+    };
+  }
+};
+
+// =========================================================
+// MAIN DASHBOARD COMPONENT
+// =========================================================
+
 function Dashboard() {
   const navigate = useNavigate();
 
-  // =========================================================
+  // =======================================================
+  // COMPLAINT STATISTICS
+  // =======================================================
+
+  const [complaintStats, setComplaintStats] = useState(
+    getComplaintStatistics
+  );
+
+  // =======================================================
+  // REFRESH COMPLAINT STATISTICS
+  // =======================================================
+
+  useEffect(() => {
+    const updateComplaintStats = () => {
+      setComplaintStats(getComplaintStatistics());
+    };
+
+    // Listen for changes from other browser tabs.
+    window.addEventListener(
+      "storage",
+      updateComplaintStats
+    );
+
+    // Refresh when the browser window receives focus.
+    window.addEventListener(
+      "focus",
+      updateComplaintStats
+    );
+
+    return () => {
+      window.removeEventListener(
+        "storage",
+        updateComplaintStats
+      );
+
+      window.removeEventListener(
+        "focus",
+        updateComplaintStats
+      );
+    };
+  }, []);
+
+  // =======================================================
   // SUMMARY CARD NAVIGATION
-  // =========================================================
+  // =======================================================
 
   const handleSummaryNavigation = (path) => {
     navigate(path);
   };
 
-  // =========================================================
+  // =======================================================
   // ATTENTION ITEM NAVIGATION
-  // =========================================================
+  // =======================================================
 
   const handleAttentionNavigation = (path) => {
     navigate(path);
   };
 
-  // =========================================================
+  // =======================================================
   // TENANT DETAILS NAVIGATION
-  // =========================================================
+  // =======================================================
 
   const handleTenantNavigation = (tenantId) => {
     navigate(`/tenant-details/${tenantId}`);
   };
+
+  // =======================================================
+  // RENDER
+  // =======================================================
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-200">
@@ -281,6 +385,57 @@ function Dashboard() {
 
           </button>
 
+          {/* =================================================
+              PENDING COMPLAINTS
+          ================================================= */}
+
+          <button
+            type="button"
+            onClick={() =>
+              handleSummaryNavigation("/owner-complaints")
+            }
+            className="text-left bg-white dark:bg-gray-900 rounded-xl shadow-sm p-5 border border-gray-200 dark:border-gray-800 hover:shadow-md hover:border-red-200 dark:hover:border-red-700 hover:-translate-y-0.5 transition duration-200 cursor-pointer"
+          >
+
+            <div className="flex items-start justify-between">
+
+              <AlertTriangle
+                className="text-red-600 dark:text-red-400"
+                size={28}
+              />
+
+              <ArrowRight
+                size={28}
+                strokeWidth={2}
+                className="text-gray-400 dark:text-gray-500"
+              />
+
+            </div>
+
+            <p className="text-gray-500 dark:text-gray-400 mt-4">
+              Pending Complaints
+            </p>
+
+            <h3 className="text-3xl font-bold mt-1 text-gray-900 dark:text-gray-100">
+              {complaintStats.pending}
+            </h3>
+
+            <div className="flex items-center gap-1.5 mt-3">
+
+              <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                View complaints ({complaintStats.total} total)
+              </span>
+
+              <ArrowRight
+                size={18}
+                strokeWidth={2}
+                className="text-red-600 dark:text-red-400"
+              />
+
+            </div>
+
+          </button>
+
         </div>
 
         {/* ===================================================
@@ -495,9 +650,7 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={() =>
-                  handleAttentionNavigation(
-                    "/rent-bills"
-                  )
+                  handleAttentionNavigation("/rent-bills")
                 }
                 className="w-full flex items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/70 transition text-left cursor-pointer"
               >
@@ -525,9 +678,7 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={() =>
-                  handleAttentionNavigation(
-                    "/rooms"
-                  )
+                  handleAttentionNavigation("/rooms")
                 }
                 className="w-full flex items-center justify-between p-4 rounded-xl bg-yellow-50 dark:bg-yellow-950/40 hover:bg-yellow-100 dark:hover:bg-yellow-950/70 transition text-left cursor-pointer"
               >
@@ -555,9 +706,7 @@ function Dashboard() {
               <button
                 type="button"
                 onClick={() =>
-                  handleAttentionNavigation(
-                    "/documents"
-                  )
+                  handleAttentionNavigation("/documents")
                 }
                 className="w-full flex items-center justify-between p-4 rounded-xl bg-orange-50 dark:bg-orange-950/40 hover:bg-orange-100 dark:hover:bg-orange-950/70 transition text-left cursor-pointer"
               >
@@ -579,6 +728,36 @@ function Dashboard() {
                 </span>
 
               </button>
+
+              {/* PENDING COMPLAINTS */}
+
+              {complaintStats.pending > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAttentionNavigation("/owner-complaints")
+                  }
+                  className="w-full flex items-center justify-between p-4 rounded-xl bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/70 transition text-left cursor-pointer"
+                >
+
+                  <div>
+
+                    <p className="font-semibold text-red-700 dark:text-red-300">
+                      Pending Complaints
+                    </p>
+
+                    <p className="text-sm text-red-600 dark:text-red-400">
+                      Complaints waiting for your attention
+                    </p>
+
+                  </div>
+
+                  <span className="font-bold text-red-700 dark:text-red-300">
+                    {complaintStats.pending}
+                  </span>
+
+                </button>
+              )}
 
             </div>
 
