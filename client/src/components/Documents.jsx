@@ -1,5 +1,5 @@
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   FileText,
   User,
@@ -11,7 +11,9 @@ import {
 import Navbar from "./Navbar";
 
 function Documents() {
-  const navigate = useNavigate();
+  // =========================================================
+  // DOCUMENT DATA
+  // =========================================================
 
   const documents = [
     {
@@ -43,6 +45,10 @@ function Documents() {
     },
   ];
 
+  // =========================================================
+  // SUMMARY CALCULATIONS
+  // =========================================================
+
   const totalDocuments = documents.length;
 
   const activeDocuments = documents.filter(
@@ -53,13 +59,16 @@ function Documents() {
     (document) => document.status === "Verified"
   ).length;
 
+  // =========================================================
+  // COMPONENT UI
+  // =========================================================
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
 
       {/* ================= NAVBAR ================= */}
 
       <Navbar />
-
 
       {/* ================= MAIN CONTENT ================= */}
 
@@ -69,17 +78,16 @@ function Documents() {
 
         <div className="mb-6">
 
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
             Document Management
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             View and manage documents related to your rental properties
             and tenants.
           </p>
 
         </div>
-
 
         {/* ================= SUMMARY CARDS ================= */}
 
@@ -87,26 +95,26 @@ function Documents() {
 
           {/* TOTAL DOCUMENTS */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
 
             <div className="flex items-center gap-3">
 
-              <div className="p-3 bg-blue-50 rounded-xl">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
 
                 <FileText
                   size={26}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
 
               </div>
 
               <div>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Documents
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {totalDocuments}
                 </h3>
 
@@ -116,29 +124,28 @@ function Documents() {
 
           </div>
 
-
           {/* ACTIVE DOCUMENTS */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
 
             <div className="flex items-center gap-3">
 
-              <div className="p-3 bg-green-50 rounded-xl">
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-xl">
 
                 <FileText
                   size={26}
-                  className="text-green-600"
+                  className="text-green-600 dark:text-green-400"
                 />
 
               </div>
 
               <div>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Active Documents
                 </p>
 
-                <h3 className="text-2xl font-bold text-green-600">
+                <h3 className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {activeDocuments}
                 </h3>
 
@@ -148,29 +155,28 @@ function Documents() {
 
           </div>
 
-
           {/* VERIFIED DOCUMENTS */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
 
             <div className="flex items-center gap-3">
 
-              <div className="p-3 bg-purple-50 rounded-xl">
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
 
                 <FileText
                   size={26}
-                  className="text-purple-600"
+                  className="text-purple-600 dark:text-purple-400"
                 />
 
               </div>
 
               <div>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Verified Documents
                 </p>
 
-                <h3 className="text-2xl font-bold text-purple-600">
+                <h3 className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {verifiedDocuments}
                 </h3>
 
@@ -182,57 +188,55 @@ function Documents() {
 
         </div>
 
-
         {/* ================= DOCUMENT RECORDS ================= */}
 
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
 
           {/* SECTION HEADER */}
 
-          <div className="p-5 border-b">
+          <div className="p-5 border-b border-gray-200 dark:border-gray-700">
 
-            <h3 className="text-lg font-bold text-gray-800">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               Document Records
             </h3>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Rental and tenant-related documents.
             </p>
 
           </div>
 
-
           {/* DOCUMENT LIST */}
 
-          <div className="divide-y">
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
 
             {documents.map((document) => (
 
               <div
                 key={document.id}
-                className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5"
+                className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors duration-200"
               >
 
                 {/* DOCUMENT NAME */}
 
                 <div className="flex items-center gap-4">
 
-                  <div className="p-3 bg-blue-50 rounded-xl">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
 
                     <FileText
                       size={24}
-                      className="text-blue-600"
+                      className="text-blue-600 dark:text-blue-400"
                     />
 
                   </div>
 
                   <div>
 
-                    <h4 className="font-bold text-gray-800">
+                    <h4 className="font-bold text-gray-800 dark:text-gray-100">
                       {document.name}
                     </h4>
 
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Document ID: {document.id}
                     </p>
 
@@ -240,10 +244,9 @@ function Documents() {
 
                 </div>
 
-
                 {/* DOCUMENT TYPE */}
 
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
 
                   <FileText size={18} />
 
@@ -253,10 +256,9 @@ function Documents() {
 
                 </div>
 
-
                 {/* TENANT */}
 
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
 
                   <User size={18} />
 
@@ -266,10 +268,9 @@ function Documents() {
 
                 </div>
 
-
                 {/* PROPERTY */}
 
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
 
                   <Building2 size={18} />
 
@@ -279,10 +280,9 @@ function Documents() {
 
                 </div>
 
-
                 {/* DATE */}
 
-                <div className="flex items-center gap-3 text-gray-600">
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
 
                   <Calendar size={18} />
 
@@ -292,19 +292,17 @@ function Documents() {
 
                 </div>
 
-
                 {/* STATUS */}
 
                 <span
                   className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${
                     document.status === "Active"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-purple-100 text-purple-700"
+                      ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300"
+                      : "bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300"
                   }`}
                 >
                   {document.status}
                 </span>
-
 
                 {/* ACTIONS */}
 
@@ -314,7 +312,7 @@ function Documents() {
                     onClick={() =>
                       alert(`Viewing ${document.name}`)
                     }
-                    className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+                    className="flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
 
                     <Eye size={18} />
@@ -322,7 +320,6 @@ function Documents() {
                     View
 
                   </button>
-
 
                   <button
                     onClick={() =>
