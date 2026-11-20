@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from "react";
 import { Plus, X } from "lucide-react";
 import RoomCard from "./RoomCard";
@@ -12,8 +13,6 @@ const PROPERTY_STORAGE_KEY = "rentalManagementProperties";
 
 // =========================================================
 // DEFAULT PROPERTIES
-// Used when no saved property list exists.
-// Keep these IDs and names aligned with Properties.jsx.
 // =========================================================
 
 const defaultProperties = [
@@ -37,7 +36,6 @@ const defaultProperties = [
 
 // =========================================================
 // DEFAULT ROOM DATA
-// Existing room IDs are preserved.
 // =========================================================
 
 const defaultRooms = [
@@ -58,6 +56,7 @@ const defaultRooms = [
     property: "Green View Apartments",
     propertyId: 1,
     location: "Bhopal",
+    propertyId: 1,
     floor: 1,
     rent: 6000,
     tenant: "Aman",
@@ -93,9 +92,7 @@ const defaultRooms = [
 
 const readSavedProperties = () => {
   try {
-    const stored = localStorage.getItem(
-      PROPERTY_STORAGE_KEY
-    );
+    const stored = localStorage.getItem(PROPERTY_STORAGE_KEY);
 
     if (stored === null) {
       return defaultProperties;
@@ -103,22 +100,15 @@ const readSavedProperties = () => {
 
     const parsed = JSON.parse(stored);
 
-    return Array.isArray(parsed)
-      ? parsed
-      : defaultProperties;
+    return Array.isArray(parsed) ? parsed : defaultProperties;
   } catch (error) {
-    console.error(
-      "Unable to read saved properties:",
-      error
-    );
-
+    console.error("Unable to read saved properties:", error);
     return defaultProperties;
   }
 };
 
 // =========================================================
 // READ SAVED ROOMS
-// Room records are stored as an object keyed by room ID.
 // =========================================================
 
 const readSavedRooms = () => {
@@ -163,7 +153,6 @@ const formatRent = (rent) =>
 
 // =========================================================
 // FIND A PROPERTY BY ITS NAME
-// Helps existing rooms without propertyId remain compatible.
 // =========================================================
 
 const findPropertyByName = (propertyName, properties) =>
@@ -175,8 +164,6 @@ const findPropertyByName = (propertyName, properties) =>
 
 // =========================================================
 // LOAD ROOMS
-// Merge defaults with saved data without changing existing IDs.
-// Saved values take priority.
 // =========================================================
 
 const loadRooms = () => {
@@ -216,9 +203,7 @@ const loadRooms = () => {
         property?.location ??
         mergedRoom.location ??
         room.location,
-      rent: formatRent(
-        mergedRoom.rent ?? room.rent
-      ),
+      rent: formatRent(mergedRoom.rent ?? room.rent),
     };
   });
 
@@ -244,8 +229,7 @@ const loadRooms = () => {
         id: room.id ?? Number(id),
         propertyId: room.propertyId ?? property?.id,
         property: property?.name ?? room.property ?? "",
-        location:
-          property?.location ?? room.location ?? "",
+        location: property?.location ?? room.location ?? "",
         rent: formatRent(room.rent),
       };
     });
@@ -261,10 +245,7 @@ const createStoredRoom = (room) => ({
   ...room,
   rent: parseRent(room.rent),
   floor: Number(room.floor),
-  tenant:
-    room.tenant === "None"
-      ? ""
-      : room.tenant ?? "",
+  tenant: room.tenant === "None" ? "" : room.tenant ?? "",
 });
 
 // =========================================================
@@ -274,7 +255,6 @@ const createStoredRoom = (room) => ({
 function Rooms() {
   // =========================================================
   // PROPERTY DATA
-  // Load properties created or edited in Properties.jsx.
   // =========================================================
 
   const [properties, setProperties] = useState(
@@ -295,7 +275,6 @@ function Rooms() {
 
   // =========================================================
   // FORM DATA
-  // propertyId connects the room to its selected property.
   // =========================================================
 
   const [formData, setFormData] = useState({
@@ -319,8 +298,7 @@ function Rooms() {
   const scrollPositionRef = useRef(0);
 
   // =========================================================
-  // REFRESH PROPERTY DATA WHEN THIS PAGE OPENS OR
-  // WHEN THE SAME STORAGE KEY CHANGES IN ANOTHER TAB.
+  // REFRESH PROPERTY DATA WHEN STORAGE CHANGES
   // =========================================================
 
   useEffect(() => {
@@ -331,58 +309,63 @@ function Rooms() {
     window.addEventListener("storage", refreshProperties);
 
     return () => {
-      window.removeEventListener(
-        "storage",
-        refreshProperties
-      );
+      window.removeEventListener("storage", refreshProperties);
     };
   }, []);
 
   // =========================================================
   // LOCK BACKGROUND SCROLL WHILE MODAL IS OPEN
+  // Restore previous inline styles when modal closes.
   // =========================================================
 
   useEffect(() => {
-    if (showAddRoom) {
-      scrollPositionRef.current = window.scrollY;
-
-      document.body.style.position = "fixed";
-      document.body.style.top =
-        `-${scrollPositionRef.current}px`;
-      document.body.style.left = "0";
-      document.body.style.right = "0";
-      document.body.style.width = "100%";
-      document.body.style.overflow = "hidden";
-
-      document.documentElement.style.overflow = "hidden";
-      document.documentElement.style.overscrollBehavior =
-        "none";
-    } else {
-      const savedPosition = scrollPositionRef.current;
-
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
-
-      window.scrollTo(0, savedPosition);
+    if (!showAddRoom) {
+      return;
     }
 
-    return () => {
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.left = "";
-      document.body.style.right = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
+    const savedPosition = window.scrollY;
+    scrollPositionRef.current = savedPosition;
 
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.overscrollBehavior = "";
+    const previousBodyStyles = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+    };
+
+    const previousHtmlStyles = {
+      overflow: document.documentElement.style.overflow,
+      overscrollBehavior:
+        document.documentElement.style.overscrollBehavior,
+    };
+
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${savedPosition}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.width = "100%";
+    document.body.style.overflow = "hidden";
+
+    document.documentElement.style.overflow = "hidden";
+    document.documentElement.style.overscrollBehavior = "none";
+
+    return () => {
+      document.body.style.position = previousBodyStyles.position;
+      document.body.style.top = previousBodyStyles.top;
+      document.body.style.left = previousBodyStyles.left;
+      document.body.style.right = previousBodyStyles.right;
+      document.body.style.width = previousBodyStyles.width;
+      document.body.style.overflow = previousBodyStyles.overflow;
+
+      document.documentElement.style.overflow =
+        previousHtmlStyles.overflow;
+
+      document.documentElement.style.overscrollBehavior =
+        previousHtmlStyles.overscrollBehavior;
+
+      window.scrollTo(0, savedPosition);
     };
   }, [showAddRoom]);
 
@@ -448,7 +431,6 @@ function Rooms() {
 
   // =========================================================
   // ADD ROOM
-  // Validate, save, and update the UI.
   // =========================================================
 
   const handleAddRoom = (event) => {
@@ -458,10 +440,7 @@ function Rooms() {
     const floor = Number(formData.floor);
     const rent = Number(formData.rent);
 
-    // -------------------------------------------------------
     // REQUIRED FIELDS
-    // -------------------------------------------------------
-
     if (
       !roomNumber ||
       !formData.propertyId ||
@@ -472,10 +451,7 @@ function Rooms() {
       return;
     }
 
-    // -------------------------------------------------------
-    // VERIFY SELECTED PROPERTY STILL EXISTS
-    // -------------------------------------------------------
-
+    // VERIFY SELECTED PROPERTY
     const property = properties.find(
       (item) =>
         String(item.id) === String(formData.propertyId)
@@ -488,21 +464,13 @@ function Rooms() {
       return;
     }
 
-    // -------------------------------------------------------
     // VERIFY PROPERTY IS ACTIVE
-    // -------------------------------------------------------
-
     if (property.status === "Inactive") {
-      setError(
-        "You cannot add a room to an inactive property."
-      );
+      setError("You cannot add a room to an inactive property.");
       return;
     }
 
-    // -------------------------------------------------------
     // VALIDATE FLOOR
-    // -------------------------------------------------------
-
     if (
       !Number.isFinite(floor) ||
       !Number.isInteger(floor) ||
@@ -525,10 +493,7 @@ function Rooms() {
       return;
     }
 
-    // -------------------------------------------------------
     // VALIDATE RENT
-    // -------------------------------------------------------
-
     if (
       !Number.isFinite(rent) ||
       !Number.isInteger(rent) ||
@@ -538,18 +503,14 @@ function Rooms() {
       return;
     }
 
-    // -------------------------------------------------------
     // PREVENT DUPLICATE ROOM NUMBER IN SAME PROPERTY
-    // -------------------------------------------------------
-
     const roomAlreadyExists = rooms.some((room) => {
       const sameRoomNumber =
         String(room.roomNumber).trim().toLowerCase() ===
         roomNumber.toLowerCase();
 
       const sameProperty =
-        String(room.propertyId ?? "") ===
-          String(property.id) ||
+        String(room.propertyId ?? "") === String(property.id) ||
         (
           !room.propertyId &&
           String(room.property || "").trim().toLowerCase() ===
@@ -566,16 +527,10 @@ function Rooms() {
       return;
     }
 
-    // -------------------------------------------------------
     // GENERATE ROOM ID
-    // -------------------------------------------------------
-
     const id = Date.now();
 
-    // -------------------------------------------------------
     // CREATE ROOM RECORD
-    // -------------------------------------------------------
-
     const newRoom = {
       id,
       roomNumber,
@@ -588,10 +543,7 @@ function Rooms() {
       status: formData.status,
     };
 
-    // -------------------------------------------------------
     // SAVE ROOM TO LOCAL STORAGE
-    // -------------------------------------------------------
-
     try {
       const savedRooms = readSavedRooms();
 
@@ -602,7 +554,7 @@ function Rooms() {
         JSON.stringify(savedRooms)
       );
 
-      // Update the room cards after saving successfully.
+      // UPDATE ROOM CARDS
       setRooms((previousRooms) => [
         ...previousRooms,
         {
@@ -627,20 +579,22 @@ function Rooms() {
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-300">
+
       {/* COMMON NAVBAR */}
       <Navbar />
 
       {/* MAIN CONTENT */}
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
+
         {/* PAGE HEADER */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
               All Rooms
             </h2>
 
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               View and manage rooms across your properties.
             </p>
           </div>
@@ -663,39 +617,44 @@ function Rooms() {
           ))}
         </div>
 
+        {/* EMPTY STATE */}
         {rooms.length === 0 && (
-          <div className="bg-white rounded-xl border shadow-sm p-10 text-center">
-            <h3 className="text-lg font-semibold text-gray-800">
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-10 text-center">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
               No rooms found
             </h3>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Add a room to get started.
             </p>
           </div>
         )}
       </main>
 
-      {/* ADD ROOM MODAL */}
+      {/* =====================================================
+          ADD ROOM MODAL
+      ===================================================== */}
+
       {showAddRoom && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="add-room-title"
         >
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden">
+          <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700">
+
             {/* MODAL HEADER */}
-            <div className="flex items-center justify-between px-5 py-4 border-b">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
               <div>
                 <h3
                   id="add-room-title"
-                  className="text-xl font-bold text-gray-800"
+                  className="text-xl font-bold text-gray-800 dark:text-gray-100"
                 >
                   Add New Room
                 </h3>
 
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Add a room to one of your properties.
                 </p>
               </div>
@@ -704,10 +663,10 @@ function Rooms() {
               <button
                 type="button"
                 onClick={handleCloseAddRoom}
-                className="p-2 rounded-lg hover:bg-gray-100 transition"
+                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 aria-label="Close add room form"
               >
-                <X size={22} className="text-gray-600" />
+                <X size={22} />
               </button>
             </div>
 
@@ -717,11 +676,12 @@ function Rooms() {
                 onSubmit={handleAddRoom}
                 className="p-5 space-y-4"
               >
+
                 {/* ROOM NUMBER */}
                 <div>
                   <label
                     htmlFor="roomNumber"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Room Number
                   </label>
@@ -735,7 +695,7 @@ function Rooms() {
                     placeholder="e.g. 205"
                     autoComplete="off"
                     required
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
@@ -743,7 +703,7 @@ function Rooms() {
                 <div>
                   <label
                     htmlFor="propertyId"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Property
                   </label>
@@ -754,7 +714,7 @@ function Rooms() {
                     value={formData.propertyId}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">Select Property</option>
 
@@ -773,7 +733,7 @@ function Rooms() {
                   </select>
 
                   {properties.length === 0 && (
-                    <p className="text-xs text-amber-700 mt-1">
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
                       No properties are available. Add a property first.
                     </p>
                   )}
@@ -783,7 +743,7 @@ function Rooms() {
                 <div>
                   <label
                     htmlFor="floor"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Floor
                   </label>
@@ -808,11 +768,11 @@ function Rooms() {
                     step="1"
                     required
                     disabled={!selectedProperty}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed"
                   />
 
                   {selectedProperty && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {selectedProperty.name} has{" "}
                       {selectedProperty.floors} floor(s).
                     </p>
@@ -823,7 +783,7 @@ function Rooms() {
                 <div>
                   <label
                     htmlFor="rent"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Monthly Rent (₹)
                   </label>
@@ -838,7 +798,7 @@ function Rooms() {
                     min="1"
                     step="1"
                     required
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
@@ -846,7 +806,7 @@ function Rooms() {
                 <div>
                   <label
                     htmlFor="status"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                   >
                     Status
                   </label>
@@ -856,7 +816,7 @@ function Rooms() {
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="Available">Available</option>
                     <option value="Occupied">Occupied</option>
@@ -867,7 +827,7 @@ function Rooms() {
                 {/* ERROR */}
                 {error && (
                   <p
-                    className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+                    className="text-sm text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-2"
                     role="alert"
                   >
                     {error}
@@ -879,7 +839,7 @@ function Rooms() {
                   <button
                     type="button"
                     onClick={handleCloseAddRoom}
-                    className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition"
+                    className="w-full sm:w-1/2 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
                     Cancel
                   </button>
@@ -887,7 +847,7 @@ function Rooms() {
                   <button
                     type="submit"
                     disabled={properties.length === 0}
-                    className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full sm:w-1/2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
                   >
                     Add Room
                   </button>
