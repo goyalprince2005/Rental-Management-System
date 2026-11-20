@@ -473,20 +473,20 @@ function Reports() {
 
   const colorStyles = {
     blue: {
-      icon: "bg-blue-50 text-blue-600",
-      arrow: "text-blue-600",
+      icon: "bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400",
+      arrow: "text-blue-600 dark:text-blue-400",
     },
     purple: {
-      icon: "bg-purple-50 text-purple-600",
-      arrow: "text-purple-600",
+      icon: "bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-400",
+      arrow: "text-purple-600 dark:text-purple-400",
     },
     green: {
-      icon: "bg-green-50 text-green-600",
-      arrow: "text-green-600",
+      icon: "bg-green-50 text-green-600 dark:bg-green-950/60 dark:text-green-400",
+      arrow: "text-green-600 dark:text-green-400",
     },
     yellow: {
-      icon: "bg-yellow-50 text-yellow-700",
-      arrow: "text-yellow-700",
+      icon: "bg-yellow-50 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-400",
+      arrow: "text-yellow-700 dark:text-yellow-400",
     },
   };
 
@@ -495,7 +495,7 @@ function Reports() {
   // -------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-4 md:p-6">
@@ -503,26 +503,26 @@ function Reports() {
 
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-blue-50 rounded-xl">
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/60 rounded-xl">
               <BarChart3
                 size={26}
-                className="text-blue-600"
+                className="text-blue-600 dark:text-blue-400"
               />
             </div>
 
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
                 Rental Reports
               </h1>
 
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                 Overview of properties, occupancy, tenants,
                 and rent collection.
               </p>
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mt-3">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
             Figures are calculated from saved property, room,
             tenant, and rent records.
           </p>
@@ -533,21 +533,21 @@ function Reports() {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
           {/* PROPERTIES */}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 rounded-xl">
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/60 rounded-xl">
                 <Building2
                   size={25}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Properties
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {reportData.totalProperties}
                 </h3>
               </div>
@@ -555,7 +555,7 @@ function Reports() {
 
             <Link
               to="/properties"
-              className="mt-4 flex items-center justify-between text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 flex items-center justify-between text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
             >
               View properties
               <ArrowRight size={17} />
@@ -564,21 +564,21 @@ function Reports() {
 
           {/* TOTAL ROOMS */}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-50 rounded-xl">
+              <div className="p-3 bg-purple-50 dark:bg-purple-950/60 rounded-xl">
                 <DoorOpen
                   size={25}
-                  className="text-purple-600"
+                  className="text-purple-600 dark:text-purple-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Rooms
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {reportData.totalRooms}
                 </h3>
               </div>
@@ -586,7 +586,7 @@ function Reports() {
 
             <Link
               to="/rooms"
-              className="mt-4 flex items-center justify-between text-sm text-purple-600 hover:text-purple-800"
+              className="mt-4 flex items-center justify-between text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300"
             >
               View rooms
               <ArrowRight size={17} />
@@ -595,21 +595,21 @@ function Reports() {
 
           {/* TENANTS */}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-50 rounded-xl">
+              <div className="p-3 bg-green-50 dark:bg-green-950/60 rounded-xl">
                 <Users
                   size={25}
-                  className="text-green-600"
+                  className="text-green-600 dark:text-green-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Tenants
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {reportData.totalTenants}
                 </h3>
               </div>
@@ -617,7 +617,7 @@ function Reports() {
 
             <Link
               to="/tenants"
-              className="mt-4 flex items-center justify-between text-sm text-green-600 hover:text-green-800"
+              className="mt-4 flex items-center justify-between text-sm text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300"
             >
               View tenants
               <ArrowRight size={17} />
@@ -626,27 +626,27 @@ function Reports() {
 
           {/* OCCUPANCY */}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-yellow-50 rounded-xl">
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-950/60 rounded-xl">
                 <TrendingUp
                   size={25}
-                  className="text-yellow-600"
+                  className="text-yellow-600 dark:text-yellow-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Occupancy Rate
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {occupancyRate}%
                 </h3>
               </div>
             </div>
 
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
               {reportData.occupiedRooms} occupied ·{" "}
               {reportData.vacantRooms} vacant
             </p>
@@ -655,13 +655,13 @@ function Reports() {
 
         {/* RENT COLLECTION REPORT */}
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-          <div className="p-5 border-b border-gray-100">
-            <h2 className="text-lg font-bold text-gray-800">
+        <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6">
+          <div className="p-5 border-b border-gray-100 dark:border-gray-700">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               Rent Collection Report
             </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Expected rent compared with recorded rent collection.
             </p>
           </div>
@@ -670,21 +670,21 @@ function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* EXPECTED RENT */}
 
-              <div className="bg-blue-50 rounded-xl p-5">
+              <div className="bg-blue-50 dark:bg-blue-950/40 rounded-xl p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
                     <IndianRupee
                       size={22}
-                      className="text-blue-600"
+                      className="text-blue-600 dark:text-blue-400"
                     />
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Expected Rent
                     </p>
 
-                    <h3 className="text-2xl font-bold text-gray-800">
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                       {formatCurrency(reportData.monthlyRent)}
                     </h3>
                   </div>
@@ -693,21 +693,21 @@ function Reports() {
 
               {/* COLLECTED RENT */}
 
-              <div className="bg-green-50 rounded-xl p-5">
+              <div className="bg-green-50 dark:bg-green-950/40 rounded-xl p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
                     <CheckCircle2
                       size={22}
-                      className="text-green-600"
+                      className="text-green-600 dark:text-green-400"
                     />
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Collected Rent
                     </p>
 
-                    <h3 className="text-2xl font-bold text-green-700">
+                    <h3 className="text-2xl font-bold text-green-700 dark:text-green-400">
                       {formatCurrency(reportData.collectedRent)}
                     </h3>
                   </div>
@@ -716,21 +716,21 @@ function Reports() {
 
               {/* PENDING RENT */}
 
-              <div className="bg-yellow-50 rounded-xl p-5">
+              <div className="bg-yellow-50 dark:bg-yellow-950/40 rounded-xl p-5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-lg">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
                     <Clock
                       size={22}
-                      className="text-yellow-700"
+                      className="text-yellow-700 dark:text-yellow-400"
                     />
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Pending Rent
                     </p>
 
-                    <h3 className="text-2xl font-bold text-yellow-700">
+                    <h3 className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                       {formatCurrency(reportData.pendingRent)}
                     </h3>
                   </div>
@@ -743,22 +743,22 @@ function Reports() {
             <div className="mt-7">
               <div className="flex flex-wrap justify-between items-center gap-2 mb-2">
                 <div>
-                  <h3 className="font-semibold text-gray-800">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                     Collection Progress
                   </h3>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Percentage of expected rent recorded as paid.
                   </p>
                 </div>
 
-                <span className="text-lg font-bold text-green-700">
+                <span className="text-lg font-bold text-green-700 dark:text-green-400">
                   {collectionRate}%
                 </span>
               </div>
 
               <div
-                className="w-full bg-gray-200 rounded-full h-3 overflow-hidden"
+                className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"
                 role="progressbar"
                 aria-label="Rent collection progress"
                 aria-valuenow={collectionRate}
@@ -771,7 +771,7 @@ function Reports() {
                 />
               </div>
 
-              <div className="flex justify-between gap-3 text-xs text-gray-500 mt-2">
+              <div className="flex justify-between gap-3 text-xs text-gray-500 dark:text-gray-400 mt-2">
                 <span>
                   Collected:{" "}
                   {formatCurrency(reportData.collectedRent)}
@@ -784,7 +784,7 @@ function Reports() {
               </div>
 
               {rentRecords.length === 0 && (
-                <p className="text-xs text-gray-400 mt-3">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
                   No saved rent bills were found. Collection
                   figures will update when rent records are available.
                 </p>
@@ -792,7 +792,7 @@ function Reports() {
 
               {reportData.monthlyRent === 0 &&
                 reportData.totalRooms > 0 && (
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                     No expected rent was found for occupied rooms.
                     Check the room assignments and rent amounts.
                   </p>
@@ -800,7 +800,7 @@ function Reports() {
 
               <Link
                 to="/rent-bills"
-                className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 hover:text-blue-800"
+                className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
               >
                 View rent and bills
                 <ArrowRight size={17} />
@@ -811,60 +811,60 @@ function Reports() {
 
         {/* ROOM OCCUPANCY REPORT */}
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+        <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-blue-50 rounded-xl">
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/60 rounded-xl">
               <BarChart3
                 size={24}
-                className="text-blue-600"
+                className="text-blue-600 dark:text-blue-400"
               />
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-gray-800">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Room Occupancy
               </h2>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Occupied and vacant room breakdown.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-            <div className="rounded-xl border border-green-100 bg-green-50 p-4">
-              <p className="text-sm text-gray-600">
+            <div className="rounded-xl border border-green-100 dark:border-green-900 bg-green-50 dark:bg-green-950/40 p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Occupied Rooms
               </p>
 
-              <p className="text-2xl font-bold text-green-700 mt-1">
+              <p className="text-2xl font-bold text-green-700 dark:text-green-400 mt-1">
                 {reportData.occupiedRooms}
               </p>
             </div>
 
-            <div className="rounded-xl border border-orange-100 bg-orange-50 p-4">
-              <p className="text-sm text-gray-600">
+            <div className="rounded-xl border border-orange-100 dark:border-orange-900 bg-orange-50 dark:bg-orange-950/40 p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Vacant Rooms
               </p>
 
-              <p className="text-2xl font-bold text-orange-700 mt-1">
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-400 mt-1">
                 {reportData.vacantRooms}
               </p>
             </div>
           </div>
 
           <div className="flex justify-between items-center gap-3 mb-2">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               Occupancy percentage
             </span>
 
-            <span className="text-sm font-semibold text-gray-800">
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
               {occupancyRate}%
             </span>
           </div>
 
           <div
-            className="w-full bg-gray-200 rounded-full h-3 overflow-hidden"
+            className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden"
             role="progressbar"
             aria-label="Room occupancy"
             aria-valuenow={occupancyRate}
@@ -877,14 +877,14 @@ function Reports() {
             />
           </div>
 
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             {reportData.occupiedRooms} of {reportData.totalRooms}{" "}
             rooms have assigned tenants.
           </p>
 
           <Link
             to="/rooms"
-            className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 hover:text-blue-800"
+            className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
           >
             View room details
             <ArrowRight size={17} />
@@ -894,7 +894,7 @@ function Reports() {
         {/* QUICK NAVIGATION */}
 
         <section>
-          <h2 className="text-lg font-bold text-gray-800 mb-4">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
             Quick Access
           </h2>
 
@@ -907,7 +907,7 @@ function Reports() {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-4 hover:shadow-md hover:border-gray-200 transition-all group"
+                  className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm p-4 flex items-center gap-4 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 transition-all group"
                 >
                   <div
                     className={`p-3 rounded-xl ${styles.icon}`}
@@ -916,11 +916,11 @@ function Reports() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-800">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-100">
                       {item.title}
                     </h3>
 
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {item.description}
                     </p>
                   </div>
