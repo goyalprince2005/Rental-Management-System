@@ -156,18 +156,18 @@ function getStatusLabel(status) {
 
 function getStatusStyle(status) {
   if (isPaid({ status })) {
-    return "bg-green-100 text-green-700";
+    return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
   }
 
   if (normalizeStatus(status) === "overdue") {
-    return "bg-red-100 text-red-700";
+    return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
   }
 
   if (isDue({ status })) {
-    return "bg-yellow-100 text-yellow-700";
+    return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
   }
 
-  return "bg-gray-100 text-gray-700";
+  return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 }
 
 function formatCurrency(value) {
@@ -279,7 +279,6 @@ function loadRentRecords() {
   if (savedRooms !== null) {
     const generatedRecords = generateRentRecords();
 
-    // Persist generated bills so later visits use the same records.
     try {
       localStorage.setItem(
         RENT_STORAGE_KEY,
@@ -422,8 +421,20 @@ function RentBills() {
   // -------------------------------------------------------
 
   const handleViewTenant = (record) => {
-    const tenantId = record.tenantId ?? record.id;
+    const tenantId = record.tenantId;
 
+    if (tenantId === undefined || tenantId === null || tenantId === "") {
+      setMessage("");
+      setErrorMessage(
+        `Tenant ID is unavailable for ${
+          getTenantName(record.tenant) || "this tenant"
+        }.`
+      );
+      return;
+    }
+
+    setMessage("");
+    setErrorMessage("");
     navigate(`/tenant-details/${tenantId}`);
   };
 
@@ -432,18 +443,18 @@ function RentBills() {
   // -------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-gray-100 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
       <Navbar />
 
-      <main className="p-4 md:p-6 max-w-7xl mx-auto">
+      <main className="mx-auto max-w-7xl p-4 md:p-6">
         {/* PAGE HEADING */}
 
         <div className="mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 md:text-3xl">
             Rent & Bills
           </h2>
 
-          <p className="text-gray-500 mt-1">
+          <p className="mt-1 text-gray-500 dark:text-gray-400">
             Track monthly rent collection and pending payments.
           </p>
         </div>
@@ -453,9 +464,9 @@ function RentBills() {
         {message && (
           <div
             role="status"
-            className="mb-5 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700"
+            className="mb-5 flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300"
           >
-            <CheckCircle2 size={19} className="shrink-0 mt-0.5" />
+            <CheckCircle2 size={19} className="mt-0.5 shrink-0" />
             <span>{message}</span>
           </div>
         )}
@@ -463,74 +474,80 @@ function RentBills() {
         {errorMessage && (
           <div
             role="alert"
-            className="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+            className="mb-5 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300"
           >
-            <AlertCircle size={19} className="shrink-0 mt-0.5" />
+            <AlertCircle size={19} className="mt-0.5 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {/* SUMMARY CARDS */}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {/* TOTAL RENT */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-500">Total Rent</p>
-                <h3 className="text-2xl font-bold text-gray-800 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Total Rent
+                </p>
+                <h3 className="mt-1 text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {formatCurrency(totalRent)}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {rentRecords.length} rent records
                 </p>
               </div>
 
-              <div className="p-3 bg-blue-50 rounded-xl shrink-0">
-                <IndianRupee size={26} className="text-blue-600" />
+              <div className="shrink-0 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/50">
+                <IndianRupee size={26} className="text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </div>
 
           {/* PAID RENT */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-500">Paid Rent</p>
-                <h3 className="text-2xl font-bold text-green-600 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Paid Rent
+                </p>
+                <h3 className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">
                   {formatCurrency(paidRent)}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {paidRecords.length}{" "}
                   {paidRecords.length === 1 ? "paid record" : "paid records"}
                 </p>
               </div>
 
-              <div className="p-3 bg-green-50 rounded-xl shrink-0">
-                <CheckCircle2 size={26} className="text-green-600" />
+              <div className="shrink-0 rounded-xl bg-green-50 p-3 dark:bg-green-950/50">
+                <CheckCircle2 size={26} className="text-green-600 dark:text-green-400" />
               </div>
             </div>
           </div>
 
           {/* DUE RENT */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+          <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-500">Due Rent</p>
-                <h3 className="text-2xl font-bold text-yellow-600 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Due Rent
+                </p>
+                <h3 className="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {formatCurrency(dueRent)}
                 </h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {dueRecords.length}{" "}
                   {dueRecords.length === 1 ? "due record" : "due records"}
                 </p>
               </div>
 
-              <div className="p-3 bg-yellow-50 rounded-xl shrink-0">
-                <Clock3 size={26} className="text-yellow-600" />
+              <div className="shrink-0 rounded-xl bg-yellow-50 p-3 dark:bg-yellow-950/50">
+                <Clock3 size={26} className="text-yellow-600 dark:text-yellow-400" />
               </div>
             </div>
           </div>
@@ -538,8 +555,8 @@ function RentBills() {
 
         {/* SEARCH AND FILTER */}
 
-        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
-          <div className="flex flex-col lg:flex-row gap-3">
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+          <div className="flex flex-col gap-3 lg:flex-row">
             <div className="relative flex-1">
               <Search
                 size={19}
@@ -551,7 +568,7 @@ function RentBills() {
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder="Search tenant, property or room..."
-                className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                 aria-label="Search rent records"
               />
 
@@ -559,7 +576,7 @@ function RentBills() {
                 <button
                   type="button"
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-gray-600 dark:hover:text-gray-200"
                   aria-label="Clear rent search"
                 >
                   <X size={18} />
@@ -570,7 +587,7 @@ function RentBills() {
             <select
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="w-full lg:w-44 px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 lg:w-44"
               aria-label="Filter rent records by status"
             >
               <option value="All">All Status</option>
@@ -578,7 +595,7 @@ function RentBills() {
               <option value="Due">Due / Pending</option>
             </select>
 
-            <div className="flex items-center justify-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 whitespace-nowrap">
+            <div className="flex items-center justify-center whitespace-nowrap rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
               {filteredRentRecords.length}{" "}
               {filteredRentRecords.length === 1 ? "record" : "records"}
             </div>
@@ -587,25 +604,25 @@ function RentBills() {
 
         {/* RENT RECORDS */}
 
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-          <div className="p-5 border-b">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+          <div className="border-b border-gray-200 p-5 dark:border-gray-700">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">
+                <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                   Monthly Rent Records
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Current rent collection information.
                 </p>
               </div>
 
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-500 dark:text-gray-400">
                 Showing{" "}
-                <span className="font-semibold text-gray-700">
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
                   {filteredRentRecords.length}
                 </span>{" "}
                 of{" "}
-                <span className="font-semibold text-gray-700">
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
                   {rentRecords.length}
                 </span>
               </div>
@@ -613,25 +630,25 @@ function RentBills() {
           </div>
 
           {filteredRentRecords.length > 0 ? (
-            <div className="divide-y">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredRentRecords.map((record) => (
                 <div
                   key={record.id}
-                  className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 hover:bg-gray-50 transition"
+                  className="flex flex-col gap-5 p-5 transition hover:bg-gray-50 dark:hover:bg-gray-800/70 lg:flex-row lg:items-center lg:justify-between"
                 >
                   {/* TENANT */}
 
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="p-3 bg-blue-50 rounded-xl shrink-0">
-                      <User size={24} className="text-blue-600" />
+                  <div className="flex min-w-0 items-center gap-4">
+                    <div className="shrink-0 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/50">
+                      <User size={24} className="text-blue-600 dark:text-blue-400" />
                     </div>
 
                     <div className="min-w-0">
-                      <h4 className="font-bold text-gray-800 break-words">
+                      <h4 className="break-words font-bold text-gray-800 dark:text-gray-100">
                         {getTenantName(record.tenant) || "Unknown Tenant"}
                       </h4>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {record.tenantId != null
                           ? `Tenant ID: ${record.tenantId}`
                           : `Rent Record ID: ${record.id}`}
@@ -641,16 +658,16 @@ function RentBills() {
 
                   {/* PROPERTY */}
 
-                  <div className="flex items-center gap-3 text-gray-600 min-w-0">
+                  <div className="flex min-w-0 items-center gap-3 text-gray-600 dark:text-gray-300">
                     <Building2 size={18} className="shrink-0" />
-                    <span className="text-sm break-words">
+                    <span className="break-words text-sm">
                       {record.property || "Not specified"}
                     </span>
                   </div>
 
                   {/* ROOM */}
 
-                  <div className="flex items-center gap-3 text-gray-600">
+                  <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                     <DoorOpen size={18} className="shrink-0" />
                     <span className="text-sm">
                       Room {record.room ?? "Not specified"}
@@ -660,30 +677,32 @@ function RentBills() {
                   {/* RENT */}
 
                   <div className="flex items-center gap-3">
-                    <IndianRupee size={18} className="text-gray-500 shrink-0" />
-                    <span className="font-semibold text-gray-800">
+                    <IndianRupee size={18} className="shrink-0 text-gray-500 dark:text-gray-400" />
+                    <span className="font-semibold text-gray-800 dark:text-gray-100">
                       {formatCurrency(getRecordAmount(record))}
                     </span>
-                    <span className="text-xs text-gray-400">/ month</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      / month
+                    </span>
                   </div>
 
                   {/* STATUS */}
 
                   <span
-                    className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${getStatusStyle(record.status)}`}
+                    className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${getStatusStyle(record.status)}`}
                   >
                     {getStatusLabel(record.status)}
                   </span>
 
                   {/* ACTIONS */}
 
-                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
                     {!isPaid(record) && isDue(record) && (
                       <button
                         type="button"
                         onClick={() => handleMarkAsPaid(record)}
                         disabled={updatingId === record.id}
-                        className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <Check size={17} />
                         {updatingId === record.id
@@ -695,7 +714,7 @@ function RentBills() {
                     <button
                       type="button"
                       onClick={() => handleViewTenant(record)}
-                      className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition"
+                      className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-gray-600 dark:text-gray-200 dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-400"
                     >
                       <Eye size={18} />
                       View Details
@@ -706,15 +725,15 @@ function RentBills() {
             </div>
           ) : (
             <div className="p-10 text-center">
-              <div className="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4">
-                <Search size={28} className="text-blue-600" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/50">
+                <Search size={28} className="text-blue-600 dark:text-blue-400" />
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-800">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                 No rent records found
               </h3>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 No rent record matches your current search or status filter.
               </p>
 
@@ -724,7 +743,7 @@ function RentBills() {
                   setSearchTerm("");
                   setStatusFilter("All");
                 }}
-                className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
               >
                 <X size={17} />
                 Clear Filters
@@ -738,7 +757,7 @@ function RentBills() {
         {rentRecords.some((record) =>
           String(record.id).startsWith("room-")
         ) && (
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
             Rent bills were initialized from assigned rooms. Review the
             amounts and payment status before using them as actual records.
           </p>
