@@ -1,3 +1,4 @@
+\
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -21,6 +22,10 @@ function Sidebar() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  // =========================================================
+  // NAVIGATION ITEMS
+  // =========================================================
 
   const menuItems = [
     {
@@ -79,13 +84,19 @@ function Sidebar() {
     },
   ];
 
+  // =========================================================
   // CLOSE SIDEBAR
+  // =========================================================
+
   const closeSidebar = () => {
     setIsOpen(false);
     setHoveredItem(null);
   };
 
+  // =========================================================
   // NAVIGATION
+  // =========================================================
+
   const handleNavigation = (item) => {
     if (!item.path) return;
 
@@ -93,13 +104,17 @@ function Sidebar() {
     closeSidebar();
   };
 
-  // CLOSE MOBILE SIDEBAR WITH ESCAPE
+  // =========================================================
+  // CLOSE SIDEBAR WITH ESCAPE
+  // =========================================================
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        closeSidebar();
+        setIsOpen(false);
+        setHoveredItem(null);
       }
     };
 
@@ -110,15 +125,25 @@ function Sidebar() {
     };
   }, [isOpen]);
 
-  // CLOSE MOBILE DRAWER AFTER NAVIGATION
+  // =========================================================
+  // CLOSE SIDEBAR AFTER NAVIGATION
+  // =========================================================
+
   useEffect(() => {
     setIsOpen(false);
     setHoveredItem(null);
   }, [location.pathname]);
 
+  // =========================================================
+  // PAGE UI
+  // =========================================================
+
   return (
     <>
-      {/* HAMBURGER BUTTON + HOVER TOOLTIP */}
+      {/* =====================================================
+          HAMBURGER BUTTON + TOOLTIP
+      ===================================================== */}
+
       <button
         type="button"
         onClick={() => setIsOpen(true)}
@@ -127,8 +152,10 @@ function Sidebar() {
         aria-expanded={isOpen}
         aria-controls="owner-sidebar"
         className={`group fixed left-4 top-4 z-[9999]
-          rounded-lg bg-blue-50 p-2 text-gray-700
-          shadow-sm hover:bg-blue-100 transition
+          rounded-lg bg-blue-50 dark:bg-gray-800
+          p-2 text-gray-700 dark:text-gray-200
+          shadow-sm hover:bg-blue-100 dark:hover:bg-gray-700
+          transition
           focus:outline-none focus:ring-2 focus:ring-blue-500
           ${
             isOpen
@@ -138,15 +165,16 @@ function Sidebar() {
       >
         <Menu size={24} />
 
-        {/* TOOLTIP WHEN HOVERING OVER THE HAMBURGER */}
+        {/* TOOLTIP */}
+
         <span
           role="tooltip"
           className="pointer-events-none invisible
             absolute left-full top-1/2 z-[70] ml-3
             -translate-y-1/2 whitespace-nowrap
-            rounded-md bg-gray-800 px-3 py-2
-            text-sm font-medium text-white shadow-lg
-            opacity-0 transition-opacity duration-200
+            rounded-md bg-gray-800 dark:bg-gray-700
+            px-3 py-2 text-sm font-medium text-white
+            shadow-lg opacity-0 transition-opacity duration-200
             group-hover:visible group-hover:opacity-100
             group-focus-visible:visible
             group-focus-visible:opacity-100"
@@ -155,13 +183,17 @@ function Sidebar() {
         </span>
       </button>
 
-      {/* BACKGROUND OVERLAY */}
+      {/* =====================================================
+          BACKGROUND OVERLAY
+      ===================================================== */}
+
       <button
         type="button"
         aria-label="Close sidebar"
         tabIndex={isOpen ? 0 : -1}
         onClick={closeSidebar}
-        className={`fixed inset-0 z-40 bg-black/30
+        className={`fixed inset-0 z-40
+          bg-black/30 dark:bg-black/60
           transition-opacity duration-300
           ${
             isOpen
@@ -170,14 +202,19 @@ function Sidebar() {
           }`}
       />
 
-      {/* SIDEBAR DRAWER */}
+      {/* =====================================================
+          SIDEBAR DRAWER
+      ===================================================== */}
+
       <aside
         id="owner-sidebar"
         aria-label="Owner navigation"
         aria-hidden={!isOpen}
         className={`fixed left-0 top-0 z-50 flex
           h-screen w-72 max-w-[85vw] flex-col
-          border-r border-gray-100 bg-white shadow-xl
+          border-r border-gray-100 dark:border-gray-700
+          bg-white dark:bg-gray-900
+          shadow-xl dark:shadow-black/30
           transition-transform duration-300 ease-in-out
           ${
             isOpen
@@ -186,17 +223,22 @@ function Sidebar() {
           }`}
         onMouseLeave={() => setHoveredItem(null)}
       >
-        {/* SIDEBAR HEADER */}
+
+        {/* =================================================
+            SIDEBAR HEADER
+        ================================================= */}
+
         <div
           className="flex h-20 shrink-0 items-center
-            justify-between border-b border-gray-100 px-5"
+            justify-between border-b border-gray-100
+            dark:border-gray-700 px-5"
         >
           <div>
-            <h2 className="text-xl font-bold text-blue-600">
+            <h2 className="text-xl font-bold text-blue-600 dark:text-blue-400">
               Rental Menu
             </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Owner Panel
             </p>
           </div>
@@ -205,8 +247,11 @@ function Sidebar() {
             type="button"
             onClick={closeSidebar}
             aria-label="Close sidebar"
-            className="rounded-lg p-2 transition
-              hover:bg-blue-50 hover:text-blue-600
+            className="rounded-lg p-2
+              text-gray-600 dark:text-gray-300
+              transition hover:bg-blue-50
+              dark:hover:bg-gray-800
+              hover:text-blue-600 dark:hover:text-blue-400
               focus:outline-none focus:ring-2
               focus:ring-blue-500"
           >
@@ -214,7 +259,10 @@ function Sidebar() {
           </button>
         </div>
 
-        {/* NAVIGATION OPTIONS */}
+        {/* =================================================
+            NAVIGATION OPTIONS
+        ================================================= */}
+
         <nav
           aria-label="Main navigation"
           className="flex-1 space-y-1 overflow-y-auto p-3"
@@ -248,8 +296,8 @@ function Sidebar() {
                     focus:ring-blue-500
                     ${
                       isActive
-                        ? "bg-blue-50 font-semibold text-blue-700"
-                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                        ? "bg-blue-50 dark:bg-blue-950 font-semibold text-blue-700 dark:text-blue-300"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400"
                     }`}
                 >
                   <Icon size={21} className="shrink-0" />
@@ -276,9 +324,15 @@ function Sidebar() {
           })}
         </nav>
 
-        {/* SIDEBAR FOOTER */}
-        <div className="shrink-0 border-t border-gray-100 p-4">
-          <p className="text-center text-xs text-gray-400">
+        {/* =================================================
+            SIDEBAR FOOTER
+        ================================================= */}
+
+        <div
+          className="shrink-0 border-t border-gray-100
+            dark:border-gray-700 p-4"
+        >
+          <p className="text-center text-xs text-gray-400 dark:text-gray-500">
             Rental Management System
           </p>
         </div>
