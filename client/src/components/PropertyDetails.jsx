@@ -1,3 +1,4 @@
+
 import React, { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,7 +24,6 @@ const ROOM_STORAGE_KEY = "rentalManagementRooms";
 
 // =========================================================
 // DEFAULT PROPERTIES
-// Used when property storage has not been created yet.
 // =========================================================
 
 const DEFAULT_PROPERTIES = [
@@ -47,7 +47,6 @@ const DEFAULT_PROPERTIES = [
 
 // =========================================================
 // DEFAULT ROOMS
-// Saved room data overrides these defaults.
 // =========================================================
 
 const DEFAULT_ROOMS = {
@@ -116,7 +115,26 @@ function getSavedProperties() {
 
     const parsed = JSON.parse(stored);
 
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return DEFAULT_PROPERTIES;
+    }
+
+    return parsed
+      .filter(
+        (property) =>
+          property &&
+          typeof property === "object" &&
+          property.id !== undefined &&
+          property.id !== null &&
+          typeof property.name === "string"
+      )
+      .map((property) => ({
+        ...property,
+        name: property.name.trim() || "Unnamed Property",
+        location: String(property.location ?? ""),
+        address: String(property.address ?? ""),
+        status: property.status || "Active",
+      }));
   } catch (error) {
     console.error("Unable to load properties:", error);
     return DEFAULT_PROPERTIES;
@@ -131,17 +149,21 @@ function getSavedRooms() {
   try {
     const stored = localStorage.getItem(ROOM_STORAGE_KEY);
 
-    if (!stored) {
+    if (stored === null) {
       return {};
     }
 
     const parsed = JSON.parse(stored);
 
-    return parsed &&
-      typeof parsed === "object" &&
-      !Array.isArray(parsed)
-      ? parsed
-      : {};
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      Array.isArray(parsed)
+    ) {
+      return {};
+    }
+
+    return parsed;
   } catch (error) {
     console.error("Unable to load rooms:", error);
     return {};
@@ -149,26 +171,38 @@ function getSavedRooms() {
 }
 
 // =========================================================
+// VALIDATE ROOM RECORDS
+// =========================================================
+
+function isValidRoom(room) {
+  return (
+    room &&
+    typeof room === "object" &&
+    !Array.isArray(room) &&
+    room.id !== undefined &&
+    room.id !== null
+  );
+}
+
+// =========================================================
 // COMBINE DEFAULT AND SAVED ROOMS
+// Saved room data overrides defaults by object key.
 // =========================================================
 
 function getAllRooms() {
   const savedRooms = getSavedRooms();
 
-  return Object.values({
+  const combinedRooms = {
     ...DEFAULT_ROOMS,
     ...savedRooms,
-  }).filter(
-    (room) =>
-      room &&
-      room.id !== undefined &&
-      room.id !== null
-  );
+  };
+
+  return Object.values(combinedRooms).filter(isValidRoom);
 }
 
 // =========================================================
 // FIND PROPERTY FOR A ROOM
-// propertyId is preferred; property name is the fallback.
+// propertyId is preferred; property name is fallback.
 // =========================================================
 
 function belongsToProperty(room, property) {
@@ -196,7 +230,9 @@ function formatCurrency(value) {
   const amount =
     typeof value === "number"
       ? value
-      : Number(String(value ?? "").replace(/[₹,\s]/g, ""));
+      : Number(
+          String(value ?? "").replace(/[₹,\s]/g, "")
+        );
 
   if (
     value === "" ||
@@ -238,16 +274,16 @@ function getTenantName(tenant) {
 function getRoomStatusStyle(status) {
   switch (status) {
     case "Occupied":
-      return "bg-red-100 text-red-700";
+      return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
 
     case "Due":
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300";
 
     case "Available":
-      return "bg-green-100 text-green-700";
+      return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
 
     default:
-      return "bg-gray-100 text-gray-700";
+      return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
   }
 }
 
@@ -318,8 +354,7 @@ function PropertyDetails() {
       (room) => room.status === "Available"
     ).length;
 
-    // "Due" rooms are not available. They remain part
-    // of the occupied/non-available room count.
+    // Due rooms are included in occupied/non-available count.
     const occupiedRooms = rooms.filter(
       (room) =>
         room.status === "Occupied" ||
@@ -334,8 +369,9 @@ function PropertyDetails() {
               String(room.rent ?? "").replace(/[₹,\s]/g, "")
             );
 
-      return total + (
-        Number.isFinite(rent) && rent > 0 ? rent : 0
+      return (
+        total +
+        (Number.isFinite(rent) && rent > 0 ? rent : 0)
       );
     }, 0);
 
@@ -352,7 +388,6 @@ function PropertyDetails() {
   // -------------------------------------------------------
 
   const handleEditProperty = () => {
-    // Preserve the existing behavior.
     navigate("/properties");
   };
 
@@ -366,24 +401,24 @@ function PropertyDetails() {
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300">
         <Navbar />
 
         <main className="p-4 md:p-6 max-w-7xl mx-auto">
           <div className="min-h-[60vh] flex items-center justify-center">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center max-w-md w-full">
-              <div className="w-16 h-16 mx-auto bg-blue-50 rounded-full flex items-center justify-center mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center max-w-md w-full">
+              <div className="w-16 h-16 mx-auto bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-4">
                 <Building2
                   size={30}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                 Property Not Found
               </h2>
 
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
                 The property you are trying to view does not
                 exist or is no longer available.
               </p>
@@ -408,6 +443,7 @@ function PropertyDetails() {
   // -------------------------------------------------------
 
   const propertyName = property.name || "Unnamed Property";
+
   const propertyLocation =
     property.location || "Not specified";
 
@@ -423,23 +459,25 @@ function PropertyDetails() {
   // -------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300">
       <Navbar />
 
       <main className="p-4 md:p-6 max-w-7xl mx-auto">
         {/* PAGE HEADING */}
+
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
               Property Details
             </h1>
 
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               View and manage property information.
             </p>
           </div>
 
           {/* EDIT PROPERTY */}
+
           <button
             type="button"
             onClick={handleEditProperty}
@@ -451,23 +489,25 @@ function PropertyDetails() {
         </div>
 
         {/* PROPERTY HEADER */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 md:p-6 mb-6">
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 md:p-6 mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
             {/* PROPERTY INFORMATION */}
+
             <div className="flex items-start gap-4 min-w-0">
-              <div className="p-4 bg-blue-50 rounded-xl shrink-0">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl shrink-0">
                 <Building2
                   size={32}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
               <div className="min-w-0">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 break-words">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100 break-words">
                   {propertyName}
                 </h2>
 
-                <div className="flex items-center gap-2 text-gray-500 mt-2">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mt-2">
                   <MapPin
                     size={18}
                     className="shrink-0"
@@ -476,22 +516,23 @@ function PropertyDetails() {
                   <span>{propertyLocation}</span>
                 </div>
 
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   {propertyAddress}
                 </p>
 
-                <p className="text-xs text-gray-400 mt-2 break-all">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 break-all">
                   Property ID: {property.id}
                 </p>
               </div>
             </div>
 
             {/* PROPERTY STATUS */}
+
             <span
               className={`w-fit px-4 py-2 rounded-full text-sm font-medium ${
                 propertyStatus === "Active"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-600"
+                  ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                  : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
               }`}
             >
               {propertyStatus}
@@ -500,23 +541,25 @@ function PropertyDetails() {
         </div>
 
         {/* PROPERTY STATISTICS */}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           {/* FLOORS */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-purple-50 rounded-xl">
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
                 <Building2
                   size={24}
-                  className="text-purple-600"
+                  className="text-purple-600 dark:text-purple-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Floors
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {floors}
                 </h3>
               </div>
@@ -524,21 +567,22 @@ function PropertyDetails() {
           </div>
 
           {/* TOTAL ROOMS */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 rounded-xl">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                 <DoorOpen
                   size={24}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Rooms
                 </p>
 
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {statistics.totalRooms}
                 </h3>
               </div>
@@ -546,21 +590,22 @@ function PropertyDetails() {
           </div>
 
           {/* AVAILABLE ROOMS */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-50 rounded-xl">
+              <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-xl">
                 <DoorOpen
                   size={24}
-                  className="text-green-600"
+                  className="text-green-600 dark:text-green-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Available
                 </p>
 
-                <h3 className="text-2xl font-bold text-green-600">
+                <h3 className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {statistics.availableRooms}
                 </h3>
               </div>
@@ -568,21 +613,22 @@ function PropertyDetails() {
           </div>
 
           {/* OCCUPIED ROOMS */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-yellow-50 rounded-xl">
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/30 rounded-xl">
                 <Users
                   size={24}
-                  className="text-yellow-600"
+                  className="text-yellow-600 dark:text-yellow-400"
                 />
               </div>
 
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Occupied
                 </p>
 
-                <h3 className="text-2xl font-bold text-blue-600">
+                <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {statistics.occupiedRooms}
                 </h3>
               </div>
@@ -591,78 +637,84 @@ function PropertyDetails() {
         </div>
 
         {/* MONTHLY RENT */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-green-50 rounded-xl">
+            <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-xl">
               <IndianRupee
                 size={24}
-                className="text-green-600"
+                className="text-green-600 dark:text-green-400"
               />
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-gray-800">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Monthly Rent
               </h3>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Total monthly rent from rooms in this property.
               </p>
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-green-600">
+          <h2 className="text-3xl font-bold text-green-600 dark:text-green-400">
             {formatCurrency(statistics.monthlyRent)}
           </h2>
         </div>
 
         {/* ROOM LIST */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* SECTION HEADER */}
-          <div className="p-5 border-b border-gray-200">
-            <h3 className="text-lg font-bold text-gray-800">
+
+          <div className="p-5 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
               Rooms in this Property
             </h3>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               View rooms and their current occupancy status.
             </p>
           </div>
 
           {/* ROOM LIST */}
+
           {rooms.length > 0 ? (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
               {rooms.map((room) => (
                 <div
                   key={room.id}
-                  className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 hover:bg-gray-50 transition"
+                  className="p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/40 transition"
                 >
                   {/* ROOM */}
+
                   <div className="flex items-center gap-4 min-w-0">
-                    <div className="p-3 bg-blue-50 rounded-xl shrink-0">
+                    <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl shrink-0">
                       <DoorOpen
                         size={24}
-                        className="text-blue-600"
+                        className="text-blue-600 dark:text-blue-400"
                       />
                     </div>
 
                     <div className="min-w-0">
-                      <h4 className="font-bold text-gray-800">
+                      <h4 className="font-bold text-gray-800 dark:text-gray-100">
                         Room {room.roomNumber ?? "Not specified"}
                       </h4>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Floor {room.floor ?? "Not specified"}
                       </p>
 
-                      <p className="text-xs text-gray-400 mt-1 break-all">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 break-all">
                         Internal ID: {room.id}
                       </p>
                     </div>
                   </div>
 
                   {/* TENANT */}
-                  <div className="flex items-center gap-2 text-gray-600">
+
+                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                     <Users size={18} className="shrink-0" />
 
                     <span className="text-sm break-words">
@@ -671,22 +723,24 @@ function PropertyDetails() {
                   </div>
 
                   {/* RENT */}
+
                   <div className="flex items-center gap-2">
                     <IndianRupee
                       size={18}
-                      className="text-gray-500"
+                      className="text-gray-500 dark:text-gray-400"
                     />
 
-                    <span className="font-semibold text-gray-800">
+                    <span className="font-semibold text-gray-800 dark:text-gray-100">
                       {formatCurrency(room.rent)}
                     </span>
 
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
                       / month
                     </span>
                   </div>
 
                   {/* STATUS */}
+
                   <span
                     className={`w-fit px-3 py-1 rounded-full text-sm font-medium ${getRoomStatusStyle(
                       room.status
@@ -696,12 +750,13 @@ function PropertyDetails() {
                   </span>
 
                   {/* VIEW ROOM */}
+
                   <button
                     type="button"
                     onClick={() =>
                       navigate(`/room-details/${room.id}`)
                     }
-                    className="flex items-center justify-center gap-2 border border-gray-300 px-4 py-2 rounded-lg hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition"
+                    className="flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-300 dark:hover:border-blue-700 hover:text-blue-600 dark:hover:text-blue-400 transition"
                   >
                     <Eye size={18} />
                     <span>View Room</span>
@@ -711,18 +766,18 @@ function PropertyDetails() {
             </div>
           ) : (
             <div className="p-10 text-center">
-              <div className="w-14 h-14 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3">
+              <div className="w-14 h-14 mx-auto bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3">
                 <DoorOpen
                   size={26}
-                  className="text-gray-400"
+                  className="text-gray-400 dark:text-gray-500"
                 />
               </div>
 
-              <h4 className="font-semibold text-gray-800">
+              <h4 className="font-semibold text-gray-800 dark:text-gray-100">
                 No rooms available
               </h4>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 No room records are currently available for
                 this property.
               </p>
@@ -740,11 +795,12 @@ function PropertyDetails() {
         </div>
 
         {/* BACK BUTTON */}
+
         <div className="mt-6">
           <button
             type="button"
             onClick={handleBack}
-            className="flex items-center gap-2 border border-gray-300 bg-white px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
+            className="flex items-center gap-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-5 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
           >
             <ArrowLeft size={18} />
             Back to Properties
