@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -45,16 +46,16 @@ function RoomCard({ room }) {
   const getStatusStyle = () => {
     switch (room.status) {
       case "Occupied":
-        return "bg-red-100 text-red-700";
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
 
       case "Due":
-        return "bg-amber-100 text-amber-700";
+        return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300";
 
       case "Available":
-        return "bg-green-100 text-green-700";
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
 
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
     }
   };
 
@@ -72,28 +73,32 @@ function RoomCard({ room }) {
   const internalId = room.id ?? "Not available";
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 hover:shadow-md transition-shadow duration-200">
+
       {/* ROOM HEADER */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="p-3 bg-blue-50 rounded-xl shrink-0">
-            <DoorOpen size={24} className="text-blue-600" />
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl shrink-0">
+            <DoorOpen
+              size={24}
+              className="text-blue-600 dark:text-blue-400"
+            />
           </div>
 
           <div className="min-w-0">
-            <h3 className="text-lg font-bold text-gray-800 truncate">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">
               Room {roomNumber}
             </h3>
 
             <div className="mt-1 space-y-1">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Room Number:{" "}
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 dark:text-gray-200">
                   {roomNumber}
                 </span>
               </p>
 
-              <p className="text-xs text-gray-400 break-all">
+              <p className="text-xs text-gray-400 dark:text-gray-500 break-all">
                 Internal ID: {internalId}
               </p>
             </div>
@@ -110,39 +115,55 @@ function RoomCard({ room }) {
 
       {/* ROOM INFORMATION */}
       <div className="mt-5 space-y-3">
+
         {/* PROPERTY */}
-        <div className="flex items-center gap-3 text-gray-600 min-w-0">
-          <Building2 size={18} className="shrink-0 text-gray-500" />
+        <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300 min-w-0">
+          <Building2
+            size={18}
+            className="shrink-0 text-gray-500 dark:text-gray-400"
+          />
+
           <span className="text-sm truncate">
             {room.property || "Property not specified"}
           </span>
         </div>
 
         {/* FLOOR */}
-        <div className="flex items-center gap-3 text-gray-600">
-          <Layers size={18} className="shrink-0 text-gray-500" />
+        <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+          <Layers
+            size={18}
+            className="shrink-0 text-gray-500 dark:text-gray-400"
+          />
+
           <span className="text-sm">
             Floor {room.floor ?? "Not specified"}
           </span>
         </div>
 
         {/* MONTHLY RENT */}
-        <div className="flex items-center gap-3 text-gray-600">
-          <IndianRupee size={18} className="shrink-0 text-gray-500" />
+        <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+          <IndianRupee
+            size={18}
+            className="shrink-0 text-gray-500 dark:text-gray-400"
+          />
+
           <span className="text-sm font-medium">
             {formatRent(room.rent)}
           </span>
-          <span className="text-xs text-gray-400">/ month</span>
+
+          <span className="text-xs text-gray-400 dark:text-gray-500">
+            / month
+          </span>
         </div>
 
         {/* TENANT */}
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           Tenant:{" "}
           <span
             className={`font-medium ${
               tenantName === "No tenant assigned"
-                ? "text-gray-400"
-                : "text-gray-700"
+                ? "text-gray-400 dark:text-gray-500"
+                : "text-gray-700 dark:text-gray-200"
             }`}
           >
             {tenantName}
@@ -151,16 +172,19 @@ function RoomCard({ room }) {
       </div>
 
       {/* ACTION BUTTONS */}
-      <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
+      <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-3">
+
+        {/* VIEW BUTTON */}
         <button
           type="button"
           onClick={handleView}
-          className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
+          className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition"
         >
           <Eye size={17} />
           <span>View</span>
         </button>
 
+        {/* EDIT BUTTON */}
         <button
           type="button"
           onClick={handleEdit}
