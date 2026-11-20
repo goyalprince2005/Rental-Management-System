@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Link,
@@ -190,26 +191,26 @@ function OwnerResetPassword() {
   // =========================================================
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100">
+    <div className="flex min-h-screen flex-col bg-gray-100 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
       <main className="flex flex-1 items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+        <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-900 border border-transparent dark:border-gray-700 p-8 shadow-lg transition-colors duration-300">
 
           {/* HEADING */}
 
-          <h1 className="text-center text-3xl font-bold text-gray-800">
+          <h1 className="text-center text-3xl font-bold text-gray-800 dark:text-gray-100">
             Owner Reset Password
           </h1>
 
-          <p className="mb-6 mt-2 text-center text-gray-500">
+          <p className="mb-6 mt-2 text-center text-gray-500 dark:text-gray-400">
             Create a new password for your owner account.
           </p>
 
           {/* MOBILE NUMBER */}
 
           {mobileNumber && (
-            <p className="mb-5 text-center text-sm text-gray-500">
+            <p className="mb-5 text-center text-sm text-gray-500 dark:text-gray-400">
               Resetting password for{" "}
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-gray-700 dark:text-gray-200">
                 {mobileNumber}
               </span>
             </p>
@@ -227,7 +228,7 @@ function OwnerResetPassword() {
             <div>
               <label
                 htmlFor="owner-new-password"
-                className="mb-2 block font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700 dark:text-gray-200"
               >
                 New Password
               </label>
@@ -249,11 +250,11 @@ function OwnerResetPassword() {
                       ? "owner-password-error"
                       : undefined
                   }
-                  className={`w-full rounded-lg border px-4 py-2.5 pr-12
+                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12
                     focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       passwordError
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-gray-300 dark:border-gray-600"
                     }`}
                 />
 
@@ -268,7 +269,7 @@ function OwnerResetPassword() {
                       : "Show new password"
                   }
                   className="absolute right-3 top-1/2 -translate-y-1/2
-                    text-gray-500 hover:text-blue-600"
+                    text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   {showNewPassword ? (
                     <EyeOff size={20} />
@@ -282,13 +283,13 @@ function OwnerResetPassword() {
                 <p
                   id="owner-password-error"
                   role="alert"
-                  className="mt-2 text-sm text-red-500"
+                  className="mt-2 text-sm text-red-500 dark:text-red-400"
                 >
                   {passwordError}
                 </p>
               )}
 
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                 Use at least 8 characters with uppercase,
                 lowercase, a number, and a special character.
               </p>
@@ -299,7 +300,7 @@ function OwnerResetPassword() {
             <div>
               <label
                 htmlFor="owner-confirm-password"
-                className="mb-2 block font-medium text-gray-700"
+                className="mb-2 block font-medium text-gray-700 dark:text-gray-200"
               >
                 Confirm Password
               </label>
@@ -323,11 +324,11 @@ function OwnerResetPassword() {
                       ? "owner-confirm-password-error"
                       : undefined
                   }
-                  className={`w-full rounded-lg border px-4 py-2.5 pr-12
+                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12
                     focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                       confirmPasswordError
                         ? "border-red-500"
-                        : "border-gray-300"
+                        : "border-gray-300 dark:border-gray-600"
                     }`}
                 />
 
@@ -344,7 +345,7 @@ function OwnerResetPassword() {
                       : "Show confirmation password"
                   }
                   className="absolute right-3 top-1/2 -translate-y-1/2
-                    text-gray-500 hover:text-blue-600"
+                    text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={20} />
@@ -358,7 +359,7 @@ function OwnerResetPassword() {
                 <p
                   id="owner-confirm-password-error"
                   role="alert"
-                  className="mt-2 text-sm text-red-500"
+                  className="mt-2 text-sm text-red-500 dark:text-red-400"
                 >
                   {confirmPasswordError}
                 </p>
@@ -385,7 +386,7 @@ function OwnerResetPassword() {
           <div className="mt-6 text-center">
             <Link
               to={backUrl}
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
             >
               ← Back to Owner Forgot Password
             </Link>
