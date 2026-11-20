@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -102,12 +103,8 @@ function getSavedRooms() {
 
 function getSavedProperties() {
   try {
-    const stored = localStorage.getItem(
-      PROPERTY_STORAGE_KEY
-    );
+    const stored = localStorage.getItem(PROPERTY_STORAGE_KEY);
 
-    // Use the original properties if the storage key
-    // has not been created yet.
     if (stored === null) {
       return [
         {
@@ -138,8 +135,6 @@ function getSavedProperties() {
 
 // =========================================================
 // FIND PROPERTY FOR A ROOM
-// Match property ID first, then use property name
-// for older rooms that don't contain propertyId.
 // =========================================================
 
 function findPropertyForRoom(room, properties) {
@@ -158,9 +153,7 @@ function findPropertyForRoom(room, properties) {
     }
   }
 
-  const roomPropertyName = String(
-    room.property ?? ""
-  )
+  const roomPropertyName = String(room.property ?? "")
     .trim()
     .toLowerCase();
 
@@ -180,7 +173,6 @@ function findPropertyForRoom(room, properties) {
 
 // =========================================================
 // GET ROOM BY INTERNAL ID
-// Supports default and dynamically added rooms.
 // =========================================================
 
 function getRoomById(id) {
@@ -192,7 +184,6 @@ function getRoomById(id) {
     return null;
   }
 
-  // Saved room values take priority over defaults.
   const room = {
     ...(defaultRoom || {}),
     ...(savedRoom || {}),
@@ -242,16 +233,16 @@ function formatCurrency(value) {
 function getStatusStyle(status) {
   switch (status) {
     case "Occupied":
-      return "bg-red-100 text-red-700";
+      return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
 
     case "Due":
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
 
     case "Available":
-      return "bg-green-100 text-green-700";
+      return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
 
     default:
-      return "bg-gray-100 text-gray-700";
+      return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
   }
 }
 
@@ -271,23 +262,23 @@ function RoomDetails() {
 
   if (!room) {
     return (
-      <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-300">
         <Navbar />
 
         <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="mx-auto w-fit p-4 bg-gray-100 rounded-full">
+          <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="mx-auto w-fit p-4 bg-gray-100 dark:bg-gray-700 rounded-full">
               <DoorOpen
                 size={32}
-                className="text-gray-500"
+                className="text-gray-500 dark:text-gray-300"
               />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-800 mt-5">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-5">
               Room Not Found
             </h2>
 
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
               The room with internal ID {id} could not be found.
             </p>
 
@@ -322,64 +313,66 @@ function RoomDetails() {
 
   const statusBackground =
     room.status === "Occupied"
-      ? "bg-red-50"
+      ? "bg-red-50 dark:bg-red-900/20"
       : room.status === "Due"
-      ? "bg-yellow-50"
+      ? "bg-yellow-50 dark:bg-yellow-900/20"
       : room.status === "Available"
-      ? "bg-green-50"
-      : "bg-gray-50";
+      ? "bg-green-50 dark:bg-green-900/20"
+      : "bg-gray-50 dark:bg-gray-700";
 
   const statusText =
     room.status === "Occupied"
-      ? "text-red-600"
+      ? "text-red-600 dark:text-red-300"
       : room.status === "Due"
-      ? "text-yellow-600"
+      ? "text-yellow-600 dark:text-yellow-300"
       : room.status === "Available"
-      ? "text-green-600"
-      : "text-gray-600";
+      ? "text-green-600 dark:text-green-300"
+      : "text-gray-600 dark:text-gray-300";
 
   // =======================================================
   // MAIN UI
   // =======================================================
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-300">
       <Navbar />
 
       <main className="p-4 md:p-6 max-w-5xl mx-auto">
+
         {/* PAGE HEADING */}
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
             Room Details
           </h1>
 
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             View complete information about this room.
           </p>
         </div>
 
         {/* ROOM DETAILS CARD */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+
           {/* ROOM HEADER */}
-          <div className="p-5 md:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div className="p-5 md:p-6 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
             <div className="flex items-center gap-4 min-w-0">
-              <div className="p-4 bg-blue-50 rounded-xl shrink-0">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl shrink-0">
                 <DoorOpen
                   size={32}
-                  className="text-blue-600"
+                  className="text-blue-600 dark:text-blue-400"
                 />
               </div>
 
               <div className="min-w-0">
-                <h3 className="text-2xl font-bold text-gray-800">
+                <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   Room {roomNumber}
                 </h3>
 
-                <p className="text-xs text-gray-400 mt-1 break-all">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 break-all">
                   Internal Room ID: {internalRoomId}
                 </p>
 
-                <div className="flex items-center gap-2 text-gray-500 mt-2">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mt-2">
                   <Building2 size={16} className="shrink-0" />
 
                   <span className="truncate">
@@ -387,7 +380,7 @@ function RoomDetails() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-gray-500 mt-1">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mt-1">
                   <MapPin size={16} className="shrink-0" />
 
                   <span>
@@ -408,50 +401,51 @@ function RoomDetails() {
 
           {/* ROOM INFORMATION */}
           <div className="p-5 md:p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
               Room Information
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
               {/* FLOOR */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-700/60 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Layers size={18} />
                   <p className="text-sm">Floor</p>
                 </div>
 
-                <p className="text-2xl font-bold text-gray-800 mt-2">
+                <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-2">
                   {room.floor ?? "Not specified"}
                 </p>
               </div>
 
               {/* MONTHLY RENT */}
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="bg-gray-50 dark:bg-gray-700/60 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <IndianRupee size={18} />
                   <p className="text-sm">Monthly Rent</p>
                 </div>
 
-                <p className="text-2xl font-bold text-gray-800 mt-2">
+                <p className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-2">
                   {formatCurrency(room.rent)}
                 </p>
               </div>
 
               {/* TENANT */}
-              <div className="bg-blue-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-blue-600">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                   <User size={18} />
                   <p className="text-sm">Tenant</p>
                 </div>
 
-                <p className="text-xl font-bold text-blue-600 mt-2 break-words">
+                <p className="text-xl font-bold text-blue-600 dark:text-blue-400 mt-2 break-words">
                   {tenantName}
                 </p>
               </div>
 
               {/* CURRENT STATUS */}
               <div className={`rounded-xl p-4 ${statusBackground}`}>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Current Status
                 </p>
 
@@ -463,25 +457,25 @@ function RoomDetails() {
 
             {/* PROPERTY INFORMATION */}
             <div className="mt-8">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
                 Property Information
               </h3>
 
-              <div className="border border-gray-200 rounded-xl p-5">
+              <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-5">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-3 bg-blue-50 rounded-lg shrink-0">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg shrink-0">
                     <Building2
                       size={24}
-                      className="text-blue-600"
+                      className="text-blue-600 dark:text-blue-400"
                     />
                   </div>
 
                   <div className="min-w-0">
-                    <h4 className="font-bold text-lg text-gray-800 truncate">
+                    <h4 className="font-bold text-lg text-gray-800 dark:text-gray-100 truncate">
                       {room.property || "Not specified"}
                     </h4>
 
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <MapPin size={15} />
 
                       <span>
@@ -492,7 +486,7 @@ function RoomDetails() {
                     {room.propertyId !== null &&
                       room.propertyId !== undefined &&
                       room.propertyId !== "" && (
-                        <p className="text-xs text-gray-400 mt-2 break-all">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 break-all">
                           Property ID: {room.propertyId}
                         </p>
                       )}
@@ -506,7 +500,7 @@ function RoomDetails() {
               <button
                 type="button"
                 onClick={() => navigate("/rooms")}
-                className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition"
+                className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-5 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition"
               >
                 <ArrowLeft size={18} />
                 Back to Rooms
