@@ -1,5 +1,6 @@
 
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   MessageSquare,
@@ -14,6 +15,7 @@ import {
   CalendarDays,
   X,
   RefreshCw,
+  ArrowLeft,
 } from "lucide-react";
 
 // =========================================================
@@ -95,6 +97,8 @@ const getStatusStyle = (status) => {
 // =========================================================
 
 function OwnerComplaints() {
+  const navigate = useNavigate();
+
   const [complaints, setComplaints] = useState(
     getStoredComplaints
   );
@@ -314,9 +318,9 @@ function OwnerComplaints() {
     </div>
   );
 
-  // =======================================================
+  // =========================================================
   // RENDER
-  // =======================================================
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 sm:p-6 lg:p-8 transition-colors">
@@ -325,14 +329,30 @@ function OwnerComplaints() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
 
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-            Complaints Management
-          </h1>
+        <div className="flex items-start gap-3">
 
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            Manage tenant complaints and respond to their concerns.
-          </p>
+          {/* BACK BUTTON */}
+
+          <button
+            type="button"
+onClick={() => navigate("/owner-dashboard")}
+            aria-label="Go back"
+            title="Go back"
+            className="mt-1 inline-flex items-center justify-center w-10 h-10 shrink-0 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <ArrowLeft size={20} />
+          </button>
+
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+              Complaints Management
+            </h1>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Manage tenant complaints and respond to their concerns.
+            </p>
+          </div>
+
         </div>
 
         <button
