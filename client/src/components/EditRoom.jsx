@@ -89,9 +89,7 @@ const readSavedRooms = () => {
 
 const readSavedProperties = () => {
   try {
-    const stored = localStorage.getItem(
-      PROPERTY_STORAGE_KEY
-    );
+    const stored = localStorage.getItem(PROPERTY_STORAGE_KEY);
 
     if (stored === null) {
       return [
@@ -116,11 +114,7 @@ const readSavedProperties = () => {
 
     return Array.isArray(parsed) ? parsed : [];
   } catch (error) {
-    console.error(
-      "Unable to read saved properties:",
-      error
-    );
-
+    console.error("Unable to read saved properties:", error);
     return [];
   }
 };
@@ -217,6 +211,22 @@ const normalizeRoomForForm = (room, id) => ({
 });
 
 // =========================================================
+// EMPTY ROOM DATA
+// =========================================================
+
+const createEmptyRoom = (id) => ({
+  id: Number(id),
+  roomNumber: "",
+  property: "",
+  propertyId: "",
+  location: "",
+  floor: "",
+  rent: "",
+  tenant: "",
+  status: "Available",
+});
+
+// =========================================================
 // EDIT ROOM COMPONENT
 // =========================================================
 
@@ -229,17 +239,7 @@ function EditRoom() {
 
     return room
       ? normalizeRoomForForm(room, id)
-      : {
-          id: Number(id),
-          roomNumber: "",
-          property: "",
-          propertyId: "",
-          location: "",
-          floor: "",
-          rent: "",
-          tenant: "",
-          status: "Available",
-        };
+      : createEmptyRoom(id);
   });
 
   const [error, setError] = useState("");
@@ -258,18 +258,7 @@ function EditRoom() {
     setIsSaving(false);
 
     if (!room) {
-      setRoomData({
-        id: Number(id),
-        roomNumber: "",
-        property: "",
-        propertyId: "",
-        location: "",
-        floor: "",
-        rent: "",
-        tenant: "",
-        status: "Available",
-      });
-
+      setRoomData(createEmptyRoom(id));
       return;
     }
 
@@ -478,6 +467,7 @@ function EditRoom() {
         }
 
         const savedVersion = savedRooms[String(defaultId)];
+
         const otherRoom = {
           ...defaultRoom,
           ...(savedVersion || {}),
@@ -626,21 +616,21 @@ function EditRoom() {
 
   if (!roomExists) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
         <Navbar />
 
         <main className="p-4 md:p-6 max-w-3xl mx-auto">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 text-center">
             <AlertCircle
               size={42}
               className="mx-auto text-red-500 mb-4"
             />
 
-            <h1 className="text-xl font-bold text-gray-800">
+            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               Room Not Found
             </h1>
 
-            <p className="text-gray-500 mt-2">
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
               The room with ID {id} does not exist.
             </p>
 
@@ -663,43 +653,51 @@ function EditRoom() {
   // =========================================================
 
   return (
-    <div className="h-screen bg-gray-100 overflow-hidden">
+    <div className="h-screen bg-gray-100 dark:bg-gray-950 overflow-hidden">
       <Navbar />
 
       <div className="h-[calc(100vh-64px)] overflow-y-auto overflow-x-hidden">
         <main className="p-4 md:p-6 max-w-3xl mx-auto">
+
           {/* PAGE HEADING */}
+
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
               Edit Room {id}
             </h1>
 
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               Update the information of this room.
             </p>
           </div>
 
           {/* FORM CARD */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+
             {/* CARD HEADER */}
-            <div className="p-5 border-b border-gray-200">
-              <h2 className="text-lg font-bold text-gray-800">
+
+            <div className="p-5 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Room Information
               </h2>
 
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Update room details and tenant information.
               </p>
             </div>
 
             {/* FORM */}
+
             <form
               onSubmit={handleSave}
               className="p-5 space-y-5"
             >
+
               {/* ERROR MESSAGE */}
+
               {error && (
-                <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-lg p-4">
+                <div className="flex items-start gap-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 rounded-lg p-4">
                   <AlertCircle
                     size={20}
                     className="mt-0.5 flex-shrink-0"
@@ -712,8 +710,9 @@ function EditRoom() {
               )}
 
               {/* SUCCESS MESSAGE */}
+
               {success && (
-                <div className="flex items-start gap-3 bg-green-50 border border-green-200 text-green-700 rounded-lg p-4">
+                <div className="flex items-start gap-3 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900 text-green-700 dark:text-green-300 rounded-lg p-4">
                   <CheckCircle2
                     size={20}
                     className="mt-0.5 flex-shrink-0"
@@ -726,10 +725,11 @@ function EditRoom() {
               )}
 
               {/* ROOM NUMBER */}
+
               <div>
                 <label
                   htmlFor="roomNumber"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Room Number
                 </label>
@@ -743,15 +743,16 @@ function EditRoom() {
                   placeholder="Enter room number"
                   required
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
               </div>
 
               {/* PROPERTY */}
+
               <div>
                 <label
                   htmlFor="property"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Property
                 </label>
@@ -765,15 +766,16 @@ function EditRoom() {
                   placeholder="Enter property name"
                   required
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
               </div>
 
               {/* LOCATION */}
+
               <div>
                 <label
                   htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Location
                 </label>
@@ -787,15 +789,16 @@ function EditRoom() {
                   placeholder="Enter location"
                   required
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
               </div>
 
               {/* FLOOR */}
+
               <div>
                 <label
                   htmlFor="floor"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Floor
                 </label>
@@ -811,15 +814,16 @@ function EditRoom() {
                   step="1"
                   required
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
               </div>
 
               {/* MONTHLY RENT */}
+
               <div>
                 <label
                   htmlFor="rent"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Monthly Rent (₹)
                 </label>
@@ -836,15 +840,16 @@ function EditRoom() {
                   inputMode="numeric"
                   required
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
               </div>
 
               {/* TENANT */}
+
               <div>
                 <label
                   htmlFor="tenant"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Tenant
                 </label>
@@ -857,19 +862,20 @@ function EditRoom() {
                   onChange={handleChange}
                   placeholder="Enter tenant name"
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 />
 
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Required when the room status is Occupied.
                 </p>
               </div>
 
               {/* STATUS */}
+
               <div>
                 <label
                   htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Status
                 </label>
@@ -880,7 +886,7 @@ function EditRoom() {
                   value={roomData.status}
                   onChange={handleChange}
                   disabled={isSaving}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                  className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-gray-900"
                 >
                   <option value="Occupied">Occupied</option>
                   <option value="Available">Available</option>
@@ -889,12 +895,13 @@ function EditRoom() {
               </div>
 
               {/* ACTION BUTTONS */}
+
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={handleCancel}
                   disabled={isSaving}
-                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-5 py-3 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-5 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50"
                 >
                   <ArrowLeft size={18} />
                   Cancel
