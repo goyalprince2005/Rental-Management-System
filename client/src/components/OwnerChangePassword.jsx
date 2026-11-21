@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -34,14 +35,9 @@ function OwnerChangePassword() {
   // PASSWORD VISIBILITY
   // =========================================================
 
-  const [showCurrentPassword, setShowCurrentPassword] =
-    useState(false);
-
-  const [showNewPassword, setShowNewPassword] =
-    useState(false);
-
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // =========================================================
   // ERROR / SUCCESS STATE
@@ -161,8 +157,6 @@ function OwnerChangePassword() {
       return null;
     }
 
-    // Prefer the mobile number stored in the active session.
-    // Keep the fallback for the existing mock-account setup.
     return ownerMobile || DEFAULT_OWNER_MOBILE;
   };
 
@@ -179,9 +173,7 @@ function OwnerChangePassword() {
 
     clearMessages();
 
-    // ---------------------------------------------------------
     // OWNER SESSION CHECK
-    // ---------------------------------------------------------
 
     let ownerMobile;
 
@@ -205,9 +197,7 @@ function OwnerChangePassword() {
       return;
     }
 
-    // ---------------------------------------------------------
     // REQUIRED FIELD CHECKS
-    // ---------------------------------------------------------
 
     if (!currentPassword) {
       setErrors((prev) => ({
@@ -235,12 +225,9 @@ function OwnerChangePassword() {
       return;
     }
 
-    // ---------------------------------------------------------
     // NEW PASSWORD VALIDATION
-    // ---------------------------------------------------------
 
-    const passwordValidationErrors =
-      validatePassword(newPassword);
+    const passwordValidationErrors = validatePassword(newPassword);
 
     if (passwordValidationErrors.length > 0) {
       setErrors((prev) => ({
@@ -250,9 +237,7 @@ function OwnerChangePassword() {
       return;
     }
 
-    // ---------------------------------------------------------
     // CONFIRM PASSWORD CHECK
-    // ---------------------------------------------------------
 
     if (newPassword !== confirmPassword) {
       setErrors((prev) => ({
@@ -262,9 +247,7 @@ function OwnerChangePassword() {
       return;
     }
 
-    // ---------------------------------------------------------
     // SAME PASSWORD CHECK
-    // ---------------------------------------------------------
 
     if (currentPassword === newPassword) {
       setErrors((prev) => ({
@@ -276,9 +259,7 @@ function OwnerChangePassword() {
       return;
     }
 
-    // ---------------------------------------------------------
     // VERIFY CURRENT PASSWORD AND SAVE
-    // ---------------------------------------------------------
 
     setIsSubmitting(true);
 
@@ -286,8 +267,6 @@ function OwnerChangePassword() {
       const passwordKey = `ownerPassword_${ownerMobile}`;
       const storedPassword = localStorage.getItem(passwordKey);
 
-      // Use the default password only when no password has
-      // previously been saved for this mock account.
       const currentStoredPassword =
         storedPassword === null
           ? DEFAULT_OWNER_PASSWORD
@@ -317,12 +296,8 @@ function OwnerChangePassword() {
       setShowNewPassword(false);
       setShowConfirmPassword(false);
 
-      // -------------------------------------------------------
       // LOG OUT AFTER PASSWORD CHANGE
-      // -------------------------------------------------------
 
-      // Use a short delay so the success message is visible.
-      // The redirect occurs after the user sees the confirmation.
       setTimeout(() => {
         try {
           localStorage.removeItem("ownerId");
@@ -370,7 +345,7 @@ function OwnerChangePassword() {
       <div>
         <label
           htmlFor={inputId}
-          className="block mb-2 font-medium text-gray-700"
+          className="block mb-2 font-medium text-gray-700 dark:text-gray-300"
         >
           {label}
         </label>
@@ -379,7 +354,7 @@ function OwnerChangePassword() {
           <Lock
             size={18}
             aria-hidden="true"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
           />
 
           <input
@@ -395,11 +370,13 @@ function OwnerChangePassword() {
                 handleConfirmPasswordChange(inputValue);
               } else {
                 setValue(inputValue);
+
                 setErrors((prev) => ({
                   ...prev,
                   currentPassword: "",
                   general: "",
                 }));
+
                 setSuccessMessage("");
               }
             }}
@@ -408,15 +385,17 @@ function OwnerChangePassword() {
             required
             aria-invalid={hasError}
             aria-describedby={hasError ? `${inputId}-error` : undefined}
-            className={`w-full border rounded-lg pl-10 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              hasError ? "border-red-500" : "border-gray-300"
+            className={`w-full border rounded-lg pl-10 pr-12 py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300 ${
+              hasError
+                ? "border-red-500"
+                : "border-gray-300 dark:border-gray-700"
             }`}
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             aria-label={
               showPassword ? `Hide ${label}` : `Show ${label}`
             }
@@ -439,7 +418,10 @@ function OwnerChangePassword() {
               role="alert"
             >
               {error.map((message, index) => (
-                <p key={`${inputId}-${index}`} className="text-red-500 text-sm">
+                <p
+                  key={`${inputId}-${index}`}
+                  className="text-red-500 dark:text-red-400 text-sm"
+                >
                   {message}
                 </p>
               ))}
@@ -449,7 +431,7 @@ function OwnerChangePassword() {
           error && (
             <p
               id={`${inputId}-error`}
-              className="text-red-500 text-sm mt-2"
+              className="text-red-500 dark:text-red-400 text-sm mt-2"
               role="alert"
             >
               {error}
@@ -465,7 +447,8 @@ function OwnerChangePassword() {
   // =========================================================
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
+
       {/* NAVBAR */}
 
       <Navbar />
@@ -474,29 +457,30 @@ function OwnerChangePassword() {
 
       <main className="flex justify-center px-4 py-8">
         <div className="w-full max-w-lg">
+
           {/* PAGE HEADER */}
 
           <div className="mb-6">
             <button
               type="button"
               onClick={() => navigate("/owner-dashboard")}
-              className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 mb-4 transition-colors"
             >
               <ArrowLeft size={18} />
               <span>Back to Dashboard</span>
             </button>
 
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-50 rounded-xl">
-                <Lock size={26} className="text-blue-600" />
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-xl">
+                <Lock size={26} className="text-blue-600 dark:text-blue-400" />
               </div>
 
               <div>
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                   Change Password
                 </h1>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Update your owner account password.
                 </p>
               </div>
@@ -505,21 +489,22 @@ function OwnerChangePassword() {
 
           {/* PASSWORD CARD */}
 
-          <div className="bg-white rounded-xl shadow-sm border p-6">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 transition-colors duration-300">
+
             {/* SUCCESS MESSAGE */}
 
             {successMessage && (
               <div
-                className="mb-5 flex items-start gap-3 bg-green-50 border border-green-200 rounded-lg p-4"
+                className="mb-5 flex items-start gap-3 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900 rounded-lg p-4"
                 role="status"
                 aria-live="polite"
               >
                 <CheckCircle
                   size={20}
-                  className="text-green-600 mt-0.5 shrink-0"
+                  className="text-green-600 dark:text-green-400 mt-0.5 shrink-0"
                 />
 
-                <p className="text-sm text-green-700">
+                <p className="text-sm text-green-700 dark:text-green-300">
                   {successMessage}
                 </p>
               </div>
@@ -529,15 +514,15 @@ function OwnerChangePassword() {
 
             {errors.general && (
               <div
-                className="mb-5 flex items-start gap-3 bg-red-50 border border-red-200 rounded-lg p-4"
+                className="mb-5 flex items-start gap-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-lg p-4"
                 role="alert"
               >
                 <AlertCircle
                   size={20}
-                  className="text-red-600 mt-0.5 shrink-0"
+                  className="text-red-600 dark:text-red-400 mt-0.5 shrink-0"
                 />
 
-                <p className="text-sm text-red-700">
+                <p className="text-sm text-red-700 dark:text-red-300">
                   {errors.general}
                 </p>
               </div>
@@ -550,6 +535,7 @@ function OwnerChangePassword() {
               className="space-y-5"
               noValidate
             >
+
               {/* CURRENT PASSWORD */}
 
               {renderPasswordInput({
@@ -608,7 +594,7 @@ function OwnerChangePassword() {
                   type="button"
                   onClick={() => navigate("/owner-dashboard")}
                   disabled={isSubmitting}
-                  className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
