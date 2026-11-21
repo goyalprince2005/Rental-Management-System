@@ -1,4 +1,4 @@
-
+\
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -7,7 +7,7 @@ import { useOwnerTheme } from "../context/OwnerThemeContext";
 
 function OwnerLogin() {
   const navigate = useNavigate();
-  const { isDarkMode } = useOwnerTheme();
+  const { theme, isDarkMode } = useOwnerTheme();
 
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
@@ -32,18 +32,14 @@ function OwnerLogin() {
     // BASIC VALIDATION
 
     if (!enteredMobile || !enteredPassword) {
-      alert(
-        "Please enter your mobile number and password."
-      );
+      alert("Please enter your mobile number and password.");
       return;
     }
 
     // MOBILE VALIDATION
 
     if (!/^\d{10}$/.test(enteredMobile)) {
-      alert(
-        "Mobile number must contain exactly 10 digits."
-      );
+      alert("Mobile number must contain exactly 10 digits.");
       return;
     }
 
@@ -95,6 +91,7 @@ function OwnerLogin() {
           ? "dark bg-gray-950 text-gray-100"
           : "bg-gray-100 text-gray-900"
       }`}
+      data-theme={theme}
     >
 
       {/* LOGIN CONTENT */}
@@ -195,16 +192,12 @@ function OwnerLogin() {
 
           <div className="flex justify-between mt-6">
 
-            {/* BACK TO HOME */}
-
             <Link
               to="/"
               className="text-blue-600 dark:text-blue-400 hover:underline"
             >
               ← Back to Home
             </Link>
-
-            {/* FORGOT PASSWORD */}
 
             <Link
               to="/owner-forgot-password"
