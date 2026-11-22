@@ -86,13 +86,17 @@ function App() {
   return (
     <Routes>
 
+      {/* ================================================= */}
       {/* GENERAL */}
+      {/* ================================================= */}
 
       <Route path="/" element={<Home />} />
 
+      {/* ================================================= */}
       {/* AUTHENTICATION */}
+      {/* ================================================= */}
 
-      {/* OWNER LOGIN - OWNER THEME PROVIDER ADDED */}
+      {/* OWNER LOGIN */}
 
       <Route
         path="/owner-login"
@@ -103,17 +107,41 @@ function App() {
         }
       />
 
-      <Route path="/tenant-login" element={<TenantLogin />} />
+      {/* TENANT LOGIN */}
 
-      <Route path="/forgot-password" element={<TenantForgotPassword />} />
+      <Route
+        path="/tenant-login"
+        element={
+          <TenantLayout>
+            <TenantLogin />
+          </TenantLayout>
+        }
+      />
 
-      <Route path="/owner-forgot-password" element={<OwnerForgotPassword />} />
+      <Route
+        path="/forgot-password"
+        element={<TenantForgotPassword />}
+      />
 
-      <Route path="/otp-verification" element={<OTPVerification />} />
+      <Route
+        path="/owner-forgot-password"
+        element={<OwnerForgotPassword />}
+      />
 
-      <Route path="/tenant-reset-password" element={<TenantResetPassword />} />
+      <Route
+        path="/otp-verification"
+        element={<OTPVerification />}
+      />
 
-      <Route path="/owner-reset-password" element={<OwnerResetPassword />} />
+      <Route
+        path="/tenant-reset-password"
+        element={<TenantResetPassword />}
+      />
+
+      <Route
+        path="/owner-reset-password"
+        element={<OwnerResetPassword />}
+      />
 
       {/* ================================================= */}
       {/* OWNER PORTAL */}
@@ -121,37 +149,87 @@ function App() {
 
       <Route element={<OwnerPortalLayout />}>
 
-        <Route path="/owner-dashboard" element={<Dashboard />} />
+        <Route
+          path="/owner-dashboard"
+          element={<Dashboard />}
+        />
 
-        <Route path="/properties" element={<Properties />} />
+        <Route
+          path="/properties"
+          element={<Properties />}
+        />
 
-        <Route path="/property-details/:id" element={<PropertyDetails />} />
+        <Route
+          path="/property-details/:id"
+          element={<PropertyDetails />}
+        />
 
-        <Route path="/rooms" element={<Rooms />} />
+        <Route
+          path="/rooms"
+          element={<Rooms />}
+        />
 
-        <Route path="/room-details/:id" element={<RoomDetails />} />
+        <Route
+          path="/room-details/:id"
+          element={<RoomDetails />}
+        />
 
-        <Route path="/edit-room/:id" element={<EditRoom />} />
+        <Route
+          path="/edit-room/:id"
+          element={<EditRoom />}
+        />
 
-        <Route path="/tenants" element={<Tenants />} />
+        {/* TENANT MANAGEMENT */}
 
-        <Route path="/tenant-details/:id" element={<TenantDetails />} />
+        <Route
+          path="/tenants"
+          element={<Tenants />}
+        />
 
-        <Route path="/edit-tenant/:id" element={<EditTenant />} />
+        <Route
+          path="/tenant-details/:id"
+          element={<TenantDetails />}
+        />
 
-        <Route path="/rent-bills" element={<RentBills />} />
+        <Route
+          path="/edit-tenant/:id"
+          element={<EditTenant />}
+        />
 
-        <Route path="/payments" element={<Payments />} />
+        <Route
+          path="/rent-bills"
+          element={<RentBills />}
+        />
 
-        <Route path="/documents" element={<Documents />} />
+        <Route
+          path="/payments"
+          element={<Payments />}
+        />
 
-        <Route path="/reports" element={<Reports />} />
+        <Route
+          path="/documents"
+          element={<Documents />}
+        />
 
-        <Route path="/owner-complaints" element={<OwnerComplaints />} />
+        <Route
+          path="/reports"
+          element={<Reports />}
+        />
 
-        <Route path="/settings" element={<Settings />} />
+        <Route
+          path="/owner-complaints"
+          element={<OwnerComplaints />}
+        />
 
-        <Route path="/owner-change-password" element={<OwnerChangePassword />} />
+        <Route
+          path="/settings"
+          element={<Settings />}
+        />
+
+        <Route
+          path="/owner-change-password"
+          element={<OwnerChangePassword />}
+        />
 
       </Route>
 
@@ -161,17 +239,35 @@ function App() {
 
       <Route element={<TenantPortalLayout />}>
 
-        <Route path="/tenant-dashboard" element={<TenantDashboard />} />
+        <Route
+          path="/tenant-dashboard"
+          element={<TenantDashboard />}
+        />
 
-        <Route path="/tenant-payments" element={<TenantPayments />} />
+        <Route
+          path="/tenant-payments"
+          element={<TenantPayments />}
+        />
 
-        <Route path="/tenant-documents" element={<TenantDocuments />} />
+        <Route
+          path="/tenant-documents"
+          element={<TenantDocuments />}
+        />
 
-        <Route path="/tenant-notices" element={<TenantNotices />} />
+        <Route
+          path="/tenant-notices"
+          element={<TenantNotices />}
+        />
 
-        <Route path="/tenant-maintenance" element={<TenantMaintenance />} />
+        <Route
+          path="/tenant-maintenance"
+          element={<TenantMaintenance />}
+        />
 
-        <Route path="/tenant-change-password" element={<TenantChangePassword />} />
+        <Route
+          path="/tenant-change-password"
+          element={<TenantChangePassword />}
+        />
 
       </Route>
 
