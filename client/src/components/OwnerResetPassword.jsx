@@ -8,10 +8,13 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 
 import Footer from "./Footer";
+import { useOwnerTheme } from "../context/OwnerThemeContext";
 
 function OwnerResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  const { theme, isDarkMode } = useOwnerTheme();
 
   // =========================================================
   // GET DATA FROM URL
@@ -165,7 +168,7 @@ function OwnerResetPassword() {
         newPassword
       );
 
-      // Remove the verification session after success.
+      // Remove verification session after success.
 
       localStorage.removeItem("passwordResetVerification");
 
@@ -176,6 +179,7 @@ function OwnerResetPassword() {
       setPasswordError(
         "Unable to reset your password. Please try again."
       );
+
       setIsSubmitting(false);
     }
   };
@@ -191,8 +195,17 @@ function OwnerResetPassword() {
   // =========================================================
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
+    <div
+      className={`flex min-h-screen flex-col transition-colors duration-300 ${
+        isDarkMode
+          ? "dark bg-gray-950 text-gray-100"
+          : "bg-gray-100 text-gray-900"
+      }`}
+      data-theme={theme}
+    >
+
       <main className="flex flex-1 items-center justify-center p-4">
+
         <div className="w-full max-w-md rounded-xl bg-white dark:bg-gray-900 border border-transparent dark:border-gray-700 p-8 shadow-lg transition-colors duration-300">
 
           {/* HEADING */}
@@ -223,9 +236,11 @@ function OwnerResetPassword() {
             className="space-y-5"
             noValidate
           >
+
             {/* NEW PASSWORD */}
 
             <div>
+
               <label
                 htmlFor="owner-new-password"
                 className="mb-2 block font-medium text-gray-700 dark:text-gray-200"
@@ -234,6 +249,7 @@ function OwnerResetPassword() {
               </label>
 
               <div className="relative">
+
                 <input
                   id="owner-new-password"
                   type={showNewPassword ? "text" : "password"}
@@ -250,12 +266,11 @@ function OwnerResetPassword() {
                       ? "owner-password-error"
                       : undefined
                   }
-                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      passwordError
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    }`}
+                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    passwordError
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                 />
 
                 <button
@@ -268,8 +283,7 @@ function OwnerResetPassword() {
                       ? "Hide new password"
                       : "Show new password"
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                    text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   {showNewPassword ? (
                     <EyeOff size={20} />
@@ -277,6 +291,7 @@ function OwnerResetPassword() {
                     <Eye size={20} />
                   )}
                 </button>
+
               </div>
 
               {passwordError && (
@@ -293,11 +308,13 @@ function OwnerResetPassword() {
                 Use at least 8 characters with uppercase,
                 lowercase, a number, and a special character.
               </p>
+
             </div>
 
             {/* CONFIRM PASSWORD */}
 
             <div>
+
               <label
                 htmlFor="owner-confirm-password"
                 className="mb-2 block font-medium text-gray-700 dark:text-gray-200"
@@ -306,6 +323,7 @@ function OwnerResetPassword() {
               </label>
 
               <div className="relative">
+
                 <input
                   id="owner-confirm-password"
                   type={
@@ -324,12 +342,11 @@ function OwnerResetPassword() {
                       ? "owner-confirm-password-error"
                       : undefined
                   }
-                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12
-                    focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      confirmPasswordError
-                        ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    }`}
+                  className={`w-full rounded-lg border bg-white dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 px-4 py-2.5 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    confirmPasswordError
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                 />
 
                 <button
@@ -344,8 +361,7 @@ function OwnerResetPassword() {
                       ? "Hide confirmation password"
                       : "Show confirmation password"
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                    text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={20} />
@@ -353,6 +369,7 @@ function OwnerResetPassword() {
                     <Eye size={20} />
                   )}
                 </button>
+
               </div>
 
               {confirmPasswordError && (
@@ -364,6 +381,7 @@ function OwnerResetPassword() {
                   {confirmPasswordError}
                 </p>
               )}
+
             </div>
 
             {/* RESET BUTTON */}
@@ -371,32 +389,36 @@ function OwnerResetPassword() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-lg bg-blue-600 py-3 text-white
-                transition hover:bg-blue-700 disabled:cursor-not-allowed
-                disabled:opacity-60"
+              className="w-full rounded-lg bg-blue-600 py-3 text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting
                 ? "Resetting Password..."
                 : "Reset Owner Password"}
             </button>
+
           </form>
 
           {/* BACK LINK */}
 
           <div className="mt-6 text-center">
+
             <Link
               to={backUrl}
               className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
             >
               ← Back to Owner Forgot Password
             </Link>
+
           </div>
+
         </div>
+
       </main>
 
       {/* FOOTER */}
 
       <Footer />
+
     </div>
   );
 }
