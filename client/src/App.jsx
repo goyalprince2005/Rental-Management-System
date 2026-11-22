@@ -92,7 +92,16 @@ function App() {
 
       {/* AUTHENTICATION */}
 
-      <Route path="/owner-login" element={<OwnerLogin />} />
+      {/* OWNER LOGIN - OWNER THEME PROVIDER ADDED */}
+
+      <Route
+        path="/owner-login"
+        element={
+          <OwnerThemeProvider>
+            <OwnerLogin />
+          </OwnerThemeProvider>
+        }
+      />
 
       <Route path="/tenant-login" element={<TenantLogin />} />
 
@@ -123,8 +132,6 @@ function App() {
         <Route path="/room-details/:id" element={<RoomDetails />} />
 
         <Route path="/edit-room/:id" element={<EditRoom />} />
-
-        {/* ALL TENANTS - OWNER MANAGEMENT */}
 
         <Route path="/tenants" element={<Tenants />} />
 
