@@ -14,46 +14,96 @@ import {
 import Navbar from "./Navbar";
 import TenantCard from "./TenantCard";
 
+// =========================================================
+// TENANT STORAGE CONFIGURATION
+// =========================================================
+
+const TENANT_STORAGE_KEY = "rentalManagementTenants";
+
+// =========================================================
+// DEFAULT TENANT DATA
+// Used only when no saved tenant data exists.
+// =========================================================
+
+const DEFAULT_TENANTS = [
+  {
+    id: 1,
+    name: "Rahul Sharma",
+    mobile: "9876543210",
+    property: "Green View Apartments",
+    room: "101",
+    rent: "₹5,000",
+    joiningDate: "2026-01-10",
+    rentDueDay: 10,
+    status: "Active",
+  },
+  {
+    id: 2,
+    name: "Aman Kumar",
+    mobile: "9876543211",
+    property: "Green View Apartments",
+    room: "102",
+    rent: "₹6,000",
+    joiningDate: "2026-02-05",
+    rentDueDay: 5,
+    status: "Active",
+  },
+  {
+    id: 3,
+    name: "Neha Sharma",
+    mobile: "9876543212",
+    property: "Shyam Residency",
+    room: "203",
+    rent: "₹5,500",
+    joiningDate: "2026-03-15",
+    rentDueDay: 15,
+    status: "Due",
+  },
+];
+
+// =========================================================
+// LOAD TENANTS FROM LOCAL STORAGE
+// =========================================================
+
+const getInitialTenants = () => {
+  try {
+    const savedTenants = localStorage.getItem(TENANT_STORAGE_KEY);
+
+    // No saved data: use default tenants.
+    if (savedTenants === null) {
+      return DEFAULT_TENANTS;
+    }
+
+    const parsedTenants = JSON.parse(savedTenants);
+
+    // Preserve saved tenant data, including an intentionally
+    // empty array.
+    if (Array.isArray(parsedTenants)) {
+      return parsedTenants;
+    }
+
+    console.error("Saved tenant data is not a valid array.");
+
+    return DEFAULT_TENANTS;
+
+  } catch (error) {
+    console.error("Unable to load tenants:", error);
+
+    return DEFAULT_TENANTS;
+  }
+};
+
+// =========================================================
+// MAIN TENANTS COMPONENT
+// =========================================================
+
 function Tenants() {
+
   // =========================================================
   // TENANT DATA
   // =========================================================
 
-  const [tenants, setTenants] = useState([
-    {
-      id: 1,
-      name: "Rahul Sharma",
-      mobile: "9876543210",
-      property: "Green View Apartments",
-      room: "101",
-      rent: "₹5,000",
-      joiningDate: "2026-01-10",
-      rentDueDay: 10,
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Aman Kumar",
-      mobile: "9876543211",
-      property: "Green View Apartments",
-      room: "102",
-      rent: "₹6,000",
-      joiningDate: "2026-02-05",
-      rentDueDay: 5,
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Neha Sharma",
-      mobile: "9876543212",
-      property: "Shyam Residency",
-      room: "203",
-      rent: "₹5,500",
-      joiningDate: "2026-03-15",
-      rentDueDay: 15,
-      status: "Due",
-    },
-  ]);
+  const [tenants, setTenants] = useState(getInitialTenants);
 
   // =========================================================
   // ADD TENANT MODAL
@@ -84,6 +134,21 @@ function Tenants() {
   // =========================================================
 
   const scrollPositionRef = useRef(0);
+
+  // =========================================================
+  // SAVE TENANTS TO LOCAL STORAGE
+  // =========================================================
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        TENANT_STORAGE_KEY,
+        JSON.stringify(tenants)
+      );
+    } catch (error) {
+      console.error("Unable to save tenants:", error);
+    }
+  }, [tenants]);
 
   // =========================================================
   // LOCK BACKGROUND SCROLL WHEN MODAL IS OPEN
@@ -259,6 +324,7 @@ function Tenants() {
     };
 
     // UPDATE TENANT LIST
+    // The useEffect above saves this updated list.
 
     setTenants((previousTenants) => [
       ...previousTenants,
@@ -279,6 +345,10 @@ function Tenants() {
 
   const inputClass =
     "w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 outline-none transition focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+
+  // =========================================================
+  // COMPONENT UI
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-x-hidden transition-colors duration-300">
@@ -613,12 +683,14 @@ function Tenants() {
 
                 {error && (
                   <div className="flex items-start gap-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-3 py-3">
+
                     <AlertCircle
                       size={18}
                       className="shrink-0 mt-0.5"
                     />
 
                     <span>{error}</span>
+
                   </div>
                 )}
 
