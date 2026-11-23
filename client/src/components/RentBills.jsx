@@ -29,7 +29,6 @@ const TENANT_STORAGE_KEY = "rentalManagementTenants";
 
 // =========================================================
 // DEFAULT DEMO RECORDS
-// Used only when neither bills nor rooms are saved.
 // =========================================================
 
 const DEFAULT_RENT_RECORDS = [
@@ -92,6 +91,10 @@ function toArray(value) {
   return [];
 }
 
+// =========================================================
+// TENANT HELPERS
+// =========================================================
+
 function getTenantName(tenant) {
   if (typeof tenant === "string") {
     return tenant.trim();
@@ -102,12 +105,179 @@ function getTenantName(tenant) {
       tenant.name ||
         tenant.fullName ||
         tenant.tenantName ||
+        tenant.tenant ||
         ""
     ).trim();
   }
 
   return "";
 }
+
+function getTenantId(tenant) {
+  return (
+    tenant?.id ??
+    tenant?.tenantId ??
+    tenant?.tenant_id ??
+    tenant?._id ??
+    null
+  );
+}
+
+function normalizeName(value) {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+// =========================================================
+// RESOLVE TENANT FOR A RENT RECORD
+// =========================================================
+
+function resolveTenantForRecord(record, tenants, rooms) {
+  const recordTenantName = normalizeName(
+    getTenantName(record?.tenant)
+  );
+
+  if (!recordTenantName) {
+    return null;
+  }
+
+  const recordProperty = normalizeName(record?.property);
+
+  const recordRoom = String(
+    record?.room ?? record?.roomId ?? ""
+  ).trim();
+
+  // Find the room connected to this rent record.
+  const matchingRoom = rooms.find((room) => {
+    const roomNumber = String(
+      room?.roomNumber ?? room?.id ?? ""
+    ).trim();
+
+    const roomProperty = normalizeName(room?.property);
+
+    const roomTenantName = normalizeName(
+      getTenantName(room?.tenant)
+    );
+
+    const sameRoom =
+      recordRoom !== "" && roomNumber === recordRoom;
+
+    const sameProperty =
+      !recordProperty ||
+      !roomProperty ||
+      recordProperty === roomProperty;
+
+    const sameTenant =
+      !roomTenantName ||
+      roomTenantName === recordTenantName;
+
+    return sameRoom && sameProperty && sameTenant;
+  });
+
+  const roomTenantId =
+    matchingRoom?.tenantId ??
+    matchingRoom?.tenant_id ??
+    null;
+
+  // First priority: match using the room's tenant ID.
+  if (roomTenantId != null) {
+    const tenantByRoomId = tenants.find(
+      (tenant) =>
+        String(getTenantId(tenant)) === String(roomTenantId)
+    );
+
+    if (tenantByRoomId) {
+      return tenantByRoomId;
+    }
+  }
+
+  // Second priority: match using tenant name,
+  // property and room.
+  const matchingTenants = tenants.filter((tenant) => {
+    const tenantName = normalizeName(getTenantName(tenant));
+
+    if (tenantName !== recordTenantName) {
+      return false;
+    }
+
+    const tenantProperty = normalizeName(tenant?.property);
+
+    const tenantRoom = String(
+      tenant?.room ?? tenant?.roomNumber ?? ""
+    ).trim();
+
+    const propertyMatches =
+      !recordProperty ||
+      !tenantProperty ||
+      recordProperty === tenantProperty;
+
+    const roomMatches =
+      !recordRoom ||
+      !tenantRoom ||
+      recordRoom === tenantRoom;
+
+    return propertyMatches && roomMatches;
+  });
+
+  // Only accept a unique match.
+  if (matchingTenants.length === 1) {
+    return matchingTenants[0];
+  }
+
+  // Final fallback: exact tenant name, only if unique.
+  const nameMatches = tenants.filter(
+    (tenant) =>
+      normalizeName(getTenantName(tenant)) === recordTenantName
+  );
+
+  return nameMatches.length === 1 ? nameMatches[0] : null;
+}
+
+// =========================================================
+// ENRICH EXISTING RENT RECORDS
+// Adds missing tenant IDs.
+// =========================================================
+
+function enrichRentRecords(records) {
+  const tenants = toArray(
+    readStorage(TENANT_STORAGE_KEY, [])
+  );
+
+  const rooms = toArray(
+    readStorage(ROOM_STORAGE_KEY, [])
+  );
+
+  return records.map((record) => {
+    // Preserve an existing tenant ID.
+    if (
+      record.tenantId !== undefined &&
+      record.tenantId !== null &&
+      record.tenantId !== ""
+    ) {
+      return record;
+    }
+
+    const tenant = resolveTenantForRecord(
+      record,
+      tenants,
+      rooms
+    );
+
+    const tenantId = getTenantId(tenant);
+
+    if (tenantId == null) {
+      return record;
+    }
+
+    return {
+      ...record,
+      tenantId,
+    };
+  });
+}
+
+// =========================================================
+// RENT AMOUNT HELPERS
+// =========================================================
 
 function getRentAmount(value) {
   const amount =
@@ -121,6 +291,10 @@ function getRentAmount(value) {
 function getRecordAmount(record) {
   return getRentAmount(record?.rent ?? record?.amount);
 }
+
+// =========================================================
+// STATUS HELPERS
+// =========================================================
 
 function normalizeStatus(status) {
   return String(status ?? "")
@@ -180,14 +354,15 @@ function formatCurrency(value) {
 
 // =========================================================
 // GENERATE INITIAL BILLS FROM SAVED ROOMS
-// Does not overwrite existing bills.
 // =========================================================
 
 function generateRentRecords() {
   const savedRooms = readStorage(ROOM_STORAGE_KEY, null);
+
   const savedProperties = toArray(
     readStorage(PROPERTY_STORAGE_KEY, [])
   );
+
   const savedTenants = toArray(
     readStorage(TENANT_STORAGE_KEY, [])
   );
@@ -206,10 +381,13 @@ function generateRentRecords() {
     })
     .map((room) => {
       const roomTenantName = getTenantName(room.tenant);
-      const roomTenantId = room.tenantId ?? room.tenant_id;
+
+      const roomTenantId =
+        room.tenantId ?? room.tenant_id;
 
       const tenant = savedTenants.find((item) => {
         const tenantName = getTenantName(item);
+
         const tenantId =
           item?.id ?? item?.tenantId ?? item?.tenant_id;
 
@@ -244,8 +422,7 @@ function generateRentRecords() {
         id: `room-${room.id}`,
         tenant: getTenantName(tenant) || roomTenantName,
         tenantId:
-          tenant?.id ??
-          tenant?.tenantId ??
+          getTenantId(tenant) ??
           roomTenantId ??
           null,
         property:
@@ -261,23 +438,44 @@ function generateRentRecords() {
 
 // =========================================================
 // LOAD RENT RECORDS
-// Priority:
-// 1. Existing saved bills
-// 2. Bills generated from saved rooms
-// 3. Demo records only if no saved data exists
 // =========================================================
 
 function loadRentRecords() {
   const savedRecords = readStorage(RENT_STORAGE_KEY, null);
 
   if (savedRecords !== null) {
-    return toArray(savedRecords);
+    const records = toArray(savedRecords);
+
+    const enrichedRecords = enrichRentRecords(records);
+
+    const hasChanges = enrichedRecords.some(
+      (record, index) =>
+        record.tenantId !== records[index]?.tenantId
+    );
+
+    if (hasChanges) {
+      try {
+        localStorage.setItem(
+          RENT_STORAGE_KEY,
+          JSON.stringify(enrichedRecords)
+        );
+      } catch (error) {
+        console.error(
+          "Unable to save updated rent records:",
+          error
+        );
+      }
+    }
+
+    return enrichedRecords;
   }
 
   const savedRooms = readStorage(ROOM_STORAGE_KEY, null);
 
   if (savedRooms !== null) {
-    const generatedRecords = generateRentRecords();
+    const generatedRecords = enrichRentRecords(
+      generateRentRecords()
+    );
 
     try {
       localStorage.setItem(
@@ -285,13 +483,16 @@ function loadRentRecords() {
         JSON.stringify(generatedRecords)
       );
     } catch (error) {
-      console.error("Unable to save generated rent bills:", error);
+      console.error(
+        "Unable to save generated rent bills:",
+        error
+      );
     }
 
     return generatedRecords;
   }
 
-  return DEFAULT_RENT_RECORDS;
+  return enrichRentRecords(DEFAULT_RENT_RECORDS);
 }
 
 // =========================================================
@@ -324,8 +525,14 @@ function RentBills() {
 
     return rentRecords.filter((record) => {
       const tenant = getTenantName(record.tenant).toLowerCase();
-      const property = String(record.property ?? "").toLowerCase();
-      const room = String(record.room ?? "").toLowerCase();
+
+      const property = String(
+        record.property ?? ""
+      ).toLowerCase();
+
+      const room = String(
+        record.room ?? ""
+      ).toLowerCase();
 
       const matchesSearch =
         !searchValue ||
@@ -394,8 +601,11 @@ function RentBills() {
       );
 
       setRentRecords(updatedRecords);
+
       setMessage(
-        `Rent marked as paid for ${getTenantName(record.tenant) || "this tenant"}.`
+        `Rent marked as paid for ${
+          getTenantName(record.tenant) || "this tenant"
+        }.`
       );
     } catch (error) {
       console.error("Unable to update rent status:", error);
@@ -421,20 +631,48 @@ function RentBills() {
   // -------------------------------------------------------
 
   const handleViewTenant = (record) => {
-    const tenantId = record.tenantId;
+    setMessage("");
+    setErrorMessage("");
 
-    if (tenantId === undefined || tenantId === null || tenantId === "") {
-      setMessage("");
-      setErrorMessage(
-        `Tenant ID is unavailable for ${
-          getTenantName(record.tenant) || "this tenant"
-        }.`
+    let tenantId = record.tenantId;
+
+    // Resolve missing tenant ID from saved data.
+    if (
+      tenantId === undefined ||
+      tenantId === null ||
+      tenantId === ""
+    ) {
+      const tenants = toArray(
+        readStorage(TENANT_STORAGE_KEY, [])
       );
+
+      const rooms = toArray(
+        readStorage(ROOM_STORAGE_KEY, [])
+      );
+
+      const tenant = resolveTenantForRecord(
+        record,
+        tenants,
+        rooms
+      );
+
+      tenantId = getTenantId(tenant);
+    }
+
+    if (
+      tenantId === undefined ||
+      tenantId === null ||
+      tenantId === ""
+    ) {
+      setErrorMessage(
+        `Unable to find a unique tenant record for ${
+          getTenantName(record.tenant) || "this rent record"
+        }. Please verify the tenant's property and room assignment.`
+      );
+
       return;
     }
 
-    setMessage("");
-    setErrorMessage("");
     navigate(`/tenant-details/${tenantId}`);
   };
 
@@ -447,6 +685,7 @@ function RentBills() {
       <Navbar />
 
       <main className="mx-auto max-w-7xl p-4 md:p-6">
+
         {/* PAGE HEADING */}
 
         <div className="mb-6">
@@ -484,6 +723,7 @@ function RentBills() {
         {/* SUMMARY CARDS */}
 
         <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
           {/* TOTAL RENT */}
 
           <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-900">
@@ -492,16 +732,21 @@ function RentBills() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Rent
                 </p>
+
                 <h3 className="mt-1 text-2xl font-bold text-gray-800 dark:text-gray-100">
                   {formatCurrency(totalRent)}
                 </h3>
+
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {rentRecords.length} rent records
                 </p>
               </div>
 
               <div className="shrink-0 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/50">
-                <IndianRupee size={26} className="text-blue-600 dark:text-blue-400" />
+                <IndianRupee
+                  size={26}
+                  className="text-blue-600 dark:text-blue-400"
+                />
               </div>
             </div>
           </div>
@@ -514,9 +759,11 @@ function RentBills() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Paid Rent
                 </p>
+
                 <h3 className="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">
                   {formatCurrency(paidRent)}
                 </h3>
+
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {paidRecords.length}{" "}
                   {paidRecords.length === 1 ? "paid record" : "paid records"}
@@ -524,7 +771,10 @@ function RentBills() {
               </div>
 
               <div className="shrink-0 rounded-xl bg-green-50 p-3 dark:bg-green-950/50">
-                <CheckCircle2 size={26} className="text-green-600 dark:text-green-400" />
+                <CheckCircle2
+                  size={26}
+                  className="text-green-600 dark:text-green-400"
+                />
               </div>
             </div>
           </div>
@@ -537,9 +787,11 @@ function RentBills() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Due Rent
                 </p>
+
                 <h3 className="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {formatCurrency(dueRent)}
                 </h3>
+
                 <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {dueRecords.length}{" "}
                   {dueRecords.length === 1 ? "due record" : "due records"}
@@ -547,7 +799,10 @@ function RentBills() {
               </div>
 
               <div className="shrink-0 rounded-xl bg-yellow-50 p-3 dark:bg-yellow-950/50">
-                <Clock3 size={26} className="text-yellow-600 dark:text-yellow-400" />
+                <Clock3
+                  size={26}
+                  className="text-yellow-600 dark:text-yellow-400"
+                />
               </div>
             </div>
           </div>
@@ -557,6 +812,7 @@ function RentBills() {
 
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
           <div className="flex flex-col gap-3 lg:flex-row">
+
             <div className="relative flex-1">
               <Search
                 size={19}
@@ -605,12 +861,15 @@ function RentBills() {
         {/* RENT RECORDS */}
 
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+
           <div className="border-b border-gray-200 p-5 dark:border-gray-700">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
               <div>
                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                   Monthly Rent Records
                 </h3>
+
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Current rent collection information.
                 </p>
@@ -631,16 +890,21 @@ function RentBills() {
 
           {filteredRentRecords.length > 0 ? (
             <div className="divide-y divide-gray-200 dark:divide-gray-700">
+
               {filteredRentRecords.map((record) => (
                 <div
                   key={record.id}
                   className="flex flex-col gap-5 p-5 transition hover:bg-gray-50 dark:hover:bg-gray-800/70 lg:flex-row lg:items-center lg:justify-between"
                 >
+
                   {/* TENANT */}
 
                   <div className="flex min-w-0 items-center gap-4">
                     <div className="shrink-0 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/50">
-                      <User size={24} className="text-blue-600 dark:text-blue-400" />
+                      <User
+                        size={24}
+                        className="text-blue-600 dark:text-blue-400"
+                      />
                     </div>
 
                     <div className="min-w-0">
@@ -660,6 +924,7 @@ function RentBills() {
 
                   <div className="flex min-w-0 items-center gap-3 text-gray-600 dark:text-gray-300">
                     <Building2 size={18} className="shrink-0" />
+
                     <span className="break-words text-sm">
                       {record.property || "Not specified"}
                     </span>
@@ -669,6 +934,7 @@ function RentBills() {
 
                   <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
                     <DoorOpen size={18} className="shrink-0" />
+
                     <span className="text-sm">
                       Room {record.room ?? "Not specified"}
                     </span>
@@ -677,10 +943,15 @@ function RentBills() {
                   {/* RENT */}
 
                   <div className="flex items-center gap-3">
-                    <IndianRupee size={18} className="shrink-0 text-gray-500 dark:text-gray-400" />
+                    <IndianRupee
+                      size={18}
+                      className="shrink-0 text-gray-500 dark:text-gray-400"
+                    />
+
                     <span className="font-semibold text-gray-800 dark:text-gray-100">
                       {formatCurrency(getRecordAmount(record))}
                     </span>
+
                     <span className="text-xs text-gray-400 dark:text-gray-500">
                       / month
                     </span>
@@ -689,7 +960,9 @@ function RentBills() {
                   {/* STATUS */}
 
                   <span
-                    className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${getStatusStyle(record.status)}`}
+                    className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${getStatusStyle(
+                      record.status
+                    )}`}
                   >
                     {getStatusLabel(record.status)}
                   </span>
@@ -697,6 +970,7 @@ function RentBills() {
                   {/* ACTIONS */}
 
                   <div className="flex shrink-0 flex-wrap items-center gap-2">
+
                     {!isPaid(record) && isDue(record) && (
                       <button
                         type="button"
@@ -705,6 +979,7 @@ function RentBills() {
                         className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-3 py-2 text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <Check size={17} />
+
                         {updatingId === record.id
                           ? "Saving..."
                           : "Mark as Paid"}
@@ -726,7 +1001,10 @@ function RentBills() {
           ) : (
             <div className="p-10 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/50">
-                <Search size={28} className="text-blue-600 dark:text-blue-400" />
+                <Search
+                  size={28}
+                  className="text-blue-600 dark:text-blue-400"
+                />
               </div>
 
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -762,6 +1040,7 @@ function RentBills() {
             amounts and payment status before using them as actual records.
           </p>
         )}
+
       </main>
     </div>
   );
