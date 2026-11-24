@@ -8,6 +8,7 @@ import React, {
 import {
   Plus,
   X,
+  Search,
   AlertCircle,
 } from "lucide-react";
 
@@ -104,6 +105,31 @@ function Tenants() {
   // =========================================================
 
   const [tenants, setTenants] = useState(getInitialTenants);
+
+  // =========================================================
+  // TENANT SEARCH
+  // =========================================================
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  const filteredTenants = tenants.filter((tenant) => {
+    if (!normalizedSearchTerm) {
+      return true;
+    }
+
+    const searchableValues = [
+      tenant.name,
+      tenant.mobile,
+      tenant.property,
+      tenant.room,
+    ];
+
+    return searchableValues.some((value) =>
+      String(value ?? "").toLowerCase().includes(normalizedSearchTerm)
+    );
+  });
 
   // =========================================================
   // ADD TENANT MODAL
@@ -393,14 +419,55 @@ function Tenants() {
         </div>
 
         {/* ===================================================== */}
+        {/* TENANT SEARCH */}
+        {/* ===================================================== */}
+
+        <div className="mb-6">
+
+          <div className="relative">
+
+            <Search
+              size={20}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
+            />
+
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search by tenant name, mobile number, property, or room..."
+              aria-label="Search tenants by name, mobile number, property, or room"
+              className="w-full pl-10 pr-11 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            />
+
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear tenant search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              >
+                <X size={18} />
+              </button>
+            )}
+
+          </div>
+
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Search using a tenant name, mobile number, property name, or room number.
+          </p>
+
+        </div>
+
+        {/* ===================================================== */}
         {/* TENANT CARDS */}
         {/* ===================================================== */}
 
-        {tenants.length > 0 ? (
+        {filteredTenants.length > 0 ? (
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-            {tenants.map((tenant) => (
+            {filteredTenants.map((tenant) => (
               <TenantCard
                 key={tenant.id}
                 tenant={tenant}
@@ -409,9 +476,9 @@ function Tenants() {
 
           </div>
 
-        ) : (
+        ) : tenants.length === 0 ? (
 
-          /* EMPTY STATE */
+          /* EMPTY TENANT LIST */
 
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-10 text-center">
 
@@ -439,6 +506,39 @@ function Tenants() {
             >
               <Plus size={18} />
               Add Tenant
+            </button>
+
+          </div>
+
+        ) : (
+
+          /* NO SEARCH RESULTS */
+
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 sm:p-10 text-center">
+
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+
+              <Search
+                size={22}
+                className="text-gray-500 dark:text-gray-300"
+              />
+
+            </div>
+
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              No matching tenants found
+            </h3>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Try another tenant name, mobile number, property, or room number.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+            >
+              Clear search
             </button>
 
           </div>
