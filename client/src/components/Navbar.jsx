@@ -595,9 +595,11 @@ function Navbar() {
                   />
                 </div>
 
-                <span className="hidden max-w-[180px] truncate whitespace-nowrap text-[16px] font-semibold text-blue-800 dark:text-blue-400 sm:block lg:max-w-[210px]">
-                  Rental Management
-                </span>
+                {/* UPDATED: BRAND NAME VISIBLE ON MOBILE AND DESKTOP */}
+
+                <span className="block shrink-0 whitespace-nowrap text-[16px] font-semibold text-blue-800 dark:text-blue-400 sm:text-[18px]">
+  Rental Management
+</span>
               </button>
             </div>
 
