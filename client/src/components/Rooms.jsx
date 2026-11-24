@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Search } from "lucide-react";
 import RoomCard from "./RoomCard";
 import Navbar from "./Navbar";
 
@@ -265,6 +265,30 @@ function Rooms() {
   // =========================================================
 
   const [rooms, setRooms] = useState(() => loadRooms());
+
+  // =========================================================
+  // ROOM SEARCH
+  // =========================================================
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+
+  const filteredRooms = rooms.filter((room) => {
+    if (!normalizedSearchTerm) {
+      return true;
+    }
+
+    const searchableValues = [
+      room.roomNumber,
+      room.tenant,
+      room.property,
+    ];
+
+    return searchableValues.some((value) =>
+      String(value ?? "").toLowerCase().includes(normalizedSearchTerm)
+    );
+  });
 
   // =========================================================
   // ADD ROOM MODAL STATE
@@ -609,14 +633,50 @@ function Rooms() {
           </button>
         </div>
 
-        {/* ROOM CARDS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {rooms.map((room) => (
-            <RoomCard key={room.id} room={room} />
-          ))}
+        {/* ROOM SEARCH */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search
+              size={20}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none"
+            />
+
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search by room number, tenant name, or property..."
+              aria-label="Search rooms by room number, tenant name, or property"
+              className="w-full pl-10 pr-11 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            />
+
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                aria-label="Clear room search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Search using a room number, tenant name, or property name.
+          </p>
         </div>
 
-        {/* EMPTY STATE */}
+        {/* ROOM CARDS */}
+        {filteredRooms.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredRooms.map((room) => (
+              <RoomCard key={room.id} room={room} />
+            ))}
+          </div>
+        )}
+
+        {/* NO ROOMS IN STORAGE */}
         {rooms.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-10 text-center">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -626,6 +686,31 @@ function Rooms() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Add a room to get started.
             </p>
+          </div>
+        )}
+
+        {/* NO SEARCH RESULTS */}
+        {rooms.length > 0 && filteredRooms.length === 0 && (
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 sm:p-10 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
+              <Search size={22} className="text-gray-500 dark:text-gray-300" />
+            </div>
+
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+              No matching rooms found
+            </h3>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Try another room number, tenant name, or property name.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setSearchTerm("")}
+              className="mt-4 inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+            >
+              Clear search
+            </button>
           </div>
         )}
       </main>
