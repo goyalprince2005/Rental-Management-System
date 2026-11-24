@@ -56,7 +56,6 @@ const defaultRooms = [
     property: "Green View Apartments",
     propertyId: 1,
     location: "Bhopal",
-    propertyId: 1,
     floor: 1,
     rent: 6000,
     tenant: "Aman",
@@ -603,7 +602,7 @@ function Rooms() {
           <button
             type="button"
             onClick={handleOpenAddRoom}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-sm shrink-0"
+            className="self-end sm:self-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-sm shrink-0"
           >
             <Plus size={19} />
             <span>Add Room</span>
