@@ -26,6 +26,7 @@ import {
   Lock,
   Sun,
   Moon,
+  Info,
 } from "lucide-react";
 
 import { useOwnerTheme } from "../context/OwnerThemeContext";
@@ -57,6 +58,8 @@ function Navbar() {
   const [hoveredSidebarItem, setHoveredSidebarItem] =
     useState(null);
 
+  const [cardVisible, setCardVisible] = useState(false);
+
   const [hoverCardPosition, setHoverCardPosition] = useState({
     top: 100,
     left: 300,
@@ -68,55 +71,21 @@ function Navbar() {
 
   // =========================================================
   // TOP NAVBAR ITEMS
-  // Complaints is intentionally excluded from this array.
   // =========================================================
 
   const navItems = [
-    {
-      name: "Dashboard",
-      path: "/owner-dashboard",
-      icon: Home,
-    },
-    {
-      name: "Properties",
-      path: "/properties",
-      icon: Building2,
-    },
-    {
-      name: "Rooms",
-      path: "/rooms",
-      icon: DoorOpen,
-    },
-    {
-      name: "Tenants",
-      path: "/tenants",
-      icon: Users,
-    },
-    {
-      name: "Rent & Bills",
-      path: "/rent-bills",
-      icon: Receipt,
-    },
-    {
-      name: "Payments",
-      path: "/payments",
-      icon: CreditCard,
-    },
-    {
-      name: "Documents",
-      path: "/documents",
-      icon: FileText,
-    },
-    {
-      name: "Reports",
-      path: "/reports",
-      icon: BarChart3,
-    },
+    { name: "Dashboard", path: "/owner-dashboard", icon: Home },
+    { name: "Properties", path: "/properties", icon: Building2 },
+    { name: "Rooms", path: "/rooms", icon: DoorOpen },
+    { name: "Tenants", path: "/tenants", icon: Users },
+    { name: "Rent & Bills", path: "/rent-bills", icon: Receipt },
+    { name: "Payments", path: "/payments", icon: CreditCard },
+    { name: "Documents", path: "/documents", icon: FileText },
+    { name: "Reports", path: "/reports", icon: BarChart3 },
   ];
 
   // =========================================================
   // SIDEBAR ITEMS
-  // Complaints appears only in the Sidebar.
   // =========================================================
 
   const sidebarItems = [
@@ -258,10 +227,11 @@ function Navbar() {
   };
 
   // =========================================================
-  // HIDE HOVER CARD
+  // CLOSE INFORMATION CARD
   // =========================================================
 
   const hideHoverCard = () => {
+    setCardVisible(false);
     setHoveredSidebarItem(null);
 
     setHoverCardPosition((previous) => ({
@@ -269,6 +239,30 @@ function Navbar() {
       visible: false,
     }));
   };
+
+  // =========================================================
+  // OPEN INFORMATION CARD WITH ANIMATION
+  // =========================================================
+
+  const showHoverCard = (itemName) => {
+    setHoveredSidebarItem(itemName);
+    setCardVisible(false);
+  };
+
+  useEffect(() => {
+    if (!hoveredSidebarItem) {
+      setCardVisible(false);
+      return;
+    }
+
+    // Allow the initial hidden state to render
+    // before showing the information card.
+    const frame = requestAnimationFrame(() => {
+      setCardVisible(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [hoveredSidebarItem]);
 
   // =========================================================
   // NAVIGATION
@@ -320,7 +314,7 @@ function Navbar() {
   };
 
   // =========================================================
-  // SIDEBAR HOVER INFORMATION POSITIONING
+  // DESKTOP SIDEBAR HOVER INFORMATION
   // =========================================================
 
   const handleSidebarHover = (itemName, event) => {
@@ -355,8 +349,6 @@ function Navbar() {
     const anchorCenter =
       itemRect.top + itemRect.height / 2;
 
-    setHoveredSidebarItem(itemName);
-
     setHoverCardPosition({
       top: itemRect.top,
       left,
@@ -365,10 +357,55 @@ function Navbar() {
       maxHeight: window.innerHeight - viewportPadding * 2,
       visible: true,
     });
+
+    showHoverCard(itemName);
   };
 
   // =========================================================
-  // CALCULATE HOVER CARD POSITION
+  // MOBILE SIDEBAR INFORMATION
+  // =========================================================
+
+  const handleMobileSidebarInfo = (itemName, event) => {
+    event.stopPropagation();
+
+    if (hoveredSidebarItem === itemName) {
+      hideHoverCard();
+      return;
+    }
+
+    const viewportPadding = 8;
+    const preferredWidth = 250;
+
+    const width = Math.min(
+      preferredWidth,
+      window.innerWidth - viewportPadding * 2
+    );
+
+    const itemRect =
+      event.currentTarget.getBoundingClientRect();
+
+    // Keep the card near the right side.
+    // Preserve the existing 15px left adjustment.
+    const left = Math.max(
+      viewportPadding,
+      window.innerWidth - width - viewportPadding - 15
+    );
+
+    setHoverCardPosition({
+      top: itemRect.top,
+      left,
+      width,
+      anchorCenter: itemRect.top + itemRect.height / 2,
+      maxHeight: window.innerHeight - viewportPadding * 2,
+      visible: true,
+    });
+
+    showHoverCard(itemName);
+  };
+
+  // =========================================================
+  // SMART INFORMATION CARD POSITIONING
+  // Adjust card position after its actual height is measured.
   // =========================================================
 
   useLayoutEffect(() => {
@@ -384,37 +421,79 @@ function Navbar() {
 
     if (!card) return;
 
-    const cardHeight = card.getBoundingClientRect().height;
-    const viewportPadding = 12;
+    const viewportPadding = 8;
+    const cardRect = card.getBoundingClientRect();
 
-    let top =
-      hoverCardPosition.anchorCenter - cardHeight / 2;
+    const cardHeight = cardRect.height;
+    const cardWidth = cardRect.width;
 
-    if (top < viewportPadding) {
-      top = viewportPadding;
+    let top;
+    let left;
+
+    if (window.innerWidth < 1024) {
+      // MOBILE POSITIONING
+
+      const maxTop =
+        window.innerHeight - cardHeight - viewportPadding;
+
+      top = Math.max(
+        viewportPadding,
+        Math.min(hoverCardPosition.top, maxTop)
+      );
+
+      const maxLeft =
+        window.innerWidth - cardWidth - viewportPadding;
+
+      left = Math.max(
+        viewportPadding,
+        Math.min(hoverCardPosition.left, maxLeft)
+      );
+    } else {
+      // DESKTOP POSITIONING
+
+      const maxTop =
+        window.innerHeight - cardHeight - 12;
+
+      top = Math.max(
+        12,
+        Math.min(
+          hoverCardPosition.anchorCenter - cardHeight / 2,
+          maxTop
+        )
+      );
+
+      const sidebar = document.getElementById("owner-sidebar");
+
+      if (sidebar) {
+        const sidebarRect = sidebar.getBoundingClientRect();
+
+        left = Math.min(
+          sidebarRect.right + 10,
+          window.innerWidth - cardWidth - 12
+        );
+      } else {
+        left = hoverCardPosition.left;
+      }
     }
 
-    const maxTop =
-      window.innerHeight - cardHeight - viewportPadding;
-
-    if (top > maxTop) {
-      top = Math.max(viewportPadding, maxTop);
-    }
-
-    top = Math.max(viewportPadding, top);
-
-    if (Math.abs(top - hoverCardPosition.top) > 1) {
+    if (
+      Math.abs(top - hoverCardPosition.top) > 1 ||
+      Math.abs(left - hoverCardPosition.left) > 1
+    ) {
       setHoverCardPosition((previous) => ({
         ...previous,
         top,
+        left,
       }));
     }
   }, [
     menuOpen,
     hoveredSidebarItem,
+    cardVisible,
     hoverCardPosition.visible,
-    hoverCardPosition.anchorCenter,
     hoverCardPosition.top,
+    hoverCardPosition.left,
+    hoverCardPosition.anchorCenter,
   ]);
 
   // =========================================================
@@ -490,8 +569,11 @@ function Navbar() {
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
-        setMenuOpen(false);
-        hideHoverCard();
+        if (hoveredSidebarItem) {
+          hideHoverCard();
+        } else {
+          setMenuOpen(false);
+        }
       }
     };
 
@@ -500,7 +582,7 @@ function Navbar() {
     return () => {
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [menuOpen]);
+  }, [menuOpen, hoveredSidebarItem]);
 
   // =========================================================
   // HIDE HOVER CARD ON ROUTE CHANGE
@@ -567,14 +649,15 @@ function Navbar() {
                 >
                   <Menu size={24} />
                 </button>
-{!menuOpen && (
-  <span
-    role="tooltip"
-    className="pointer-events-none invisible absolute left-3 top-full z-[100] mt-1.5 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:visible group-hover:opacity-100"
-  >
-    Open sidebar
-  </span>
-)}
+
+                {!menuOpen && (
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none invisible absolute left-3 top-full z-[100] mt-1.5 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:visible group-hover:opacity-100"
+                  >
+                    Open sidebar
+                  </span>
+                )}
               </div>
 
               {/* LOGO */}
@@ -594,11 +677,9 @@ function Navbar() {
                   />
                 </div>
 
-                {/* UPDATED: BRAND NAME VISIBLE ON MOBILE AND DESKTOP */}
-
-                <span className="block shrink-0 whitespace-nowrap text-[16px] font-semibold text-blue-800 dark:text-blue-400 sm:text-[18px]">
-  Rental Management
-</span>
+                <span className="block shrink-0 whitespace-nowrap text-[14px] font-semibold text-blue-800 dark:text-blue-400 sm:text-[16px]">
+                  Rental Management
+                </span>
               </button>
             </div>
 
@@ -720,7 +801,6 @@ function Navbar() {
                       className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-blue-400"
                     >
                       <UserCircle size={18} />
-
                       <span className="text-sm font-medium">
                         My Details
                       </span>
@@ -734,7 +814,6 @@ function Navbar() {
                       className="flex w-full items-center gap-3 px-4 py-3 text-left text-gray-700 transition hover:bg-blue-50 hover:text-blue-600 dark:text-gray-200 dark:hover:bg-gray-800 dark:hover:text-blue-400"
                     >
                       <Lock size={18} />
-
                       <span className="text-sm font-medium">
                         Change Password
                       </span>
@@ -750,7 +829,6 @@ function Navbar() {
                       className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
                     >
                       <LogOut size={18} />
-
                       <span className="text-sm font-medium">
                         Logout
                       </span>
@@ -845,12 +923,21 @@ function Navbar() {
             {sidebarItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
+              const infoActive =
+                hoveredSidebarItem === item.name;
 
               return (
                 <div
                   key={item.name}
-                  onMouseLeave={hideHoverCard}
+                  className="flex items-center gap-1"
+                  onMouseLeave={() => {
+                    if (window.innerWidth >= 1024) {
+                      hideHoverCard();
+                    }
+                  }}
                 >
+                  {/* NAVIGATION BUTTON */}
+
                   <button
                     type="button"
                     onMouseEnter={(event) =>
@@ -859,11 +946,15 @@ function Navbar() {
                     onFocus={(event) =>
                       handleSidebarHover(item.name, event)
                     }
-                    onBlur={hideHoverCard}
+                    onBlur={() => {
+                      if (window.innerWidth >= 1024) {
+                        hideHoverCard();
+                      }
+                    }}
                     onClick={() =>
                       handleNavigation(item.path)
                     }
-                    className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
+                    className={`flex min-w-0 flex-1 items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                       active
                         ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
                         : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
@@ -876,13 +967,38 @@ function Navbar() {
                       {item.name}
                     </span>
                   </button>
+
+                  {/* MOBILE INFORMATION BUTTON */}
+
+                  <button
+                    type="button"
+                    onClick={(event) =>
+                      handleMobileSidebarInfo(item.name, event)
+                    }
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-300 lg:hidden ${
+                      infoActive
+                        ? "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                        : "text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                    }`}
+                    aria-label={`Show ${item.name} information`}
+                    aria-expanded={infoActive}
+                  >
+                    <Info size={19} />
+                  </button>
                 </div>
               );
             })}
 
             {/* SETTINGS */}
 
-            <div onMouseLeave={hideHoverCard}>
+            <div
+              className="flex items-center gap-1"
+              onMouseLeave={() => {
+                if (window.innerWidth >= 1024) {
+                  hideHoverCard();
+                }
+              }}
+            >
               <button
                 type="button"
                 onMouseEnter={(event) =>
@@ -891,11 +1007,15 @@ function Navbar() {
                 onFocus={(event) =>
                   handleSidebarHover("Settings", event)
                 }
-                onBlur={hideHoverCard}
+                onBlur={() => {
+                  if (window.innerWidth >= 1024) {
+                    hideHoverCard();
+                  }
+                }}
                 onClick={() =>
                   handleNavigation("/settings")
                 }
-                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
+                className={`flex min-w-0 flex-1 items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                   isActive("/settings")
                     ? "bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
                     : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
@@ -909,6 +1029,26 @@ function Navbar() {
                 <span className="flex-1 text-[15px] font-medium">
                   Settings
                 </span>
+              </button>
+
+              {/* MOBILE SETTINGS INFORMATION */}
+
+              <button
+                type="button"
+                onClick={(event) =>
+                  handleMobileSidebarInfo("Settings", event)
+                }
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition focus:outline-none focus:ring-2 focus:ring-blue-300 lg:hidden ${
+                  hoveredSidebarItem === "Settings"
+                    ? "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
+                    : "text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-blue-400"
+                }`}
+                aria-label="Show Settings information"
+                aria-expanded={
+                  hoveredSidebarItem === "Settings"
+                }
+              >
+                <Info size={19} />
               </button>
             </div>
 
@@ -938,41 +1078,77 @@ function Navbar() {
       {menuOpen &&
         currentHoverInfo &&
         hoverCardPosition.visible && (
-          <div
-            ref={hoverCardRef}
-            className="pointer-events-none fixed z-[70]"
-            style={{
-              top: `${hoverCardPosition.top}px`,
-              left: `${hoverCardPosition.left}px`,
-              width: `${hoverCardPosition.width}px`,
-              maxHeight: `${hoverCardPosition.maxHeight}px`,
-            }}
-            aria-hidden="true"
-          >
-            <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+          <>
+            {/* MOBILE CARD BACKDROP */}
 
-              <p className="mb-2.5 text-sm font-bold leading-5 text-blue-600 dark:text-blue-400">
-                {currentHoverInfo.title}
-              </p>
+            <button
+              type="button"
+              className="fixed inset-0 z-[65] bg-black/10 lg:hidden"
+              onClick={hideHoverCard}
+              aria-label="Close information panel"
+            />
 
-              <div className="mb-2.5 h-px bg-blue-100 dark:bg-gray-700" />
+            {/* INFORMATION CARD */}
 
-              <div className="space-y-1.5">
-                {currentHoverInfo.items.map((text) => (
-                  <div
-                    key={text}
-                    className="flex items-start gap-2 text-[13px] leading-5 text-gray-600 dark:text-gray-300"
+            <div
+              ref={hoverCardRef}
+              className={`pointer-events-auto fixed z-[70] transition-all duration-200 ease-out ${
+                cardVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-2 opacity-0"
+              }`}
+              style={{
+                top: `${hoverCardPosition.top}px`,
+                left: `${hoverCardPosition.left}px`,
+                width: `${hoverCardPosition.width}px`,
+                maxHeight: `${hoverCardPosition.maxHeight}px`,
+              }}
+              aria-label={`${currentHoverInfo.title} information`}
+            >
+              <div className="relative max-h-full w-full overflow-y-auto rounded-xl border border-blue-100 bg-white px-4 py-3.5 text-gray-700 shadow-2xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+
+                {/* CARD HEADER */}
+
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <p className="text-sm font-bold leading-5 text-blue-600 dark:text-blue-400">
+                    {currentHoverInfo.title}
+                  </p>
+
+                  {/* MOBILE CLOSE BUTTON */}
+
+                  <button
+                    type="button"
+                    onClick={hideHoverCard}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+                    aria-label="Close information"
                   >
-                    <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                    <X size={17} />
+                  </button>
+                </div>
 
-                    <span>{text}</span>
-                  </div>
-                ))}
+                <div className="mb-2.5 h-px bg-blue-100 dark:bg-gray-700" />
+
+                {/* INFORMATION ITEMS */}
+
+                <div className="space-y-2">
+                  {currentHoverInfo.items.map((text) => (
+                    <div
+                      key={text}
+                      className="flex items-start gap-2 text-[13px] leading-5 text-gray-600 dark:text-gray-300"
+                    >
+                      <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+
+                      <span>{text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* DESKTOP POINTER */}
+
+                <span className="absolute right-full top-1/2 hidden -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900 lg:block" />
               </div>
-
-              <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
             </div>
-          </div>
+          </>
         )}
     </>
   );
