@@ -567,15 +567,14 @@ function Navbar() {
                 >
                   <Menu size={24} />
                 </button>
-
-                {!menuOpen && (
-                  <span
-                    role="tooltip"
-                    className="pointer-events-none invisible absolute left-0 top-full z-[100] mt-2 hidden whitespace-nowrap rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:visible group-hover:opacity-100 lg:block"
-                  >
-                    Open sidebar
-                  </span>
-                )}
+{!menuOpen && (
+  <span
+    role="tooltip"
+    className="pointer-events-none invisible absolute left-3 top-full z-[100] mt-1.5 whitespace-nowrap rounded-md bg-slate-900 px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:visible group-hover:opacity-100"
+  >
+    Open sidebar
+  </span>
+)}
               </div>
 
               {/* LOGO */}
