@@ -172,13 +172,13 @@ function RoomCard({ room }) {
       </div>
 
       {/* ACTION BUTTONS */}
-      <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row gap-3">
+      <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-row gap-3">
 
         {/* VIEW BUTTON */}
         <button
           type="button"
           onClick={handleView}
-          className="w-full sm:flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-3 sm:px-4 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition"
         >
           <Eye size={17} />
           <span>View</span>
@@ -188,7 +188,7 @@ function RoomCard({ room }) {
         <button
           type="button"
           onClick={handleEdit}
-          className="w-full sm:flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
+          className="flex-1 min-w-0 flex items-center justify-center gap-2 bg-blue-600 text-white px-3 sm:px-4 py-2.5 rounded-lg hover:bg-blue-700 transition shadow-sm"
         >
           <Pencil size={17} />
           <span>Edit</span>
