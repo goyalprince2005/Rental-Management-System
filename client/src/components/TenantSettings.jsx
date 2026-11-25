@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,6 +15,7 @@ import {
   Check,
   Settings,
   Info,
+  ArrowLeft,
 } from "lucide-react";
 
 import { useTenantTheme } from "../context/TenantThemeContext";
@@ -133,6 +133,14 @@ function TenantSettings() {
   };
 
   // =======================================================
+  // BACK TO DASHBOARD
+  // =======================================================
+
+  const handleBackToDashboard = () => {
+    navigate("/tenant-dashboard");
+  };
+
+  // =======================================================
   // NOTIFICATION SWITCH COMPONENT
   // =======================================================
 
@@ -225,9 +233,9 @@ function TenantSettings() {
     );
   };
 
-  // =======================================================
+  // =========================================================
   // MAIN UI
-  // =======================================================
+  // =========================================================
 
   return (
     <div className="min-h-screen bg-gray-50 px-3 py-5 transition-colors duration-300 dark:bg-gray-950 sm:px-5 sm:py-7 lg:px-8">
@@ -238,23 +246,40 @@ function TenantSettings() {
         {/* PAGE HEADER */}
         {/* ================================================= */}
 
-        <div className="mb-6 flex items-start gap-3 sm:mb-8">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
-            <Settings
-              size={24}
-              className="text-green-600 dark:text-green-400"
-            />
+        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+
+          {/* HEADER TITLE */}
+
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+              <Settings
+                size={24}
+                className="text-green-600 dark:text-green-400"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
+                Settings
+              </h1>
+
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
+                Manage your account preferences and settings.
+              </p>
+            </div>
           </div>
 
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
-              Settings
-            </h1>
+          {/* BACK TO DASHBOARD BUTTON */}
 
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-              Manage your account preferences and settings.
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={handleBackToDashboard}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 active:bg-green-800 sm:w-auto sm:shrink-0"
+          >
+            <ArrowLeft size={18} />
+            Back to Dashboard
+          </button>
+
         </div>
 
         {/* ================================================= */}
