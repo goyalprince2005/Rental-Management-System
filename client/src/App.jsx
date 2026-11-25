@@ -47,6 +47,7 @@ import TenantDocuments from "./components/TenantDocuments";
 import TenantNotices from "./components/TenantNotices";
 import TenantMaintenance from "./components/TenantMaintenance";
 import TenantChangePassword from "./components/TenantChangePassword";
+import TenantSettings from "./components/TenantSettings";
 
 // =========================================================
 // THEME PROVIDERS AND LAYOUTS
@@ -267,6 +268,13 @@ function App() {
         <Route
           path="/tenant-change-password"
           element={<TenantChangePassword />}
+        />
+
+        {/* TENANT SETTINGS */}
+
+        <Route
+          path="/tenant-settings"
+          element={<TenantSettings />}
         />
 
       </Route>
