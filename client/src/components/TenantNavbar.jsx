@@ -31,64 +31,36 @@ function TenantNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // =========================================================
   // COMPONENT STATE
-  // =========================================================
-
   const [isOpen, setIsOpen] = useState(false);
-
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
-  const [hoveredSidebarItem, setHoveredSidebarItem] =
-    useState(null);
-
+  const [hoveredSidebarItem, setHoveredSidebarItem] = useState(null);
   const [hoverCardPosition, setHoverCardPosition] = useState({
     top: 0,
     left: 0,
   });
 
-  // =========================================================
-  // SHARED TENANT THEME CONTEXT
-  // =========================================================
-
+  // TENANT THEME
   const { isDarkMode, toggleTheme } = useTenantTheme();
 
-  // =========================================================
   // REFS
-  // =========================================================
-
   const profileRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const navigationTimerRef = useRef(null);
   const hoverCardTimerRef = useRef(null);
 
-  // =========================================================
   // TENANT DATA
-  // =========================================================
-
   const tenants = {
-    "1": {
-      name: "Rahul Sharma",
-    },
-    "2": {
-      name: "Aman Kumar",
-    },
-    "3": {
-      name: "Neha Sharma",
-    },
+    "1": { name: "Rahul Sharma" },
+    "2": { name: "Aman Kumar" },
+    "3": { name: "Neha Sharma" },
   };
 
-  // =========================================================
-  // GET LOGGED-IN TENANT
-  // =========================================================
-
+  // LOGGED-IN TENANT
   const tenantId = localStorage.getItem("tenantId");
   const tenant = tenants[tenantId];
 
-  // =========================================================
   // SIDEBAR INFORMATION
-  // =========================================================
-
   const sidebarInfo = {
     Dashboard: {
       title: "Dashboard",
@@ -156,12 +128,21 @@ function TenantNavbar() {
         "Previous complaints",
       ],
     },
+
+    // NEW SETTINGS INFORMATION
+    Settings: {
+      title: "Settings",
+      items: [
+        "Profile settings",
+        "Appearance preferences",
+        "Notification preferences",
+        "Security settings",
+        "Help and support",
+      ],
+    },
   };
 
-  // =========================================================
   // CLEAR NAVIGATION TIMER
-  // =========================================================
-
   const clearNavigationTimer = () => {
     if (navigationTimerRef.current !== null) {
       window.clearTimeout(navigationTimerRef.current);
@@ -169,10 +150,7 @@ function TenantNavbar() {
     }
   };
 
-  // =========================================================
   // CLEAR HOVER CARD TIMER
-  // =========================================================
-
   const clearHoverCardTimer = () => {
     if (hoverCardTimerRef.current !== null) {
       window.clearTimeout(hoverCardTimerRef.current);
@@ -180,10 +158,7 @@ function TenantNavbar() {
     }
   };
 
-  // =========================================================
   // CLOSE SIDEBAR AFTER NAVIGATION
-  // =========================================================
-
   const closeSidebarAfterNavigation = () => {
     clearNavigationTimer();
 
@@ -196,10 +171,7 @@ function TenantNavbar() {
     }, 300);
   };
 
-  // =========================================================
   // NORMAL SIDEBAR CLOSE
-  // =========================================================
-
   const closeSidebar = () => {
     clearNavigationTimer();
     clearHoverCardTimer();
@@ -208,10 +180,7 @@ function TenantNavbar() {
     setHoveredSidebarItem(null);
   };
 
-  // =========================================================
   // LOGOUT
-  // =========================================================
-
   const handleLogout = () => {
     clearNavigationTimer();
     clearHoverCardTimer();
@@ -225,10 +194,7 @@ function TenantNavbar() {
     navigate("/tenant-login");
   };
 
-  // =========================================================
   // MY DETAILS
-  // =========================================================
-
   const handleMyDetails = () => {
     const currentTenantId = localStorage.getItem("tenantId");
 
@@ -243,10 +209,7 @@ function TenantNavbar() {
     setIsProfileOpen(false);
   };
 
-  // =========================================================
   // CHANGE PASSWORD
-  // =========================================================
-
   const handleChangePassword = () => {
     navigate("/tenant-change-password");
 
@@ -254,19 +217,13 @@ function TenantNavbar() {
     setIsProfileOpen(false);
   };
 
-  // =========================================================
   // SIDEBAR NAVIGATION
-  // =========================================================
-
   const handleSidebarNavigation = (path) => {
     navigate(path);
     closeSidebarAfterNavigation();
   };
 
-  // =========================================================
   // SIDEBAR HOVER HANDLER
-  // =========================================================
-
   const handleSidebarHover = (itemName, event) => {
     if (window.innerWidth < 768) {
       return;
@@ -290,10 +247,7 @@ function TenantNavbar() {
     });
   };
 
-  // =========================================================
   // SIDEBAR HOVER LEAVE
-  // =========================================================
-
   const handleSidebarLeave = () => {
     clearHoverCardTimer();
 
@@ -303,35 +257,23 @@ function TenantNavbar() {
     }, 450);
   };
 
-  // =========================================================
   // HOVER CARD MOUSE ENTER
-  // =========================================================
-
   const handleHoverCardEnter = () => {
     clearHoverCardTimer();
   };
 
-  // =========================================================
   // HOVER CARD MOUSE LEAVE
-  // =========================================================
-
   const handleHoverCardLeave = () => {
     handleSidebarLeave();
   };
 
-  // =========================================================
   // LOGOUT HOVER HANDLER
-  // =========================================================
-
   const handleLogoutHover = () => {
     clearHoverCardTimer();
     setHoveredSidebarItem(null);
   };
 
-  // =========================================================
   // PROFILE DROPDOWN: CLICK OUTSIDE
-  // =========================================================
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -351,10 +293,7 @@ function TenantNavbar() {
     };
   }, []);
 
-  // =========================================================
   // ESCAPE KEY
-  // =========================================================
-
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.key !== "Escape") {
@@ -376,10 +315,7 @@ function TenantNavbar() {
     };
   }, []);
 
-  // =========================================================
   // LOCK BACKGROUND SCROLL WHEN SIDEBAR IS OPEN
-  // =========================================================
-
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -430,10 +366,7 @@ function TenantNavbar() {
     };
   }, [isOpen]);
 
-  // =========================================================
   // CLEANUP TIMERS
-  // =========================================================
-
   useEffect(() => {
     return () => {
       clearNavigationTimer();
@@ -441,10 +374,7 @@ function TenantNavbar() {
     };
   }, []);
 
-  // =========================================================
   // ACTIVE ROUTE HELPERS
-  // =========================================================
-
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -457,34 +387,33 @@ function TenantNavbar() {
     return location.pathname === "/tenant-change-password";
   };
 
-  // =========================================================
-  // TOP NAVIGATION
-  // =========================================================
+  // NEW SETTINGS ACTIVE ROUTE
+  const isSettingsActive = () => {
+    return location.pathname === "/tenant-settings";
+  };
 
+  // TOP NAVIGATION
   const navigateFromNavbar = (path) => {
     navigate(path);
   };
 
-  // =========================================================
   // CURRENT HOVER INFORMATION
-  // =========================================================
-
   const currentHoverInfo = hoveredSidebarItem
     ? sidebarInfo[hoveredSidebarItem]
     : null;
 
   return (
     <>
-      {/* ===================================================== */}
       {/* TOP NAVBAR */}
-      {/* ===================================================== */}
 
       <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-4 md:px-6">
+
           {/* LEFT SIDE */}
 
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            {/* HAMBURGER + OPEN SIDEBAR TOOLTIP */}
+
+            {/* HAMBURGER */}
 
             <div className="group relative shrink-0">
               <button
@@ -600,11 +529,26 @@ function TenantNavbar() {
             >
               Maintenance
             </button>
+
+            {/* NEW SETTINGS NAVBAR BUTTON */}
+
+            <button
+              type="button"
+              onClick={() => navigateFromNavbar("/tenant-settings")}
+              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                isSettingsActive()
+                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+              }`}
+            >
+              Settings
+            </button>
           </nav>
 
           {/* RIGHT SIDE: THEME + PROFILE */}
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+
             {/* LIGHT / DARK MODE */}
 
             <div className="group relative">
@@ -686,6 +630,7 @@ function TenantNavbar() {
 
               {isProfileOpen && (
                 <div className="absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
+
                   {/* PROFILE HEADER */}
 
                   <div className="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
@@ -814,7 +759,7 @@ function TenantNavbar() {
             </div>
           </div>
 
-          {/* CLOSE BUTTON + CLOSE TOOLTIP */}
+          {/* CLOSE BUTTON */}
 
           <div className="group relative shrink-0">
             <button
@@ -838,6 +783,7 @@ function TenantNavbar() {
         {/* SIDEBAR MENU */}
 
         <div className="h-[calc(100%-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain p-3">
+
           {/* DASHBOARD */}
 
           <button
@@ -1010,6 +956,34 @@ function TenantNavbar() {
             </span>
           </button>
 
+          {/* SETTINGS */}
+
+          <button
+            type="button"
+            onMouseEnter={(event) =>
+              handleSidebarHover("Settings", event)
+            }
+            onMouseLeave={handleSidebarLeave}
+            onFocus={(event) =>
+              handleSidebarHover("Settings", event)
+            }
+            onBlur={handleSidebarLeave}
+            onClick={() =>
+              handleSidebarNavigation("/tenant-settings")
+            }
+            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+              isSettingsActive()
+                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+            }`}
+          >
+            <Settings size={22} />
+
+            <span className="text-base font-medium">
+              Settings
+            </span>
+          </button>
+
           {/* DIVIDER */}
 
           <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
@@ -1031,9 +1005,8 @@ function TenantNavbar() {
           </button>
         </div>
       </aside>
-            {/* ===================================================== */}
+
       {/* SIDEBAR HOVER INFORMATION CARD */}
-      {/* ===================================================== */}
 
       {isOpen && currentHoverInfo && (
         <div
@@ -1046,6 +1019,7 @@ function TenantNavbar() {
           onMouseLeave={handleHoverCardLeave}
         >
           <div className="relative w-[280px] rounded-xl border border-green-100 bg-white px-4 py-3 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
+
             {/* CARD TITLE */}
 
             <p className="mb-2 text-sm font-semibold text-green-600 dark:text-green-400">
