@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   useLocation,
@@ -23,6 +19,7 @@ import {
   ChevronDown,
   Sun,
   Moon,
+  Info,
 } from "lucide-react";
 
 import { useTenantTheme } from "../context/TenantThemeContext";
@@ -35,6 +32,8 @@ function TenantNavbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [hoveredSidebarItem, setHoveredSidebarItem] = useState(null);
+  const [mobileInfoItem, setMobileInfoItem] = useState(null);
+
   const [hoverCardPosition, setHoverCardPosition] = useState({
     top: 0,
     left: 0,
@@ -129,7 +128,6 @@ function TenantNavbar() {
       ],
     },
 
-    // SETTINGS INFORMATION
     Settings: {
       title: "Settings",
       items: [
@@ -165,6 +163,7 @@ function TenantNavbar() {
     navigationTimerRef.current = window.setTimeout(() => {
       setIsOpen(false);
       setHoveredSidebarItem(null);
+      setMobileInfoItem(null);
       clearHoverCardTimer();
 
       navigationTimerRef.current = null;
@@ -178,6 +177,7 @@ function TenantNavbar() {
 
     setIsOpen(false);
     setHoveredSidebarItem(null);
+    setMobileInfoItem(null);
   };
 
   // LOGOUT
@@ -190,6 +190,7 @@ function TenantNavbar() {
     setIsOpen(false);
     setIsProfileOpen(false);
     setHoveredSidebarItem(null);
+    setMobileInfoItem(null);
 
     navigate("/tenant-login");
   };
@@ -223,7 +224,16 @@ function TenantNavbar() {
     closeSidebarAfterNavigation();
   };
 
-  // SIDEBAR HOVER HANDLER
+  // MOBILE INFORMATION CARD TOGGLE
+  const toggleMobileInfo = (itemName) => {
+    setMobileInfoItem((current) =>
+      current === itemName ? null : itemName
+    );
+
+    setHoveredSidebarItem(null);
+  };
+
+  // SIDEBAR HOVER HANDLER - DESKTOP
   const handleSidebarHover = (itemName, event) => {
     if (window.innerWidth < 768) {
       return;
@@ -271,6 +281,7 @@ function TenantNavbar() {
   const handleLogoutHover = () => {
     clearHoverCardTimer();
     setHoveredSidebarItem(null);
+    setMobileInfoItem(null);
   };
 
   // PROFILE DROPDOWN: CLICK OUTSIDE
@@ -306,6 +317,7 @@ function TenantNavbar() {
       setIsOpen(false);
       setIsProfileOpen(false);
       setHoveredSidebarItem(null);
+      setMobileInfoItem(null);
     };
 
     document.addEventListener("keydown", handleEscape);
@@ -375,22 +387,16 @@ function TenantNavbar() {
   }, []);
 
   // ACTIVE ROUTE HELPERS
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const isActive = (path) => location.pathname === path;
 
-  const isDetailsActive = () => {
-    return location.pathname.startsWith("/tenant-details");
-  };
+  const isDetailsActive = () =>
+    location.pathname.startsWith("/tenant-details");
 
-  const isChangePasswordActive = () => {
-    return location.pathname === "/tenant-change-password";
-  };
+  const isChangePasswordActive = () =>
+    location.pathname === "/tenant-change-password";
 
-  // SETTINGS ACTIVE ROUTE
-  const isSettingsActive = () => {
-    return location.pathname === "/tenant-settings";
-  };
+  const isSettingsActive = () =>
+    location.pathname === "/tenant-settings";
 
   // TOP NAVIGATION
   const navigateFromNavbar = (path) => {
@@ -402,19 +408,68 @@ function TenantNavbar() {
     ? sidebarInfo[hoveredSidebarItem]
     : null;
 
+  // SIDEBAR ITEM RENDERER
+  const renderSidebarItem = ({
+    name,
+    icon: Icon,
+    path,
+    active,
+    onClick,
+  }) => (
+    <div key={name} className="relative mb-2">
+      <button
+        type="button"
+        onMouseEnter={(event) =>
+          handleSidebarHover(name, event)
+        }
+        onMouseLeave={handleSidebarLeave}
+        onFocus={(event) =>
+          handleSidebarHover(name, event)
+        }
+        onBlur={handleSidebarLeave}
+        onClick={
+          onClick || (() => handleSidebarNavigation(path))
+        }
+        className={`flex w-full items-center gap-4 rounded-xl px-4 py-4 pr-12 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
+          active
+            ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+            : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+        }`}
+      >
+        <Icon size={22} />
+
+        <span className="text-base font-medium">
+          {name}
+        </span>
+      </button>
+
+      {/* MOBILE INFO BUTTON */}
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          toggleMobileInfo(name);
+        }}
+        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-gray-500 transition hover:bg-green-100 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-green-400 md:hidden"
+        aria-label={`Information about ${name}`}
+        aria-expanded={mobileInfoItem === name}
+        aria-controls="tenant-mobile-information-card"
+      >
+        <Info size={18} />
+      </button>
+    </div>
+  );
+
   return (
     <>
       {/* TOP NAVBAR */}
-
       <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm transition-colors duration-300 dark:border-gray-700 dark:bg-gray-900">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-4 md:px-6">
 
           {/* LEFT SIDE */}
-
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
 
             {/* HAMBURGER */}
-
             <div className="group relative shrink-0">
               <button
                 type="button"
@@ -438,14 +493,13 @@ function TenantNavbar() {
                 />
               </button>
 
-              {/* UPDATED RESPONSIVE TOOLTIP */}
-<span className="pointer-events-none absolute left-1/2 top-full z-[100] mt-2 translate-x-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 md:left-[calc(50%+12px)] md:top-full md:ml-0 md:mt-2 md:-translate-x-1/2 md:translate-y-0">
-  Open Sidebar
-</span>
+              {/* OPEN SIDEBAR TOOLTIP */}
+              <span className="pointer-events-none absolute left-1/2 top-full z-[100] mt-2 translate-x-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 md:left-[calc(50%+12px)] md:top-full md:ml-0 md:mt-2 md:-translate-x-1/2 md:translate-y-0">
+                Open Sidebar
+              </span>
             </div>
 
             {/* LOGO */}
-
             <button
               type="button"
               onClick={() => navigate("/tenant-dashboard")}
@@ -464,93 +518,57 @@ function TenantNavbar() {
               </span>
             </button>
           </div>
-                    {/* DESKTOP NAVIGATION */}
 
+          {/* DESKTOP NAVIGATION */}
           <nav
             className="hidden items-center gap-1 lg:flex"
             aria-label="Tenant navigation"
           >
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-dashboard")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isActive("/tenant-dashboard")
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Dashboard
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-payments")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isActive("/tenant-payments")
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Payments
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-documents")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isActive("/tenant-documents")
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Documents
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-notices")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isActive("/tenant-notices")
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Notices
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-maintenance")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isActive("/tenant-maintenance")
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Maintenance
-            </button>
-
-            {/* SETTINGS NAVBAR BUTTON */}
-
-            <button
-              type="button"
-              onClick={() => navigateFromNavbar("/tenant-settings")}
-              className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                isSettingsActive()
-                  ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-              }`}
-            >
-              Settings
-            </button>
+            {[
+              {
+                label: "Dashboard",
+                path: "/tenant-dashboard",
+              },
+              {
+                label: "Payments",
+                path: "/tenant-payments",
+              },
+              {
+                label: "Documents",
+                path: "/tenant-documents",
+              },
+              {
+                label: "Notices",
+                path: "/tenant-notices",
+              },
+              {
+                label: "Maintenance",
+                path: "/tenant-maintenance",
+              },
+              {
+                label: "Settings",
+                path: "/tenant-settings",
+              },
+            ].map((item) => (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => navigateFromNavbar(item.path)}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  isActive(item.path)
+                    ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
           {/* RIGHT SIDE: THEME + PROFILE */}
-
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
 
             {/* LIGHT / DARK MODE */}
-
             <div className="group relative">
               <button
                 type="button"
@@ -568,10 +586,7 @@ function TenantNavbar() {
                     className="text-yellow-400"
                   />
                 ) : (
-                  <Moon
-                    size={21}
-                    className="text-gray-700"
-                  />
+                  <Moon size={21} />
                 )}
               </button>
 
@@ -583,11 +598,7 @@ function TenantNavbar() {
             </div>
 
             {/* PROFILE DROPDOWN */}
-
-            <div
-              ref={profileRef}
-              className="relative"
-            >
+            <div ref={profileRef} className="relative">
               <button
                 type="button"
                 onClick={() =>
@@ -627,12 +638,10 @@ function TenantNavbar() {
               </button>
 
               {/* PROFILE MENU */}
-
               {isProfileOpen && (
                 <div className="absolute right-0 z-50 mt-2 w-[min(16rem,calc(100vw-1.5rem))] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
 
                   {/* PROFILE HEADER */}
-
                   <div className="border-b border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                     <div className="flex items-center gap-3">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
@@ -655,7 +664,6 @@ function TenantNavbar() {
                   </div>
 
                   {/* MY DETAILS */}
-
                   <button
                     type="button"
                     onClick={handleMyDetails}
@@ -666,14 +674,12 @@ function TenantNavbar() {
                     }`}
                   >
                     <User size={18} />
-
                     <span className="text-sm font-medium">
                       My Details
                     </span>
                   </button>
 
                   {/* CHANGE PASSWORD */}
-
                   <button
                     type="button"
                     onClick={handleChangePassword}
@@ -684,7 +690,6 @@ function TenantNavbar() {
                     }`}
                   >
                     <Settings size={18} />
-
                     <span className="text-sm font-medium">
                       Change Password
                     </span>
@@ -693,14 +698,12 @@ function TenantNavbar() {
                   <div className="border-t border-gray-100 dark:border-gray-700" />
 
                   {/* LOGOUT */}
-
                   <button
                     type="button"
                     onClick={handleLogout}
                     className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
                   >
                     <LogOut size={18} />
-
                     <span className="text-sm font-medium">
                       Logout
                     </span>
@@ -711,8 +714,8 @@ function TenantNavbar() {
           </div>
         </div>
       </header>
-            {/* BACKGROUND OVERLAY */}
 
+      {/* SIDEBAR BACKGROUND OVERLAY */}
       <div
         className={`fixed inset-0 z-40 touch-none bg-black/40 transition-opacity duration-300 ${
           isOpen
@@ -724,7 +727,6 @@ function TenantNavbar() {
       />
 
       {/* TENANT SIDEBAR */}
-
       <aside
         id="tenant-sidebar"
         className={`fixed left-0 top-0 z-50 flex h-[100dvh] w-[min(18rem,85vw)] flex-col border-r border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:border-gray-700 dark:bg-gray-900 ${
@@ -738,7 +740,6 @@ function TenantNavbar() {
         aria-hidden={!isOpen}
       >
         {/* SIDEBAR HEADER */}
-
         <div className="flex h-20 shrink-0 items-center justify-between border-b border-gray-200 px-4 dark:border-gray-700 sm:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <div className="shrink-0 rounded-lg bg-green-50 p-2 dark:bg-green-900/30">
@@ -760,7 +761,6 @@ function TenantNavbar() {
           </div>
 
           {/* CLOSE BUTTON */}
-
           <div className="group relative shrink-0">
             <button
               type="button"
@@ -781,215 +781,63 @@ function TenantNavbar() {
         </div>
 
         {/* SIDEBAR MENU */}
-
         <div className="h-[calc(100%-5rem)] overflow-x-hidden overflow-y-auto overscroll-contain p-3">
 
-          {/* DASHBOARD */}
+          {/* NAVIGATION ITEMS */}
+          {renderSidebarItem({
+            name: "Dashboard",
+            icon: Home,
+            path: "/tenant-dashboard",
+            active: isActive("/tenant-dashboard"),
+          })}
 
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("Dashboard", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("Dashboard", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-dashboard")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isActive("/tenant-dashboard")
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Home size={22} />
+          {renderSidebarItem({
+            name: "My Details",
+            icon: User,
+            path: "/tenant-details",
+            active: isDetailsActive(),
+            onClick: handleMyDetails,
+          })}
 
-            <span className="text-base font-medium">
-              Dashboard
-            </span>
-          </button>
+          {renderSidebarItem({
+            name: "Payments",
+            icon: CreditCard,
+            path: "/tenant-payments",
+            active: isActive("/tenant-payments"),
+          })}
 
-          {/* MY DETAILS */}
+          {renderSidebarItem({
+            name: "Documents",
+            icon: FileText,
+            path: "/tenant-documents",
+            active: isActive("/tenant-documents"),
+          })}
 
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("My Details", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("My Details", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={handleMyDetails}
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isDetailsActive()
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <User size={22} />
+          {renderSidebarItem({
+            name: "Notices",
+            icon: Bell,
+            path: "/tenant-notices",
+            active: isActive("/tenant-notices"),
+          })}
 
-            <span className="text-base font-medium">
-              My Details
-            </span>
-          </button>
+          {renderSidebarItem({
+            name: "Maintenance & Complaints",
+            icon: Wrench,
+            path: "/tenant-maintenance",
+            active: isActive("/tenant-maintenance"),
+          })}
 
-          {/* PAYMENTS */}
-
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("Payments", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("Payments", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-payments")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isActive("/tenant-payments")
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <CreditCard size={22} />
-
-            <span className="text-base font-medium">
-              Payments
-            </span>
-          </button>
-
-          {/* DOCUMENTS */}
-
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("Documents", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("Documents", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-documents")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isActive("/tenant-documents")
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <FileText size={22} />
-
-            <span className="text-base font-medium">
-              Documents
-            </span>
-          </button>
-
-          {/* NOTICES */}
-
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("Notices", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("Notices", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-notices")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isActive("/tenant-notices")
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Bell size={22} />
-
-            <span className="text-base font-medium">
-              Notices
-            </span>
-          </button>
-
-          {/* MAINTENANCE & COMPLAINTS */}
-
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover(
-                "Maintenance & Complaints",
-                event
-              )
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover(
-                "Maintenance & Complaints",
-                event
-              )
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-maintenance")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isActive("/tenant-maintenance")
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Wrench size={22} />
-
-            <span className="text-base font-medium">
-              Maintenance &amp; Complaints
-            </span>
-          </button>
-
-          {/* SETTINGS */}
-
-          <button
-            type="button"
-            onMouseEnter={(event) =>
-              handleSidebarHover("Settings", event)
-            }
-            onMouseLeave={handleSidebarLeave}
-            onFocus={(event) =>
-              handleSidebarHover("Settings", event)
-            }
-            onBlur={handleSidebarLeave}
-            onClick={() =>
-              handleSidebarNavigation("/tenant-settings")
-            }
-            className={`mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-4 text-left transition focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              isSettingsActive()
-                ? "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-            }`}
-          >
-            <Settings size={22} />
-
-            <span className="text-base font-medium">
-              Settings
-            </span>
-          </button>
+          {renderSidebarItem({
+            name: "Settings",
+            icon: Settings,
+            path: "/tenant-settings",
+            active: isSettingsActive(),
+          })}
 
           {/* DIVIDER */}
-
           <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
 
           {/* LOGOUT */}
-
           <button
             type="button"
             onMouseEnter={handleLogoutHover}
@@ -1006,8 +854,50 @@ function TenantNavbar() {
         </div>
       </aside>
 
-      {/* SIDEBAR HOVER INFORMATION CARD */}
+      {/* MOBILE INFORMATION CARD — RIGHT SIDE ONLY */}
+      {mobileInfoItem && sidebarInfo[mobileInfoItem] && (
+        <div
+          id="tenant-mobile-information-card"
+          className="fixed right-4 top-1/2 z-[60] w-[min(17rem,calc(100vw-2rem))] -translate-y-1/2 rounded-xl border border-green-200 bg-green-50 p-4 shadow-2xl dark:border-gray-700 dark:bg-gray-800 md:hidden"
+        >
+          {/* CARD HEADER */}
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold text-green-700 dark:text-green-400">
+              {sidebarInfo[mobileInfoItem].title}
+            </h3>
 
+            <button
+              type="button"
+              onClick={() => setMobileInfoItem(null)}
+              className="shrink-0 rounded-md p-1 text-gray-500 transition hover:bg-green-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+              aria-label="Close information card"
+            >
+              <X size={17} />
+            </button>
+          </div>
+
+          {/* CARD DIVIDER */}
+          <div className="mb-3 h-px bg-green-200 dark:bg-gray-700" />
+
+          {/* CARD INFORMATION */}
+          <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+            {sidebarInfo[mobileInfoItem].items.map(
+              (text, index) => (
+                <div
+                  key={`${mobileInfoItem}-mobile-info-${index}`}
+                  className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
+
+                  <span>{text}</span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* DESKTOP SIDEBAR HOVER INFORMATION CARD */}
       {isOpen && currentHoverInfo && (
         <div
           className="pointer-events-auto fixed z-[80] hidden -translate-y-1/2 md:block"
@@ -1021,17 +911,14 @@ function TenantNavbar() {
           <div className="relative w-[280px] rounded-xl border border-green-100 bg-white px-4 py-3 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200">
 
             {/* CARD TITLE */}
-
             <p className="mb-2 text-sm font-semibold text-green-600 dark:text-green-400">
               {currentHoverInfo.title}
             </p>
 
             {/* DIVIDER */}
-
             <div className="mb-2 h-px bg-green-50 dark:bg-gray-700" />
 
             {/* INFORMATION ITEMS */}
-
             <div className="space-y-1.5">
               {currentHoverInfo.items.map((text, index) => (
                 <div
@@ -1046,7 +933,6 @@ function TenantNavbar() {
             </div>
 
             {/* CARD ARROW */}
-
             <span className="absolute right-full top-1/2 -translate-y-1/2 border-y-[7px] border-r-[7px] border-y-transparent border-r-white dark:border-r-gray-900" />
           </div>
         </div>
