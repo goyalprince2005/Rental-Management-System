@@ -129,7 +129,7 @@ function TenantNavbar() {
       ],
     },
 
-    // NEW SETTINGS INFORMATION
+    // SETTINGS INFORMATION
     Settings: {
       title: "Settings",
       items: [
@@ -387,7 +387,7 @@ function TenantNavbar() {
     return location.pathname === "/tenant-change-password";
   };
 
-  // NEW SETTINGS ACTIVE ROUTE
+  // SETTINGS ACTIVE ROUTE
   const isSettingsActive = () => {
     return location.pathname === "/tenant-settings";
   };
@@ -438,9 +438,10 @@ function TenantNavbar() {
                 />
               </button>
 
-              <span className="pointer-events-none absolute left-[calc(50%+12px)] top-full z-[100] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                Open Sidebar
-              </span>
+              {/* UPDATED RESPONSIVE TOOLTIP */}
+<span className="pointer-events-none absolute left-1/2 top-full z-[100] mt-2 translate-x-2 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 md:left-[calc(50%+12px)] md:top-full md:ml-0 md:mt-2 md:-translate-x-1/2 md:translate-y-0">
+  Open Sidebar
+</span>
             </div>
 
             {/* LOGO */}
@@ -463,8 +464,7 @@ function TenantNavbar() {
               </span>
             </button>
           </div>
-
-          {/* DESKTOP NAVIGATION */}
+                    {/* DESKTOP NAVIGATION */}
 
           <nav
             className="hidden items-center gap-1 lg:flex"
@@ -530,7 +530,7 @@ function TenantNavbar() {
               Maintenance
             </button>
 
-            {/* NEW SETTINGS NAVBAR BUTTON */}
+            {/* SETTINGS NAVBAR BUTTON */}
 
             <button
               type="button"
