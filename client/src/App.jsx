@@ -1,5 +1,4 @@
-
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useSearchParams } from "react-router-dom";
 
 // =========================================================
 // AUTHENTICATION
@@ -80,6 +79,34 @@ function TenantPortalLayout() {
 }
 
 // =========================================================
+// SHARED TENANT DETAILS ROUTE
+// =========================================================
+
+function SharedTenantDetailsRoute() {
+  const [searchParams] = useSearchParams();
+
+  const isTenantView = searchParams.get("view") === "tenant";
+
+  // Tenant viewing their own details
+  if (isTenantView) {
+    return (
+      <TenantLayout>
+        <TenantDetails />
+      </TenantLayout>
+    );
+  }
+
+  // Owner viewing tenant details
+  return (
+    <OwnerThemeProvider>
+      <OwnerLayout>
+        <TenantDetails />
+      </OwnerLayout>
+    </OwnerThemeProvider>
+  );
+}
+
+// =========================================================
 // MAIN APP
 // =========================================================
 
@@ -145,6 +172,15 @@ function App() {
       />
 
       {/* ================================================= */}
+      {/* SHARED TENANT DETAILS */}
+      {/* ================================================= */}
+
+      <Route
+        path="/tenant-details/:id"
+        element={<SharedTenantDetailsRoute />}
+      />
+
+      {/* ================================================= */}
       {/* OWNER PORTAL */}
       {/* ================================================= */}
 
@@ -185,11 +221,6 @@ function App() {
         <Route
           path="/tenants"
           element={<Tenants />}
-        />
-
-        <Route
-          path="/tenant-details/:id"
-          element={<TenantDetails />}
         />
 
         <Route
