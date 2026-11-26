@@ -1,13 +1,10 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
   User,
-  Sun,
-  Moon,
   Bell,
-  CreditCard,
-  Wrench,
   ShieldCheck,
   Lock,
   HelpCircle,
@@ -17,8 +14,6 @@ import {
   Info,
   ArrowLeft,
 } from "lucide-react";
-
-import { useTenantTheme } from "../context/TenantThemeContext";
 
 // =========================================================
 // STORAGE KEY
@@ -74,8 +69,6 @@ const getSavedNotificationSettings = () => {
 
 function TenantSettings() {
   const navigate = useNavigate();
-
-  const { isDarkMode, toggleTheme } = useTenantTheme();
 
   // =======================================================
   // NOTIFICATION STATE
@@ -239,7 +232,6 @@ function TenantSettings() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-3 py-5 transition-colors duration-300 dark:bg-gray-950 sm:px-5 sm:py-7 lg:px-8">
-
       <div className="mx-auto max-w-5xl">
 
         {/* ================================================= */}
@@ -279,7 +271,6 @@ function TenantSettings() {
             <ArrowLeft size={18} />
             Back to Dashboard
           </button>
-
         </div>
 
         {/* ================================================= */}
@@ -287,7 +278,6 @@ function TenantSettings() {
         {/* ================================================= */}
 
         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
-
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Profile Settings
@@ -304,77 +294,6 @@ function TenantSettings() {
             description="View your personal, property and room details."
             onClick={handleMyDetails}
           />
-
-        </section>
-
-        {/* ================================================= */}
-        {/* APPEARANCE */}
-        {/* ================================================= */}
-
-        <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
-
-          <div className="mb-5">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Appearance
-            </h2>
-
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              Customize how your Tenant Portal looks.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between">
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30">
-                {isDarkMode ? (
-                  <Moon
-                    size={21}
-                    className="text-green-600 dark:text-green-400"
-                  />
-                ) : (
-                  <Sun
-                    size={21}
-                    className="text-green-600 dark:text-green-400"
-                  />
-                )}
-              </div>
-
-              <div>
-                <p className="font-semibold text-gray-800 dark:text-gray-100">
-                  {isDarkMode
-                    ? "Dark Mode"
-                    : "Light Mode"}
-                </p>
-
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {isDarkMode
-                    ? "Dark appearance is currently enabled."
-                    : "Light appearance is currently enabled."}
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 font-medium text-white transition hover:bg-green-700 sm:w-auto"
-            >
-              {isDarkMode ? (
-                <>
-                  <Sun size={18} />
-                  Switch to Light Mode
-                </>
-              ) : (
-                <>
-                  <Moon size={18} />
-                  Switch to Dark Mode
-                </>
-              )}
-            </button>
-
-          </div>
-
         </section>
 
         {/* ================================================= */}
@@ -382,7 +301,6 @@ function TenantSettings() {
         {/* ================================================= */}
 
         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
-
           <div className="mb-5 flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30">
               <Bell
@@ -403,7 +321,6 @@ function TenantSettings() {
           </div>
 
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-
             <NotificationSwitch
               label="Rent Reminders"
               description="Receive reminders when your rent payment is approaching."
@@ -427,7 +344,6 @@ function TenantSettings() {
               description="Receive important announcements from your property owner."
               settingName="importantNotices"
             />
-
           </div>
 
           <div className="mt-4 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
@@ -442,7 +358,6 @@ function TenantSettings() {
               </p>
             </div>
           </div>
-
         </section>
 
         {/* ================================================= */}
@@ -450,7 +365,6 @@ function TenantSettings() {
         {/* ================================================= */}
 
         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
-
           <div className="mb-5 flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30">
               <ShieldCheck
@@ -476,7 +390,6 @@ function TenantSettings() {
             description="Update your password to keep your account secure."
             onClick={handleChangePassword}
           />
-
         </section>
 
         {/* ================================================= */}
@@ -484,7 +397,6 @@ function TenantSettings() {
         {/* ================================================= */}
 
         <section className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:p-6">
-
           <div className="mb-5 flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30">
               <HelpCircle
@@ -505,7 +417,6 @@ function TenantSettings() {
           </div>
 
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-
             <div className="flex items-start gap-3">
               <Info
                 size={20}
@@ -524,20 +435,16 @@ function TenantSettings() {
                 </p>
               </div>
             </div>
-
           </div>
 
           <div className="mt-4 space-y-3">
-
             <SettingsNavigationCard
               icon={User}
               title="Contact Property Owner"
               description="Visit your tenant details to view your property information."
               onClick={handleMyDetails}
             />
-
           </div>
-
         </section>
 
         {/* ================================================= */}
@@ -545,7 +452,6 @@ function TenantSettings() {
         {/* ================================================= */}
 
         <div className="pb-6 text-center">
-
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Rental Management System
           </p>
@@ -553,11 +459,8 @@ function TenantSettings() {
           <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
             Tenant Portal Settings
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }
